@@ -1,3 +1,5 @@
+import { ThemeSwitch } from "./theme-switch";
+
 // A small, fixed starfield. Positions come from a seeded generator so every
 // visit (and every build) draws exactly the same sky.
 function makeStars(count: number) {
@@ -17,6 +19,17 @@ function makeStars(count: number) {
 }
 
 const stars = makeStars(54);
+
+// "Horoscope / birth chart" in Indian languages, ordered by number of
+// first-language speakers (Census of India 2011).
+const nativeWords = [
+  { lang: "hi", name: "Hindi", word: "कुंडली" },
+  { lang: "bn", name: "Bengali", word: "কোষ্ঠী" },
+  { lang: "te", name: "Telugu", word: "జాతకం" },
+  { lang: "ta", name: "Tamil", word: "ஜாதகம்" },
+  { lang: "kn", name: "Kannada", word: "ಜಾತಕ" },
+  { lang: "ml", name: "Malayalam", word: "ജാതകം" },
+];
 
 function Starfield() {
   return (
@@ -61,14 +74,31 @@ export default function Home() {
   return (
     <>
       <Starfield />
+      <header className="relative flex justify-end px-5 pt-5 sm:px-8 sm:pt-6">
+        <ThemeSwitch />
+      </header>
       <main className="relative flex flex-1 items-center justify-center px-6 py-16">
         <div className="mx-auto flex w-full max-w-xl flex-col items-center text-center">
-          <p className="font-serif text-4xl font-medium tracking-[0.12em] text-gold sm:text-5xl">
+          <p className="font-serif text-5xl font-bold tracking-[0.1em] text-gold sm:text-6xl md:text-7xl">
             Jathag
           </p>
-          <p lang="ta" className="mt-2 font-tamil text-sm text-muted">
-            ஜாதகம்
-          </p>
+          <ul
+            aria-label="Jathag in Indian languages"
+            className="mt-4 grid grid-cols-3 gap-x-5 gap-y-1.5 text-sm text-muted sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-3"
+          >
+            {nativeWords.map((w, i) => (
+              <li key={w.lang} className="flex items-center justify-center gap-x-3">
+                {i > 0 && (
+                  <span aria-hidden="true" className="hidden text-gold/70 sm:inline">
+                    ·
+                  </span>
+                )}
+                <span lang={w.lang} title={w.name}>
+                  {w.word}
+                </span>
+              </li>
+            ))}
+          </ul>
 
           <div className="my-10 w-full">
             <Ornament />

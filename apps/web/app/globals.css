@@ -1,27 +1,40 @@
 @import "tailwindcss";
 
-/* Light theme (device set to light) */
+/*
+ * Theme colours.
+ * By default the page follows the device setting. The switch in the top right
+ * sets data-theme="light" or data-theme="dark" on <html> to override it.
+ */
+
+/* Light theme */
 :root {
   --bg: #f7f3ea; /* ivory */
   --fg: #0b1026; /* deep navy */
   --muted: #474d66; /* secondary text */
   --gold: #7a5c1e; /* darker gold, readable on ivory */
-  --line: #7a5c1e;
   --star: #0b1026;
   color-scheme: light;
 }
 
-/* Dark theme (device set to dark) */
+/* Dark theme: when the device is dark (unless switched to light), or when switched to dark */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0b1026; /* midnight blue */
     --fg: #f4efe3; /* ivory */
     --muted: #b9b3a5; /* secondary text */
     --gold: #c9a961; /* warm gold */
-    --line: #c9a961;
     --star: #f4efe3;
     color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1026;
+  --fg: #f4efe3;
+  --muted: #b9b3a5;
+  --gold: #c9a961;
+  --star: #f4efe3;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -31,13 +44,20 @@
   --color-gold: var(--gold);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-cormorant);
-  --font-tamil: var(--font-tamil);
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
 }
+
+/* Each Indian language uses a font that has its script */
+:lang(hi) { font-family: var(--font-hi); }
+:lang(bn) { font-family: var(--font-bn); }
+:lang(te) { font-family: var(--font-te); }
+:lang(ta) { font-family: var(--font-ta); }
+:lang(kn) { font-family: var(--font-kn); }
+:lang(ml) { font-family: var(--font-ml); }
 
 /* Visible keyboard focus */
 :focus-visible {
@@ -46,7 +66,24 @@ body {
   border-radius: 2px;
 }
 
-/* Gentle twinkle for a few stars; off when reduced motion is requested */
+/* Theme switch: the knob sits left in light mode and slides right in dark mode */
+.theme-knob {
+  transform: translateX(0);
+  transition: transform 200ms ease;
+}
+.theme-icon-sun { opacity: 0; }
+.theme-icon-moon { opacity: 1; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-knob { transform: translateX(1.5rem); }
+  :root:not([data-theme="light"]) .theme-icon-sun { opacity: 1; }
+  :root:not([data-theme="light"]) .theme-icon-moon { opacity: 0; }
+}
+:root[data-theme="dark"] .theme-knob { transform: translateX(1.5rem); }
+:root[data-theme="dark"] .theme-icon-sun { opacity: 1; }
+:root[data-theme="dark"] .theme-icon-moon { opacity: 0; }
+
+/* Gentle twinkle for a few stars */
 @keyframes twinkle {
   0%,
   100% {
@@ -61,8 +98,12 @@ body {
   animation: twinkle 6s ease-in-out infinite;
 }
 
+/* No movement for people who ask their device to reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .twinkle {
     animation: none;
+  }
+  .theme-knob {
+    transition: none;
   }
 }
