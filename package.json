@@ -1,0 +1,15 @@
+{
+  "name": "jathag",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "dev": "pnpm --filter @jathag/web dev",
+    "build": "pnpm --filter @jathag/web build",
+    "lint": "pnpm --filter @jathag/web lint"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.21.0"
+}

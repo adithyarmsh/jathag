@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* Light theme (device set to light) */
+:root {
+  --bg: #f7f3ea; /* ivory */
+  --fg: #0b1026; /* deep navy */
+  --muted: #474d66; /* secondary text */
+  --gold: #7a5c1e; /* darker gold, readable on ivory */
+  --line: #7a5c1e;
+  --star: #0b1026;
+  color-scheme: light;
+}
+
+/* Dark theme (device set to dark) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1026; /* midnight blue */
+    --fg: #f4efe3; /* ivory */
+    --muted: #b9b3a5; /* secondary text */
+    --gold: #c9a961; /* warm gold */
+    --line: #c9a961;
+    --star: #f4efe3;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-cormorant);
+  --font-tamil: var(--font-tamil);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Visible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* Gentle twinkle for a few stars; off when reduced motion is requested */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--o);
+  }
+  50% {
+    opacity: calc(var(--o) * 0.25);
+  }
+}
+
+.twinkle {
+  animation: twinkle 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkle {
+    animation: none;
+  }
+}
