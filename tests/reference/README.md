@@ -1,16 +1,16 @@
 # JHora reference tests
 
-Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8.0) with the same settings (D-013, D-074). This folder holds JHora's answers for 25 test births and the tests that hold the engine to them.
+Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8.0) with the same settings (D-013, D-074). This folder holds JHora's answers for 26 test births and the tests that hold the engine to them.
 
-**All 25 births are synthetic.** They were designed to hit edge cases (time zones, boundaries, retrogrades, high latitude, 1901, leap day, before sunrise). They are not real people.
+**All 26 births are synthetic.** They were designed to hit edge cases (time zones, boundaries, retrogrades, high latitude, 1901 and 1853 (R26, D-080), leap day, before sunrise). They are not real people.
 
 ## What is in here
 
 | Path | What it is |
 |---|---|
-| `births.json` | The 25 births R01–R25: date, local time, **true** UTC offset, IANA time zone, latitude/longitude, and why each one is included. The engine is always fed these values. |
+| `births.json` | The 26 births R01–R26: date, local time, **true** UTC offset, IANA time zone, latitude/longitude, and why each one is included. The engine is always fed these values. |
 | `raw/` | JHora's answer key, exactly as exported. **Never edit.** `rNN.pdf` (printed chart), `rNN.jhd` (JHora's birth file), `rNN-pratyantar.txt` (pratyantardasha times for R01, R09, R10, R15, R22), `jhora-settings-jathag.ini` (the JHora settings used, D-070). |
-| `expected/` | Clean data made from `raw/` by the converter: `R01.json` … `R25.json`. |
+| `expected/` | Clean data made from `raw/` by the converter: `R01.json` … `R26.json`. |
 | `scripts/` | `convert.mjs` (the converter), `parse.mjs` (how the PDFs and text files are read), `ids.mjs` (the stable IDs). |
 | `checks.test.ts` | Self-checks on the answer key. Always on, must always pass. |
 | `engine.test.ts` | Tests that compare the engine to `expected/`. Switched off until the engine exists; see the top of the file for how each step switches its group on. |
@@ -42,13 +42,26 @@ Rebuilds `expected/` from `raw/`. Only needed if `raw/` changes; `checks.test.ts
 
 ## What the self-checks prove
 
-- All 25 births parsed with no missing field and all 20 charts present.
+- All 26 births parsed with no missing field and all 20 charts present.
 - Printed birth details and the `.jhd` files match `births.json` (R22 by instant, see below).
 - In every birth: the D-1 chart drawing equals the table's Rasi column, and the D-9 drawing equals the Navamsa column, for every body; bracketed (retrograde) bodies in every chart equal the table's "(R)".
 - Every sign, nakshatra, pada and navamsa in the table agrees with its own longitude; Ketu is exactly opposite Rahu.
 - Panchanga nakshatra = Moon's nakshatra, and its "% left" agrees with the Moon's longitude.
 - Mahadashas and antardashas are in Vimshottari order, start with the Moon's nakshatra lord, and their lengths follow the 365.25-day year.
 - Pratyantardashas: 9 per antardasha, in order, back to back, with the right lengths, matching the PDF's dasha table.
+
+## Tolerances (how close the engine must be to JHora)
+
+Set in `engine.test.ts`, chosen by the birth's **local date** in `births.json`:
+
+| Births | Longitudes (all bodies and Lagna) | Dasha times (from step 0.3.1) | Decision |
+|---|---|---|---|
+| From 1900-01-01 | within 1″ | within 1 hour | D-074 |
+| Before 1900-01-01 (today only R26) | within 3″ | within 12 hours | D-081 |
+
+Signs, nakshatras, padas, D-9, divisional signs and retrograde must be **exact** for every birth.
+
+Why two levels: JHora and Swiss Ephemeris estimate Earth's past rotation (ΔT) a little differently, so the gap grows slowly with distance from today. The Moon moves fastest, so it shows the gap most (2018 −0.21″, 1901 +0.30″, 1853 +1.47″). For 1853 that is about 3 seconds of the Moon's motion, far less than how precisely any 1800s birth time is known. Births from 1800 stay supported (FR-IN-02); the public promise (D-013: ±1′, ±1 day) is the same for all dates.
 
 ## JHora quirks to know about
 
@@ -59,3 +72,5 @@ Rebuilds `expected/` from `raw/`. Only needed if `raw/` changes; `checks.test.ts
 - **Before sunrise = previous weekday.** R24 (Pune, 05:54) and R19 (Oslo in December, 08:30) are before sunrise, so JHora's Vedic weekday is the day before the calendar date.
 - **Rahu and Ketu** are never marked "(R)" by JHora, so retrograde is only tested for Sun–Saturn.
 - **Place labels** printed in the PDFs (e.g. "Madras" for R12, "(, India)" for London) are just JHora's text box; only the coordinates matter, and they are correct.
+- **Seconds in coordinates (R26).** R01–R25 have whole-minute coordinates; R26 (New Haven, 41° 18′ 29″ N, 72° 55′ 43″ W) is the first with seconds. The PDF prints them as `72 W 55' 43"`; the `.jhd` stores degrees + *decimal minutes* (`72.557167` = 72° 55.7167′). The converter reads both at full precision; the `.jhd` keeps 6 decimals, so it can differ from `births.json` by 0.000001° (≈0.004″).
+- **R26 (1853, fixed UTC−5:00, `Etc/GMT+5`).** The US had no standard time until 1883, so R26 uses a fixed offset — exactly what was typed into JHora ("5:00 West of GMT"). Birth instant 1853-06-28T12:25:00Z. No pratyantardasha file.
