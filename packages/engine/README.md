@@ -57,4 +57,6 @@ chart.meta;        // { engineVersion, settings, ephemeris, input, julianDayUt }
 - All engine code is plain TypeScript, apart from the adapter (D-025, D-069). A WebAssembly adapter for the phone (v1.3) plugs in through `calculateChart(input, { ephemeris })`.
 - Bump `ENGINE_VERSION` (and `package.json` `version`) whenever a change could alter any calculated value (NFR-DET-01).
 - Any engine change must keep `pnpm test` green, including every JHora reference test (CLAUDE.md rule 4).
+- `pnpm typecheck` (from the repo root) type-checks the engine on its own; CI runs it on every push and PR.
+- Longitudes are decimal degrees; turning them into degrees/minutes/seconds is the display layer's job (D-078). Birth time goes to Swiss Ephemeris as UT without a leap-second/UT1 correction, like JHora (D-078).
 - To check the data files by hand: `cd packages/engine/ephe && shasum -a 256 -c SHA256SUMS`.

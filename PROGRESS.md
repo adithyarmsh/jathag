@@ -11,7 +11,7 @@
 | **Current step** | 0.2.9 — Test report reviewed (Adithya + Claude Project) |
 | **Next step** | 0.2.10 — O-004 Bombay/Calcutta time decision |
 | **Then** | 0.2.11 — GeoNames place index + feasibility |
-| **Blocked on** | Project review of the 0.2.8 report, then Adithya's approval to merge PR #9 (D-075) |
+| **Blocked on** | Nothing |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-20 |
 
@@ -65,7 +65,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.5 JHora 8.0 installed and configured (Windows laptop; settings in `tests/reference/raw/jhora-settings-jathag.ini`)
 - ✅ 0.2.6 JHora exports for all reference births in `tests/reference/raw/` (D-073, D-074)
 - ✅ 0.2.7 Reference tests created: converter → `tests/reference/expected/`, 283 self-checks passing, 180 engine tests written and switched off until 0.2.8 / 0.3.1 / 0.9.1 / 1.0.1
-- ✅ 0.2.8 Engine core: time zone → UTC, sidereal positions, Lagna (D-073), whole-sign houses, D-9, dignity (D-076), aspects, combustion (D-077); `sweph` behind one adapter, data files pinned; all 100 position reference tests pass (every longitude within 0.31″ of JHora) (PR #9, awaiting review)
+- ✅ 0.2.8 Engine core: time zone → UTC, sidereal positions, Lagna (D-073), whole-sign houses, D-9, dignity (D-076), aspects, combustion (D-077); `sweph` behind one adapter, data files pinned; all 100 position reference tests pass (every longitude within 0.31″ of JHora) (PR #9)
 - ⏳ 0.2.9 Test report reviewed
 - ⏳ 0.2.10 O-004 Bombay/Calcutta time decision
 - ⏳ 0.2.11 GeoNames place index + feasibility
@@ -112,7 +112,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
-| 2026-11-20 | 0.2.8 | #9 | Engine core built: positions, Lagna, houses, D-9, dignity, aspects, combustion, local time → UTC; JHora position tests switched on and passing for all 25 births (constant ≈ −0.14″ offset, max 0.31″); hand-made dignity/aspect/combustion/time-zone tests added. |
+| 2026-11-20 | 0.2.8 | #9 | Engine core built: positions, Lagna, houses, D-9, dignity, aspects, combustion, local time → UTC; JHora position tests switched on and passing for all 25 births (constant ≈ −0.14″ offset, max 0.31″); hand-made dignity/aspect/combustion/time-zone tests added. After Project review: `@types/node` added and engine type check now runs in CI; D-078 logged. |
 | 2026-11-20 | 0.2.3–0.2.7 | #8 | Decisions D-069–D-074 logged; JHora answer key for 25 synthetic births added; converter turns it into clean test data; 283 self-checks pass; 180 engine tests wait (switched off) for the engine; tests now run in CI. |
 | 2026-11-20 | 0.2.1–0.2.2 | #7 | Swiss Ephemeris options compared; `sweph` and `swisseph-wasm` both ran on a Vercel preview and agreed within 0.004″; report recommends `sweph` behind an adapter. Choice pending (0.2.3). |
 | 2026-11-20 | 0.1.10 | #6 | Home polish (star dust in both modes, gold hover border on outer cards, numbers and eyebrow line removed, "Made by Adithya" footer) plus docs D-065–D-068. Founder confirmed two-factor login (0.1.8). v0.1 complete. |

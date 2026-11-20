@@ -8,7 +8,8 @@
     "build": "pnpm --filter @jathag/web build",
     "lint": "pnpm --filter @jathag/web lint",
     "test": "vitest run",
-    "reference:convert": "node tests/reference/scripts/convert.mjs"
+    "reference:convert": "node tests/reference/scripts/convert.mjs",
+    "typecheck": "pnpm --filter @jathag/engine typecheck"
   },
   "engines": {
     "node": ">=24"
