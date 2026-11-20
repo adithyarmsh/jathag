@@ -1,0 +1,113 @@
+# Jathag – Progress
+
+> **Read this first in every session.** It is the single source of truth for where the build stands.
+> Update it in the same PR as every change (see `CLAUDE.md`). Step IDs match `docs/roadmap.md`.
+
+## ▶ Current position
+
+| | |
+|---|---|
+| **Milestone** | v0.1 Coming soon — 🔄 finishing |
+| **Current step** | 0.1.6 — Docs, PROGRESS.md and updated CLAUDE.md into the repo (PR #3) |
+| **Next step** | 0.1.7 — Restyle Coming Soon in the B2 look (PR #4) |
+| **Then** | v0.2 starts with 0.2.1 (Swiss Ephemeris binding evaluation) |
+| **Blocked on** | Nothing |
+| **Live site** | https://jathag.vercel.app (Coming Soon) |
+| **Last updated** | 2026-11-20 |
+
+Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
+
+---
+
+## Milestones
+
+| Milestone | Status |
+|---|---|
+| v0.1 Coming soon | 🔄 |
+| v0.2 First real chart | ⏳ |
+| v0.3 Timing engine | ⏳ |
+| v0.4 Design system + app shell | ⏳ |
+| v0.5 Chart screens | ⏳ |
+| v0.6 Timing screens | ⏳ |
+| v0.7 Interpretations | ⏳ |
+| v0.8 Approximate time, settings, downloads | ⏳ |
+| v0.9 Panchanga + legal | ⏳ |
+| v1.0 Divisional charts + Beta launch | ⏳ |
+| v1.1 Feedback fixes | ⏳ |
+| v1.2 Basic Learn | ⏳ |
+| v1.5 Interactive Learn | ⏳ |
+| v2.x Mobile apps | ⏳ |
+
+---
+
+## Steps
+
+### v0.1 — Coming soon
+- ✅ 0.1.1 Developer tools installed on the founder's Mac (Homebrew, Node 24, pnpm, GitHub CLI)
+- ✅ 0.1.2 Public GitHub repo `adithyarmsh/jathag`
+- ✅ 0.1.3 Monorepo skeleton, LICENSE (AGPL-3.0), README, CLAUDE.md, CI
+- ✅ 0.1.4 Coming Soon page live on Vercel, auto-deploy from `main` (PR #1: CI actions → Node 24)
+- ✅ 0.1.5 Indian-language words, bolder wordmark, dark/light switch (PR #2)
+- 🔄 0.1.6 Docs into `docs/`, this PROGRESS.md, updated CLAUDE.md (PR #3)
+- ⏳ 0.1.7 Coming Soon restyled in the B2 look, gold accents in both modes (PR #4)
+- ⏳ 0.1.8 Founder: two-factor login on GitHub and Vercel
+
+### v0.2 — First real chart
+- ⏳ 0.2.1 Handoff: evaluate Swiss Ephemeris bindings
+- ⏳ 0.2.2 Evaluation report
+- ⏳ 0.2.3 Choose binding (decision logged)
+- ⏳ 0.2.4 Reference births + JHora settings/export checklists
+- ⏳ 0.2.5 JHora installed and configured (Windows laptop)
+- ⏳ 0.2.6 JHora exports for all reference births (positions, D1–D60, dashas, panchanga)
+- ⏳ 0.2.7 Reference tests created
+- ⏳ 0.2.8 Engine core (positions, lagna, houses, D9, dignity, aspects, combustion)
+- ⏳ 0.2.9 Test report reviewed
+- ⏳ 0.2.10 O-004 Bombay/Calcutta time decision
+- ⏳ 0.2.11 GeoNames place index + feasibility
+- ⏳ 0.2.12 Calculation API
+- ⏳ 0.2.13 Minimal form + planet table live on the site
+- ⏳ 0.2.14 Founder test: 20 places + own chart vs JHora
+
+### v0.3 — Timing engine
+- ⏳ 0.3.1 Dashas (3 levels) · ⏳ 0.3.2 Transits + Sade Sati · ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
+
+### v0.4 — Design system + app shell
+- ⏳ 0.4.1 References · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
+
+### v0.5 — Chart screens
+- ⏳ 0.5.1 Overview · ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
+
+### v0.6 — Timing screens
+- ⏳ 0.6.1 Dasha timeline · ⏳ 0.6.2 Transits + Sade Sati
+
+### v0.7 — Interpretations
+- ⏳ 0.7.1 Style guide · ⏳ 0.7.2 Pilot · ⏳ 0.7.3 Batches · ⏳ 0.7.4 Founder review · ⏳ 0.7.5 Content in app
+
+### v0.8 — Approximate time, settings, downloads
+- ⏳ 0.8.1 Approx-time UX · ⏳ 0.8.2 Settings · ⏳ 0.8.3 Download design · ⏳ 0.8.4 Downloads · ⏳ 0.8.5 Report an issue
+
+### v0.9 — Panchanga + legal
+- ⏳ 0.9.1 Panchanga calc · ⏳ 0.9.2 Explanations · ⏳ 0.9.3 Panchanga card · ⏳ 0.9.4 Legal drafts · ⏳ 0.9.5 Legal pages · ⏳ 0.9.6 Analytics decision
+
+### v1.0 — Divisional charts + Beta launch
+- ⏳ 1.0.1 16 divisional charts · ⏳ 1.0.2 Chart notes · ⏳ 1.0.3 Chart selector · ⏳ 1.0.4 A11y/perf audit · ⏳ 1.0.5 Device testing · ⏳ 1.0.6 Pre-launch review · ⏳ 1.0.7 Domain + beta testers · ⏳ 1.0.8 Go live · ⏳ 1.0.9 Feedback
+
+---
+
+## Open questions / blockers
+- O-001 Design references for screens beyond the home page (founder, before v0.4)
+- O-003 Content licence wording (before launch)
+- O-004 Pre-1955 Bombay/Calcutta local time (during v0.2)
+- O-005 Analytics: none vs cookieless (v0.9)
+- O-006 Domain name (v1.0)
+
+---
+
+## Session log (newest first)
+
+| Date | Step | PR | What happened |
+|---|---|---|---|
+| 2026-11-20 | 0.1.6 | #3 | Docs, PROGRESS.md and updated CLAUDE.md added (prepared in the Claude Project). |
+| 2026-11-16 | 0.1.5 | #2 | Indian-language words, bolder wordmark, dark/light switch. |
+| 2026-11-16 | 0.1.4 | #1 | CI actions updated to Node 24 versions; first automatic production deploy confirmed. |
+| 2026-11-16 | 0.1.3 | — | Initial setup pushed to `main` (the only direct push allowed); site live on Vercel. |
