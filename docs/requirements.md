@@ -136,7 +136,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-HOME-01 | One screen, layout per design "B2 — Split screen" (Decisions D-048): desktop = left hero card + right form card; phone = stacked, form first after a short intro. | Must |
+| FR-HOME-01 | One screen, layout per design "B2 — Split screen" (Decisions D-048): desktop = left hero card + right form card. **Phone order (D-064):** short intro (Indian-language words + tagline) → the birth form → the "What you'll get" cards below the form. (The Coming Soon page, which has no form, shows the hero first.) | Must |
 | FR-HOME-02 | Left hero: Indian-language words for "birth chart" (Hindi, Bengali, Telugu, Tamil, Kannada, Malayalam), the line "Vedic birth chart · Free · No account", the tagline "Know your chart, not just your sign.", a one-sentence intro, and three "What you'll get" cards (Accurate chart · Plain-language explanations · Your life timeline). | Must |
 | FR-HOME-03 | Right card "Your birth details — Five questions, about a minute": the birth form (FR-IN-01…10) and a "See my chart" button, with the privacy line "Your details stay in this browser. Nothing is stored on our servers." under it. | Must |
 | FR-HOME-04 | No separate welcome or chart-style screens (supersedes the earlier onboarding requirements). | Must |
@@ -257,6 +257,8 @@ Confirmed by the founder on 2026-11-20:
 | FR-CONT-05 | All content written in original words by Claude, reviewed and approved by the founder for tone; source citation required before an entry is marked approved. | Must |
 | FR-CONT-06 | Content stored separately from code, under a separate licence (wording TBD, O-003). | Must |
 | FR-CONT-07 | Deeper, synthesised readings; per-planet readings for divisional charts other than D1/D9; other languages; AI readings. | Later |
+| FR-LANG-01 | **Language-ready architecture (v0.2 onward):** engine returns stable IDs, not names; all UI strings in message files from v0.4; content entries carry a language field (Decisions D-063). | Must |
+| FR-LANG-02 | **Primary + secondary language (v1.6 → v2.0):** user chooses a primary and a secondary language. English primary + Indian secondary shows chart terms in both; Indian primary shows most of the site in that language with English as secondary. Languages, order and details decided after v1.5 (D-061). | Later (v1.6–v2.0) |
 | FR-CONT-08 | **Learn section:** basic Learn (v1.2) and interactive Learn (v1.5); scope decided after v1.0. | Later (v1.2 / v1.5) |
 
 ---
@@ -332,7 +334,7 @@ Reference case coverage (Claude will specify exact births):
 
 ## 12. Out of scope for web v1
 
-Accounts and sync · payments and ads · mobile apps · offline mode · tarot · other languages · compatibility (porutham) · AI readings · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.2 basic, v1.5 interactive) · per-planet readings for divisional charts other than D1/D9.
+Accounts and sync · payments and ads · offline mode · tarot · compatibility (porutham) · AI readings · Indian-language interface (v1.6–v2.0) · mobile apps (test builds v1.3–v1.4, public v2.0) · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.2 basic, v1.5 interactive) · per-planet readings for divisional charts other than D1/D9.
 
 ## 13. Definition of done for the v1 beta launch
 
@@ -359,5 +361,8 @@ Accounts and sync · payments and ads · mobile apps · offline mode · tarot ·
 | v1.0 Divisional charts + Beta launch | 16 divisional charts; quality pass; domain; `noindex` removed (public launch) | FR-CALC-10, FR-CH-05, NFR-ACC-01, NFR-PERF-01, NFR-BRW-01, §13 |
 | v1.1 | Beta feedback fixes | — |
 | v1.2 | Basic Learn | FR-CONT-08 |
+| v1.3 | Mobile test build (founder's phone); framework decided | FR-PROF-05 (planning) |
+| v1.4 | Mobile test version for a few friends | — |
 | v1.5 | Interactive Learn | FR-CONT-08 |
-| v2.x | iOS and Android apps, accounts, offline | FR-PROF-05 |
+| v1.6 – v1.9 | Indian languages, step by step (details after v1.5) | FR-LANG-02 |
+| v2.0 | Multilingual Jathag on web + public iOS/Android apps; accounts across web and apps | FR-LANG-02, FR-PROF-05 |
