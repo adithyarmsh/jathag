@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Jathag — Know your chart, not just your sign.",
+    "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Coming soon."
+  },
+  "header": {
+    "wordmark": "Jathag",
+    "beta": "Beta",
+    "tagline": "Vedic birth charts, explained plainly",
+    "themeSwitch": "Dark mode"
+  },
+  "hero": {
+    "nativeWordsLabel": "“Birth chart” in Indian languages",
+    "eyebrow": "Vedic birth chart · Free · No account",
+    "title": "Know your chart, [not just your sign].",
+    "intro": "Jathag turns your birth details into an [accurate Vedic birth chart], then explains it in [short, honest, modern language]. No fear, no ads.",
+    "featuresLabel": "What you'll get",
+    "features": [
+      {
+        "number": "01",
+        "title": "Accurate chart",
+        "text": "Calculated from your exact birth date, time and place, drawn in the style you know."
+      },
+      {
+        "number": "02",
+        "title": "Plain-language explanations",
+        "text": "Short, honest notes on what each part means. No jargon, no fear."
+      },
+      {
+        "number": "03",
+        "title": "Your life timeline",
+        "text": "Your dasha periods, the chapters of your life, laid out as a simple timeline."
+      }
+    ]
+  },
+  "comingSoon": {
+    "label": "Coming soon",
+    "title": "Your chart is on its way",
+    "text": "We're building Jathag carefully, accuracy first. Every chart will be checked against trusted reference calculations before we open the doors.",
+    "list": [
+      "Rasi and Navamsa charts, South or North Indian style",
+      "Your dasha timeline, past, present and future",
+      "Plain-English explanations, no fear-selling"
+    ],
+    "privacy": "When it opens, your details will stay in your browser. Nothing stored on our servers."
+  },
+  "footer": {
+    "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
+    "sourceLink": "Source code (AGPL)"
+  }
+}

@@ -9,13 +9,14 @@ import {
   Noto_Serif_Tamil,
   Noto_Serif_Telugu,
 } from "next/font/google";
+import { getMessages } from "@/lib/i18n";
 import "./globals.css";
 
 // Fonts are downloaded at build time and served from this site (no calls to Google at runtime).
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["500", "600"],
   display: "swap",
 });
 
@@ -34,9 +35,7 @@ const tamil = Noto_Serif_Tamil({ variable: "--font-ta", subsets: ["tamil"], weig
 const kannada = Noto_Serif_Kannada({ variable: "--font-kn", subsets: ["kannada"], weight: ["400"], display: "swap", preload: false });
 const malayalam = Noto_Serif_Malayalam({ variable: "--font-ml", subsets: ["malayalam"], weight: ["400"], display: "swap", preload: false });
 
-const title = "Jathag — Know your chart, not just your sign.";
-const description =
-  "A calm, precise Vedic astrology app. Accurate charts, honest explanations, no ads, no fear. Coming soon.";
+const { title, description } = getMessages().meta;
 
 export const metadata: Metadata = {
   title,
@@ -47,12 +46,14 @@ export const metadata: Metadata = {
     siteName: "Jathag",
     type: "website",
   },
+  // Keep the whole site out of search results until the v1.0 launch (FR-HOME-05, D-060).
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b1026" },
-    { media: "(prefers-color-scheme: light)", color: "#f7f3ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1426" },
+    { media: "(prefers-color-scheme: light)", color: "#f9f6f3" },
   ],
 };
 

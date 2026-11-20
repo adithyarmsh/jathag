@@ -29,5 +29,6 @@
 - `PROGRESS.md` — live build status (read first, update last)
 - `docs/` — product brief, requirements (with requirement IDs and milestones), decisions log, roadmap (step IDs and "done when")
 - `packages/engine` — calculation engine · `packages/content` — interpretation text · `apps/web` — Next.js site
+- `apps/web/messages/en.json` — all website text (English); never hard-code page text in components (D-063)
 - `data/places` — GeoNames place index scripts · `tests/reference` — JHora reference tests
 - Design: home page = "B2 — Split screen" (Decisions D-048); light mode uses gold accents, not blue (D-051). Design specs arrive in handoffs.

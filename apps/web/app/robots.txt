@@ -1,0 +1,3 @@
+# Jathag is in beta. Please do not list it in search results until it launches.
+User-Agent: *
+Disallow: /

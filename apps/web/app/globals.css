@@ -1,54 +1,123 @@
 @import "tailwindcss";
 
 /*
- * Theme colours.
- * By default the page follows the device setting. The switch in the top right
+ * Theme colours (B2 layout, gold accents in both modes: D-048, D-051).
+ * By default the page follows the device setting. The switch in the header
  * sets data-theme="light" or data-theme="dark" on <html> to override it.
+ * Every text/background pair passes WCAG 2.2 AA (ratios in the 0.1.7 PR).
  */
 
-/* Light theme */
+/* Light theme (gold, not blue). --accent is decoration only, never text. */
 :root {
-  --bg: #f7f3ea; /* ivory */
-  --fg: #0b1026; /* deep navy */
-  --muted: #474d66; /* secondary text */
-  --gold: #7a5c1e; /* darker gold, readable on ivory */
-  --star: #0b1026;
+  --bg: #f9f6f3;
+  --card: #ffffff;
+  --ink: #1b1624;
+  --muted: #6f6a76;
+  --line: #ece5e1;
+  --accent: #a8843a;
+  --accent-text: #7a5c1e;
+  --accent-soft: #f6eedc;
+  --accent-border: rgba(122, 92, 30, 0.3);
+  --sun-soft: #fbefcf;
+  --shadow: 0 1px 2px rgba(27, 22, 36, 0.04), 0 6px 20px rgba(27, 22, 36, 0.05);
+  --stardust: none;
   color-scheme: light;
 }
 
 /* Dark theme: when the device is dark (unless switched to light), or when switched to dark */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0b1026; /* midnight blue */
-    --fg: #f4efe3; /* ivory */
-    --muted: #b9b3a5; /* secondary text */
-    --gold: #c9a961; /* warm gold */
-    --star: #f4efe3;
+    --bg: #0b1426;
+    --card: #101b31;
+    --ink: #f3ede0;
+    --muted: #b9b3a5;
+    --line: #2a3550;
+    --accent: #c9a964;
+    --accent-text: #d4b26a;
+    --accent-soft: #15213a;
+    --accent-border: rgba(212, 178, 106, 0.35);
+    --sun-soft: #3a3324;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
+    --stardust: var(--stardust-dots);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #0b1026;
-  --fg: #f4efe3;
+  --bg: #0b1426;
+  --card: #101b31;
+  --ink: #f3ede0;
   --muted: #b9b3a5;
-  --gold: #c9a961;
-  --star: #f4efe3;
+  --line: #2a3550;
+  --accent: #c9a964;
+  --accent-text: #d4b26a;
+  --accent-soft: #15213a;
+  --accent-border: rgba(212, 178, 106, 0.35);
+  --sun-soft: #3a3324;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
+  --stardust: var(--stardust-dots);
   color-scheme: dark;
+}
+
+/* Dark-mode "star dust": 14 tiny gold dots, repeated every 320px. Pure CSS, no images. */
+:root {
+  --dust: rgba(212, 178, 106, 0.38);
+  --stardust-dots:
+    radial-gradient(circle at 18px 34px, var(--dust) 0.9px, transparent 1.5px),
+    radial-gradient(circle at 96px 12px, var(--dust) 0.6px, transparent 1.2px),
+    radial-gradient(circle at 168px 58px, var(--dust) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 252px 24px, var(--dust) 0.7px, transparent 1.3px),
+    radial-gradient(circle at 300px 96px, var(--dust) 1px, transparent 1.6px),
+    radial-gradient(circle at 54px 118px, var(--dust) 0.7px, transparent 1.3px),
+    radial-gradient(circle at 128px 150px, var(--dust) 1.1px, transparent 1.7px),
+    radial-gradient(circle at 214px 132px, var(--dust) 0.6px, transparent 1.2px),
+    radial-gradient(circle at 276px 190px, var(--dust) 0.8px, transparent 1.4px),
+    radial-gradient(circle at 22px 214px, var(--dust) 1px, transparent 1.6px),
+    radial-gradient(circle at 104px 246px, var(--dust) 0.6px, transparent 1.2px),
+    radial-gradient(circle at 190px 226px, var(--dust) 0.9px, transparent 1.5px),
+    radial-gradient(circle at 236px 290px, var(--dust) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 70px 302px, var(--dust) 0.8px, transparent 1.4px);
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-fg: var(--fg);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
   --color-muted: var(--muted);
-  --color-gold: var(--gold);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
+  --shadow-soft: var(--shadow);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-cormorant);
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
+  background-color: var(--bg);
+  background-image: var(--stardust);
+  background-size: 320px 320px;
+  color: var(--ink);
+}
+
+/* Highlighter band behind the lower 38% of the words */
+.highlight-band {
+  background-image: linear-gradient(transparent 62%, var(--sun-soft) 62%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.04em;
+}
+
+/* Soft highlight for key phrases in running text */
+.soft-highlight {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.05em 0.2em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* Each Indian language uses a font that has its script */
@@ -61,9 +130,9 @@ body {
 
 /* Visible keyboard focus */
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent-text);
   outline-offset: 4px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 /* Theme switch: the knob sits left in light mode and slides right in dark mode */
@@ -83,26 +152,8 @@ body {
 :root[data-theme="dark"] .theme-icon-sun { opacity: 1; }
 :root[data-theme="dark"] .theme-icon-moon { opacity: 0; }
 
-/* Gentle twinkle for a few stars */
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: var(--o);
-  }
-  50% {
-    opacity: calc(var(--o) * 0.25);
-  }
-}
-
-.twinkle {
-  animation: twinkle 6s ease-in-out infinite;
-}
-
 /* No movement for people who ask their device to reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  .twinkle {
-    animation: none;
-  }
   .theme-knob {
     transition: none;
   }
