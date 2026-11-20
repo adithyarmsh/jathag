@@ -323,15 +323,20 @@ function parseJhd(text) {
   };
   const t = hmm(v[3]);
   const off = hmm(v[4]);
-  const lng = hmm(v[5]);
-  const lat = hmm(v[6]);
   const sec = Math.round(t.m * 60);
+  // Coordinates are D.MMmmmm with *decimal* minutes (R26: 72.557167 = 72° 55.7167′ = 72° 55′ 43″),
+  // so the minutes must not be rounded to 2 decimals the way the time's minutes are.
+  const deg = (x) => {
+    const a = Math.abs(Number(x));
+    const d = Math.floor(a + 1e-9);
+    return (Number(x) < 0 ? -1 : 1) * (d + ((a - d) * 100) / 60);
+  };
   return {
     date: `${v[2]}-${pad(v[0])}-${pad(v[1])}`,
     time: `${pad(t.h)}:${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`,
     utcOffsetMinutes: -off.sign * (off.h * 60 + Math.round(off.m)),
-    lng: Number((-lng.sign * (lng.h + lng.m / 60)).toFixed(6)),
-    lat: Number((lat.sign * (lat.h + lat.m / 60)).toFixed(6)),
+    lng: Number((-deg(v[5])).toFixed(6)),
+    lat: Number(deg(v[6]).toFixed(6)),
   };
 }
 

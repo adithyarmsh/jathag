@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.9 — Test report reviewed (Adithya + Claude Project) |
+| **Current step** | 0.2.9 — Test report reviewed (Adithya + Claude Project) — R26 added, one test failing |
 | **Next step** | 0.2.10 — O-004 Bombay/Calcutta time decision |
 | **Then** | 0.2.11 — GeoNames place index + feasibility |
-| **Blocked on** | Nothing |
+| **Blocked on** | Project decision: R26 (1853) Moon is +1.47″ from JHora, over the 1″ tolerance (PR #10 left open, unmerged) |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-20 |
 
@@ -66,7 +66,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.6 JHora exports for all reference births in `tests/reference/raw/` (D-073, D-074)
 - ✅ 0.2.7 Reference tests created: converter → `tests/reference/expected/`, 283 self-checks passing, 180 engine tests written and switched off until 0.2.8 / 0.3.1 / 0.9.1 / 1.0.1
 - ✅ 0.2.8 Engine core: time zone → UTC, sidereal positions, Lagna (D-073), whole-sign houses, D-9, dignity (D-076), aspects, combustion (D-077); `sweph` behind one adapter, data files pinned; all 100 position reference tests pass (every longitude within 0.31″ of JHora) (PR #9)
-- ⏳ 0.2.9 Test report reviewed
+- 🔄 0.2.9 Test report reviewed: 0.2.8 results accepted (D-079); reference birth R26 (1853) added (D-080). **Left:** R26's Moon is +1.47″ from JHora (limit 1″) — every other body, and sign/nakshatra/pada/navamsa/retrograde, match; waiting for the Project's decision (PR #10)
 - ⏳ 0.2.10 O-004 Bombay/Calcutta time decision
 - ⏳ 0.2.11 GeoNames place index + feasibility
 - ⏳ 0.2.12 Calculation API
@@ -112,6 +112,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-20 | 0.2.9 | #10 | R26 (New Haven, 1853) added to the reference tests; converter now reads coordinates with seconds from the `.jhd`; all self-checks pass for 26 births and R01–R25 data unchanged. Engine matches JHora for R26 except the Moon (+1.47″ > 1″ limit), so 0.2.9 is not signed off; PR left open for the Project. |
 | 2026-11-20 | 0.2.8 | #9 | Engine core built: positions, Lagna, houses, D-9, dignity, aspects, combustion, local time → UTC; JHora position tests switched on and passing for all 25 births (constant ≈ −0.14″ offset, max 0.31″); hand-made dignity/aspect/combustion/time-zone tests added. After Project review: `@types/node` added and engine type check now runs in CI; D-078 logged. |
 | 2026-11-20 | 0.2.3–0.2.7 | #8 | Decisions D-069–D-074 logged; JHora answer key for 25 synthetic births added; converter turns it into clean test data; 283 self-checks pass; 180 engine tests wait (switched off) for the engine; tests now run in CI. |
 | 2026-11-20 | 0.2.1–0.2.2 | #7 | Swiss Ephemeris options compared; `sweph` and `swisseph-wasm` both ran on a Vercel preview and agreed within 0.004″; report recommends `sweph` behind an adapter. Choice pending (0.2.3). |

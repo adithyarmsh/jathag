@@ -30,10 +30,10 @@ describe('expected/ is up to date with raw/', () => {
   });
 });
 
-describe('all 25 births parsed', () => {
-  it('has 25 births R01–R25', () => {
-    expect(births.map((b) => b.id)).toEqual(Array.from({ length: 25 }, (_, i) => `R${String(i + 1).padStart(2, '0')}`));
-    expect(expected).toHaveLength(25);
+describe('all 26 births parsed', () => {
+  it('has 26 births R01–R26', () => {
+    expect(births.map((b) => b.id)).toEqual(Array.from({ length: 26 }, (_, i) => `R${String(i + 1).padStart(2, '0')}`));
+    expect(expected).toHaveLength(26);
   });
 
   it.each(expected.map((e) => [e.id, e]))('%s: no missing fields', (_id, e) => {

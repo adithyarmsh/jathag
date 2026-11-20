@@ -16,7 +16,7 @@ function byOffset(b: Birth): string {
     .toISOString().replace('.000Z', 'Z');
 }
 
-describe('IANA time zone gives the same instant as the true offset, all 25 reference births', () => {
+describe('IANA time zone gives the same instant as the true offset, all 26 reference births', () => {
   it.each(births.map((b) => [b.id, b] as const))('%s', (_id, b) => {
     const r = localToUtc({ date: b.date, time: b.time, zone: { iana: b.iana } });
     expect(r.utc).toBe(byOffset(b));
@@ -26,7 +26,7 @@ describe('IANA time zone gives the same instant as the true offset, all 25 refer
 });
 
 describe('manual UTC offset (FR-IN-07)', () => {
-  it('all 25 births by offset in seconds', () => {
+  it('all 26 births by offset in seconds', () => {
     for (const b of births) {
       const off = Math.round(b.utc_offset * 3600);
       expect(localToUtc({ date: b.date, time: b.time, zone: { utcOffsetSeconds: off } }).utc, b.id).toBe(byOffset(b));

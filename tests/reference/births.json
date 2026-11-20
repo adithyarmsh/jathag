@@ -1,5 +1,5 @@
 {
- "note": "Synthetic reference births for JHora answer-key tests (step 0.2.4). Not real people. Lat/long are exact degree-minute values.",
+ "note": "Synthetic reference births for JHora answer-key tests (step 0.2.4). Not real people. Lat/long are exact degree-minute values (R26: degree-minute-second). R26 was added after step 0.2.8.",
  "births": [
   {
    "id": "R01",
@@ -275,6 +275,17 @@
    "place": "Kochi, India",
    "lat": 9.966667,
    "lng": 76.266667
+  },
+  {
+   "id": "R26",
+   "why": "Before 1901: ephemeris accuracy in the 1850s (no standard time in the US until 1883, so a fixed UTC-5:00 is used)",
+   "date": "1853-06-28",
+   "time": "07:25",
+   "utc_offset": -5,
+   "iana": "Etc/GMT+5",
+   "place": "New Haven, Connecticut, USA",
+   "lat": 41.308056,
+   "lng": -72.928611
   }
  ]
 }
