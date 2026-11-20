@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.3 — Choose the binding (Claude Project + Adithya), using `notes/0.2.1-ephemeris-evaluation.md` |
-| **Next step** | 0.2.4 — Reference births + JHora settings/export checklists |
-| **Then** | 0.2.5 — JHora installed and configured (Windows laptop) |
-| **Blocked on** | Decision 0.2.3 (binding choice) |
+| **Current step** | 0.2.8 — Engine core (positions, Lagna, houses, D9, dignity, aspects, combustion); switch on the position reference tests |
+| **Next step** | 0.2.9 — Test report reviewed (Adithya + Claude Project) |
+| **Then** | 0.2.10 — O-004 Bombay/Calcutta time decision |
+| **Blocked on** | Nothing |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-20 |
 
@@ -60,11 +60,11 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 ### v0.2 — First real chart
 - ✅ 0.2.1 Handoff: evaluate Swiss Ephemeris bindings (spike tested `sweph` and `swisseph-wasm` on a Vercel preview; spike branch deleted)
 - ✅ 0.2.2 Evaluation report (`notes/0.2.1-ephemeris-evaluation.md`)
-- ⏳ 0.2.3 Choose binding (decision logged)
-- ⏳ 0.2.4 Reference births + JHora settings/export checklists
-- ⏳ 0.2.5 JHora installed and configured (Windows laptop)
-- ⏳ 0.2.6 JHora exports for all reference births (positions, D1–D60, dashas, panchanga)
-- ⏳ 0.2.7 Reference tests created
+- ✅ 0.2.3 Choose binding: `sweph` behind an adapter; `swisseph-wasm` later for the phone (D-069)
+- ✅ 0.2.4 Reference births + JHora settings/export checklists (25 synthetic births in `tests/reference/births.json`; D-070–D-072)
+- ✅ 0.2.5 JHora 8.0 installed and configured (Windows laptop; settings in `tests/reference/raw/jhora-settings-jathag.ini`)
+- ✅ 0.2.6 JHora exports for all reference births in `tests/reference/raw/` (D-073, D-074)
+- ✅ 0.2.7 Reference tests created: converter → `tests/reference/expected/`, 283 self-checks passing, 180 engine tests written and switched off until 0.2.8 / 0.3.1 / 0.9.1 / 1.0.1
 - ⏳ 0.2.8 Engine core (positions, lagna, houses, D9, dignity, aspects, combustion)
 - ⏳ 0.2.9 Test report reviewed
 - ⏳ 0.2.10 O-004 Bombay/Calcutta time decision
@@ -112,6 +112,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-20 | 0.2.3–0.2.7 | #8 | Decisions D-069–D-074 logged; JHora answer key for 25 synthetic births added; converter turns it into clean test data; 283 self-checks pass; 180 engine tests wait (switched off) for the engine; tests now run in CI. |
 | 2026-11-20 | 0.2.1–0.2.2 | #7 | Swiss Ephemeris options compared; `sweph` and `swisseph-wasm` both ran on a Vercel preview and agreed within 0.004″; report recommends `sweph` behind an adapter. Choice pending (0.2.3). |
 | 2026-11-20 | 0.1.10 | #6 | Home polish (star dust in both modes, gold hover border on outer cards, numbers and eyebrow line removed, "Made by Adithya" footer) plus docs D-065–D-068. Founder confirmed two-factor login (0.1.8). v0.1 complete. |
 | 2026-11-20 | 0.1.9 | #5 | Docs synced from the Claude Project: decisions D-061–D-064 (languages, mobile, language-ready, phone order), requirements FR-LANG-01/02, milestones up to v2.0. |

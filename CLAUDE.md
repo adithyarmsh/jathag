@@ -30,7 +30,8 @@
 - `docs/` — product brief, requirements (with requirement IDs and milestones), decisions log, roadmap (step IDs and "done when")
 - `packages/engine` — calculation engine · `packages/content` — interpretation text · `apps/web` — Next.js site
 - `apps/web/messages/en.json` — all website text (English); never hard-code page text in components (D-063)
-- `data/places` — GeoNames place index scripts · `tests/reference` — JHora reference tests
+- `data/places` — GeoNames place index scripts · `tests/reference` — JHora reference tests (`raw/` = JHora answer key, `expected/` = clean data from `pnpm reference:convert`, `engine.test.ts` = engine tests switched on step by step; see its README)
+- `pnpm test` runs all tests (Vitest); CI runs it on every push and PR
 - `notes/` — evaluation and research reports from Claude Code (e.g. `notes/0.2.1-ephemeris-evaluation.md`)
 - Design: home page = "B2 — Split screen" (Decisions D-048); light mode uses gold accents, not blue (D-051). Design specs arrive in handoffs.
 - Outer cards/boxes always use the `card-outer` class in `apps/web/app/globals.css` (gold border on hover/focus, D-066); inner cards use a plain border. No decorative numbers (D-067).

@@ -1,0 +1,280 @@
+{
+ "note": "Synthetic reference births for JHora answer-key tests (step 0.2.4). Not real people. Lat/long are exact degree-minute values.",
+ "births": [
+  {
+   "id": "R01",
+   "why": "Baseline: modern Chennai birth",
+   "date": "1992-08-14",
+   "time": "06:45",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Chennai, India",
+   "lat": 13.083333,
+   "lng": 80.283333
+  },
+  {
+   "id": "R02",
+   "why": "Baseline: New Delhi, evening",
+   "date": "1985-01-26",
+   "time": "19:20",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "New Delhi, India",
+   "lat": 28.616667,
+   "lng": 77.216667
+  },
+  {
+   "id": "R03",
+   "why": "Baseline: Mumbai, afternoon",
+   "date": "1999-11-03",
+   "time": "14:10",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Mumbai, India",
+   "lat": 19.083333,
+   "lng": 72.883333
+  },
+  {
+   "id": "R04",
+   "why": "Baseline: Kolkata, night",
+   "date": "1978-03-21",
+   "time": "22:35",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Kolkata, India",
+   "lat": 22.566667,
+   "lng": 88.366667
+  },
+  {
+   "id": "R05",
+   "why": "Baseline: Bengaluru, morning",
+   "date": "2003-06-09",
+   "time": "09:05",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Bengaluru, India",
+   "lat": 12.966667,
+   "lng": 77.583333
+  },
+  {
+   "id": "R06",
+   "why": "Indian War Time (clocks +1h, UTC+6:30), New Delhi",
+   "date": "1943-07-15",
+   "time": "11:30",
+   "utc_offset": 6.5,
+   "iana": "Asia/Kolkata",
+   "place": "New Delhi, India",
+   "lat": 28.616667,
+   "lng": 77.216667
+  },
+  {
+   "id": "R07",
+   "why": "Pre-independence birth, Chennai (IST UTC+5:30)",
+   "date": "1936-10-02",
+   "time": "04:40",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Chennai, India",
+   "lat": 13.083333,
+   "lng": 80.283333
+  },
+  {
+   "id": "R08",
+   "why": "Just before local midnight (date boundary)",
+   "date": "1994-12-31",
+   "time": "23:57",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Hyderabad, India",
+   "lat": 17.383333,
+   "lng": 78.483333
+  },
+  {
+   "id": "R09",
+   "why": "Moon just AFTER a nakshatra boundary (≈49″ after the boundary)",
+   "date": "1988-04-02",
+   "time": "23:00",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Bengaluru, India",
+   "lat": 12.966667,
+   "lng": 77.583333
+  },
+  {
+   "id": "R10",
+   "why": "Moon just BEFORE a nakshatra boundary (≈42″ before the boundary)",
+   "date": "1996-09-10",
+   "time": "23:31",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "New Delhi, India",
+   "lat": 28.616667,
+   "lng": 77.216667
+  },
+  {
+   "id": "R11",
+   "why": "Lagna just BEFORE a sign change (≈43″ before the boundary)",
+   "date": "2005-03-15",
+   "time": "04:36",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Chennai, India",
+   "lat": 13.083333,
+   "lng": 80.283333
+  },
+  {
+   "id": "R12",
+   "why": "Sun just AFTER a sign change (sankranti) (≈37″ after the boundary)",
+   "date": "1990-04-14",
+   "time": "04:12",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Madurai, India",
+   "lat": 9.916667,
+   "lng": 78.116667
+  },
+  {
+   "id": "R13",
+   "why": "Rahu (mean node) just BEFORE a nakshatra boundary (≈35″ before the boundary)",
+   "date": "1970-02-05",
+   "time": "06:40",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Kolkata, India",
+   "lat": 22.566667,
+   "lng": 88.366667
+  },
+  {
+   "id": "R14",
+   "why": "Mercury, Mars, Jupiter and Saturn all retrograde",
+   "date": "1980-02-26",
+   "time": "12:00",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Kochi, India",
+   "lat": 9.966667,
+   "lng": 76.266667
+  },
+  {
+   "id": "R15",
+   "why": "Moon just AFTER a pada (navamsa) boundary (≈58″ after the boundary)",
+   "date": "2015-08-20",
+   "time": "09:42",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Mumbai, India",
+   "lat": 19.083333,
+   "lng": 72.883333
+  },
+  {
+   "id": "R16",
+   "why": "Diaspora: US daylight saving (EDT, UTC-4)",
+   "date": "2001-07-04",
+   "time": "10:15",
+   "utc_offset": -4,
+   "iana": "America/New_York",
+   "place": "Newark, New Jersey, USA",
+   "lat": 40.733333,
+   "lng": -74.166667
+  },
+  {
+   "id": "R17",
+   "why": "UK 1944 double summer time (UTC+2)",
+   "date": "1944-06-06",
+   "time": "07:20",
+   "utc_offset": 2,
+   "iana": "Europe/London",
+   "place": "London, UK",
+   "lat": 51.5,
+   "lng": -0.116667
+  },
+  {
+   "id": "R18",
+   "why": "Southern hemisphere, Australian summer time (UTC+11)",
+   "date": "1997-01-18",
+   "time": "16:40",
+   "utc_offset": 11,
+   "iana": "Australia/Sydney",
+   "place": "Sydney, Australia",
+   "lat": -33.866667,
+   "lng": 151.216667
+  },
+  {
+   "id": "R19",
+   "why": "High latitude (60°N), winter",
+   "date": "1982-12-10",
+   "time": "08:30",
+   "utc_offset": 1,
+   "iana": "Europe/Oslo",
+   "place": "Oslo, Norway",
+   "lat": 59.916667,
+   "lng": 10.75
+  },
+  {
+   "id": "R20",
+   "why": "Singapore historic time zone (UTC+7:30 in 1960)",
+   "date": "1960-05-20",
+   "time": "12:00",
+   "utc_offset": 7.5,
+   "iana": "Asia/Singapore",
+   "place": "Singapore",
+   "lat": 1.283333,
+   "lng": 103.85
+  },
+  {
+   "id": "R21",
+   "why": "Gulf diaspora: Dubai (UTC+4)",
+   "date": "2011-09-28",
+   "time": "05:50",
+   "utc_offset": 4,
+   "iana": "Asia/Dubai",
+   "place": "Dubai, UAE",
+   "lat": 25.266667,
+   "lng": 55.3
+  },
+  {
+   "id": "R22",
+   "why": "Around 1900: Madras Mean Time (UTC+5:21:10)",
+   "date": "1901-04-12",
+   "time": "07:30",
+   "utc_offset": 5.352778,
+   "iana": "Asia/Kolkata",
+   "place": "Chennai, India",
+   "lat": 13.083333,
+   "lng": 80.283333
+  },
+  {
+   "id": "R23",
+   "why": "Leap day: 29 February",
+   "date": "2008-02-29",
+   "time": "13:25",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Pune, India",
+   "lat": 18.516667,
+   "lng": 73.85
+  },
+  {
+   "id": "R24",
+   "why": "Just BEFORE local sunrise (sunrise ≈05:58:50 IST; Vedic weekday = previous day)",
+   "date": "2018-06-21",
+   "time": "05:54",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Pune, India",
+   "lat": 18.516667,
+   "lng": 73.85
+  },
+  {
+   "id": "R25",
+   "why": "Recent birth (teen user)",
+   "date": "2009-10-17",
+   "time": "20:05",
+   "utc_offset": 5.5,
+   "iana": "Asia/Kolkata",
+   "place": "Kochi, India",
+   "lat": 9.966667,
+   "lng": 76.266667
+  }
+ ]
+}
