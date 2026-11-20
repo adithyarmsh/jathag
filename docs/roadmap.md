@@ -1,0 +1,187 @@
+# JATHAG – ROADMAP (v0.1 → v1.5)
+
+Version 2.0 · 2026-11-20 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+
+---
+
+## Part 1 — Who does what
+
+| Tag | Who | What they do | Where |
+|---|---|---|---|
+| **[YOU]** | Adithya, the founder | Decide, approve designs and content, run JHora, test on phone and laptop, approve Claude Code's permission prompts, merge PRs. Never needs to write code. | Everywhere |
+| **[PROJECT]** | Claude in the "Jathag" Claude Project | Questions, decisions, requirements, design (Design System + Design canvas), interpretation content, reference test cases, handoffs for Claude Code, reviews, keeps docs updated (writes them into the local Jathag folder). | Claude desktop app, Project chat |
+| **[CODE]** | Claude Code | All code, tests, PRs, deployments. Reads `CLAUDE.md` + `PROGRESS.md` at the start of every session; updates `PROGRESS.md` in every PR. | Claude Code, inside `/Users/adithya/Documents/Jathag` |
+
+Claude (Project) and Claude Code do not share memory. The bridges are: the handoff you paste, the `docs/` folder, `CLAUDE.md` and `PROGRESS.md`.
+
+### Glossary
+- **Repository (repo):** the project folder plus full history, stored on GitHub (public, AGPL).
+- **Branch:** a draft copy for one change. **Pull request (PR):** a request to merge a branch into `main`, showing exactly what changed. **Merge:** accept it.
+- **main:** the official version; whatever is on `main` is what Vercel puts live.
+- **CI:** GitHub's robot that builds and tests every change. Green tick = pass; red cross = don't merge.
+- **Preview link:** a private test website Vercel builds for every branch.
+- **noindex:** a tag that tells search engines not to list the site. Jathag is live and updated after every step, but stays unlisted until the v1.0 launch.
+- **Handoff:** a paste-ready brief from [PROJECT] to [CODE]: what to build, acceptance criteria, files, requirement IDs.
+- **Step ID:** `0.2.6` = milestone v0.2, step 6. Used everywhere: handoffs, PR titles, `PROGRESS.md`.
+
+---
+
+## Part 2 — The working loop (every step)
+
+1. **[PROJECT]** Agree the next step from `PROGRESS.md`; write the handoff.
+2. **[YOU]** Start a **new** Claude Code session in the Jathag folder; paste the handoff.
+3. **[CODE]** Reads `CLAUDE.md` + `PROGRESS.md`, says where we are, creates a branch, builds, tests, updates `PROGRESS.md`, opens a PR.
+4. **[YOU]** Check the green tick and the preview; ask for fixes or say merge.
+5. **[CODE]** Merges after approval; confirms the deploy.
+6. **[YOU]** Tell the Project chat it's merged (or paste Claude Code's final report).
+7. **[PROJECT]** Updates docs/decisions if anything changed (writes them into the folder) and prepares the next handoff.
+
+**Ground rules:** one step per branch · never merge a red cross · no secrets or real people's birth details in the public repo · product decisions only in the Project · if Claude Code's plan contradicts `docs/`, stop and bring it to the Project.
+
+---
+
+## Part 3 — Milestones at a glance
+
+| Milestone | You can see… | Status |
+|---|---|---|
+| **v0.1 Coming soon** | Live holding page; repo, CI, auto-deploy; docs + progress tracking; B2-styled Coming Soon | 🔄 finishing |
+| **v0.2 First real chart** | On the live site: enter real birth details, see planet positions that match JHora | ⏳ |
+| **v0.3 Timing engine** | Dashas (3 levels), transits, Sade Sati, approximate-time results (as plain lists on the live site) | ⏳ |
+| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | ⏳ |
+| **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | ⏳ |
+| **v0.6 Timing screens** | Timeline with "you are here", transits, Sade Sati card | ⏳ |
+| **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
+| **v0.8 Approx. time, settings, downloads** | Certain/uncertain markers, settings, PNG/PDF downloads, report-an-issue | ⏳ |
+| **v0.9 Panchanga + legal** | Panchanga card; privacy, disclaimer, about, credits pages | ⏳ |
+| **v1.0 Divisional charts + Beta launch** | All 16 divisional charts; quality pass; domain; Jathag goes public | ⏳ |
+| v1.1 | Beta feedback fixes | ⏳ |
+| v1.2 | Basic Learn (scope decided after v1.0) | ⏳ |
+| v1.5 | Interactive Learn (scope decided after v1.0) | ⏳ |
+| v2.x | iOS + Android apps, accounts, offline | ⏳ |
+
+Design (Track D) and content writing (Track C) can start early, in parallel with engine work; they are listed under the milestone where they must be finished. Time estimates: unknown until we measure pace during v0.2.
+
+---
+
+## v0.1 — Coming soon
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.1.1 | YOU | Install Homebrew, Node 24, pnpm, GitHub CLI; log in to GitHub | ✅ |
+| 0.1.2 | YOU | Create public GitHub repo `adithyarmsh/jathag` | ✅ |
+| 0.1.3 | CODE | Monorepo skeleton, LICENSE (AGPL), README, CLAUDE.md, CI | ✅ |
+| 0.1.4 | CODE | Coming Soon page live on Vercel with auto-deploy (PR #1 = CI update) | ✅ |
+| 0.1.5 | CODE | Indian-language words, bolder wordmark, dark/light switch (PR #2) | ✅ |
+| 0.1.6 | PROJECT → CODE | Docs into `docs/`, `PROGRESS.md`, updated `CLAUDE.md` (PR #3) | Merged; Claude Code reports correct status at session start |
+| 0.1.7 | PROJECT → CODE | Restyle Coming Soon in the B2 look, gold accents in both modes (PR #4) | Merged; live site matches B2 structure in both modes and on phone |
+| 0.1.8 | YOU | Turn on two-factor login on GitHub and Vercel | Done |
+
+## v0.2 — First real chart
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.2.1 | PROJECT | Handoff: evaluate Swiss Ephemeris JS/WebAssembly bindings (licence, upkeep, accuracy, runs on Vercel) — report only | Handoff given |
+| 0.2.2 | CODE | Evaluation report | Report in Project chat |
+| 0.2.3 | YOU + PROJECT | Choose the binding; log the decision | Logged |
+| 0.2.4 | PROJECT | Design ~25 reference births + a JHora settings checklist + an export checklist covering positions, D1–D60, dashas (3 levels) and panchanga | Sheet delivered |
+| 0.2.5 | YOU | Install JHora on the Windows laptop; apply the settings checklist | Settings screenshot matches |
+| 0.2.6 | YOU | Enter all births; export everything on the checklist; send files to the Jathag folder | Files in `tests/reference/raw/` |
+| 0.2.7 | CODE | Turn JHora exports into automated reference tests | Tests exist (failing is fine) |
+| 0.2.8 | CODE | Engine core: time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1′; exact signs/nakshatras/padas/D9) |
+| 0.2.9 | YOU + PROJECT | Review the test report; explain any mismatches | Signed off |
+| 0.2.10 | PROJECT | Research O-004 (pre-1955 Bombay/Calcutta local time); propose handling | Decision logged |
+| 0.2.11 | CODE | GeoNames place index (all Indian populated places + worldwide towns) + feasibility report on Vercel limits | Report reviewed |
+| 0.2.12 | CODE | Calculation API (no logging of birth details) | Works on preview; logs checked |
+| 0.2.13 | CODE | Minimal B2 form (replaces the Coming Soon card) + plain planet-position table; "Beta — work in progress" notice | Live on jathag.vercel.app |
+| 0.2.14 | YOU | Test 20 places you know; compare your own chart with JHora | Matches |
+
+## v0.3 — Timing engine
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.3.1 | CODE | Vimshottari Mahadasha / Antardasha / Pratyantardasha + current period + coming up | Dasha tests pass (±1 day) |
+| 0.3.2 | CODE | Transits: today's positions, houses from Moon and lagna, Saturn/Jupiter/Rahu-Ketu sign changes (10 years), Sade Sati periods | Tests pass |
+| 0.3.3 | YOU | Spot-check 2–3 transit / Sade Sati dates in JHora | Match |
+| 0.3.4 | CODE | Life-area window rule (period lord rules/occupies the area's houses), with reasons | Tests pass |
+| 0.3.5 | PROJECT | Design 3–5 approximate-time test cases | Delivered |
+| 0.3.6 | CODE | Approximate-time scanner (certain vs uncertain values with time sub-ranges) | Tests pass |
+| 0.3.7 | CODE | Show all of the above as plain lists on the live site | Live |
+
+## v0.4 — Design system + app shell
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.4.1 | YOU | References for the remaining screens (O-001); can start any time | Sent |
+| 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve |
+| 0.4.3 | PROJECT | Mockups (phone + desktop): overview, charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
+| 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given |
+| 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid | Merged |
+| 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), validation | Merged |
+| 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged |
+
+## v0.5 — Chart screens
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.5.1 | CODE | Chart overview (bird's-eye view) | You compare with JHora |
+| 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle | Visual match with JHora |
+| 0.5.3 | CODE | Planets table + planet detail pages (numbers; text placeholders until v0.7) | Merged |
+
+## v0.6 — Timing screens
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.6.1 | CODE | Dasha timeline (3 levels, you-are-here, coming up, short/medium/long labels) | Matches JHora for today |
+| 0.6.2 | CODE | Transits screen + Sade Sati card + transit layer on the timeline | Merged |
+
+## v0.7 — Interpretations (Track C; writing can start after v0.2)
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.7.1 | PROJECT | Content Style Guide (from the Saturn-in-7th sample) | You approve |
+| 0.7.2 | PROJECT | Pilot batch of 10 entries with sources | You approve |
+| 0.7.3 | PROJECT | Remaining entries in batches, tracked in a review sheet | Batches drafted |
+| 0.7.4 | YOU | Review each batch for tone; spot-check sources | All approved |
+| 0.7.5 | CODE | Content package + "i" pop-ups + Sources screen + life-area pages + timing windows on pages | Content-coverage test passes |
+
+## v0.8 — Approximate time, settings, downloads
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.8.1 | CODE | Approximate-time experience (certain vs uncertain markers, ranges) | You test "Morning" for a known birth |
+| 0.8.2 | CODE | Settings: beginner + advanced toggle, reset | Merged |
+| 0.8.3 | PROJECT | Download checklist + PDF layout design | You approve |
+| 0.8.4 | CODE | Downloads: chart-only → PNG; anything else → PDF; in-browser | All combinations work on iPhone + Android |
+| 0.8.5 | CODE | Report-an-issue link | Merged |
+
+## v0.9 — Panchanga + legal
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 0.9.1 | CODE | Panchanga at birth (tithi, vara, nakshatra, yoga, karana) | Matches JHora exports |
+| 0.9.2 | PROJECT | Five short "what this part means" explanations | You approve |
+| 0.9.3 | CODE | Panchanga card | Merged |
+| 0.9.4 | PROJECT | Privacy, Disclaimer, About, Credits pages + content licence options (O-003) | You decide |
+| 0.9.5 | CODE | Legal pages live | Merged |
+| 0.9.6 | YOU | Decide analytics (O-005) | Logged |
+
+## v1.0 — Divisional charts + Beta launch
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 1.0.1 | CODE | All 16 divisional charts (D1–D60) using JHora's default methods | Every reference test matches |
+| 1.0.2 | PROJECT | 16 "what this chart is for" notes | You approve |
+| 1.0.3 | CODE | Divisional chart selector beside the main chart, both styles | Merged |
+| 1.0.4 | CODE | Accessibility + performance audit and fixes | Report clean |
+| 1.0.5 | YOU | Real-device testing with a checklist from the Project | Done |
+| 1.0.6 | PROJECT | Pre-launch review against Requirements §13 | All met |
+| 1.0.7 | YOU | Buy the domain (optional); 5–10 beta testers lined up | Done |
+| 1.0.8 | CODE | Public launch: remove `noindex` and the work-in-progress notice; connect the domain | Live and listed |
+| 1.0.9 | YOU + PROJECT | Collect beta feedback; plan v1.1 | Done |
+
+## After v1.0
+- **v1.1** — fixes from beta feedback.
+- **v1.2** — Basic Learn (scope decided after v1.0).
+- **v1.5** — Interactive Learn: how the lagna, Moon and Sun move through the chart, eclipses, how a chart is built (scope decided after v1.0).
+- **v2.x** — Mobile apps: framework choice (D-045), accounts (Supabase), offline, store accounts (Apple US$99/yr, Google US$25), age check.
+- Revisit the Swiss Ephemeris licence and hosting plan if Jathag ever earns money (D-006, D-043).
