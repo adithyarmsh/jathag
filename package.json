@@ -15,6 +15,7 @@
   },
   "packageManager": "pnpm@12.21.0",
   "devDependencies": {
+    "@jathag/engine": "workspace:*",
     "pdfjs-dist": "6.5.438",
     "vitest": "5.1.1"
   }

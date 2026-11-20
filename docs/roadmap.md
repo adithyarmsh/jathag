@@ -92,7 +92,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.2.5 | YOU | Install JHora on the Windows laptop; apply the settings checklist | Settings screenshot matches |
 | 0.2.6 | YOU | Enter all births; export everything on the checklist; send files to the Jathag folder | Files in `tests/reference/raw/` |
 | 0.2.7 | CODE | Turn JHora exports into automated reference tests | Tests exist (failing is fine) |
-| 0.2.8 | CODE | Engine core (outputs stable IDs, not English names — D-063): time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1′; exact signs/nakshatras/padas/D9) |
+| 0.2.8 | CODE | Engine core (outputs stable IDs, not English names — D-063): time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1″, D-074; exact signs/nakshatras/padas/D9); dignity (D-076) and combustion (D-077) tested |
 | 0.2.9 | YOU + PROJECT | Review the test report; explain any mismatches | Signed off |
 | 0.2.10 | PROJECT | Research O-004 (pre-1955 Bombay/Calcutta local time); propose handling | Decision logged |
 | 0.2.11 | CODE | GeoNames place index (all Indian populated places + worldwide towns) + feasibility report on Vercel limits | Report reviewed |

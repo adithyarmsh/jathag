@@ -29,6 +29,7 @@
 - `PROGRESS.md` — live build status (read first, update last)
 - `docs/` — product brief, requirements (with requirement IDs and milestones), decisions log, roadmap (step IDs and "done when")
 - `packages/engine` — calculation engine · `packages/content` — interpretation text · `apps/web` — Next.js site
+- Engine internals (see `packages/engine/README.md`): only `src/ephemeris/sweph.ts` may import `sweph`; Swiss Ephemeris data files are pinned in `packages/engine/ephe/` (checksums tested); engine unit tests in `packages/engine/test/`
 - `apps/web/messages/en.json` — all website text (English); never hard-code page text in components (D-063)
 - `data/places` — GeoNames place index scripts · `tests/reference` — JHora reference tests (`raw/` = JHora answer key, `expected/` = clean data from `pnpm reference:convert`, `engine.test.ts` = engine tests switched on step by step; see its README)
 - `pnpm test` runs all tests (Vitest); CI runs it on every push and PR
