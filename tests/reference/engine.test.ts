@@ -32,7 +32,7 @@ import { loadBirths, EXPECTED_DIR } from './scripts/parse.mjs';
 import { BODIES } from './scripts/ids.mjs';
 
 const ENABLED = {
-  positions: false, // 0.2.8
+  positions: true, // 0.2.8
   divisional: false, // 1.0.1
   dashas: false, // 0.3.1
   panchanga: false, // 0.9.1
@@ -70,11 +70,29 @@ export type EngineResult = {
   };
 };
 
-async function runEngine(_input: EngineInput): Promise<EngineResult> {
-  // 0.2.8: replace with the real engine, e.g.
-  //   const { calculateChart } = await import('@jathag/engine');
-  //   return adapt(await calculateChart(_input));
-  throw new Error('Engine not built yet (step 0.2.8)');
+async function runEngine(input: EngineInput): Promise<EngineResult> {
+  const { calculateChart } = await import('@jathag/engine');
+  const chart = calculateChart(input);
+  const bodies = Object.fromEntries((BODIES as BodyCode[]).map((code) => {
+    const b = chart.bodies[code];
+    return [code, {
+      lonArcsec: b.lon * 3600,
+      sign: b.sign,
+      nakshatra: b.nakshatra,
+      pada: b.pada,
+      retrograde: b.retrograde ?? false,
+    }];
+  })) as EngineResult['bodies'];
+  return {
+    bodies,
+    divisional: (n) => {
+      if (n === 1) return Object.fromEntries((BODIES as BodyCode[]).map((c) => [c, chart.bodies[c].sign])) as Record<BodyCode, number>;
+      if (n === 9) return Object.fromEntries((BODIES as BodyCode[]).map((c) => [c, chart.bodies[c].navamsaSign])) as Record<BodyCode, number>;
+      throw new Error(`D-${n} not built yet (step 1.0.1)`);
+    },
+    get vimshottari(): never { throw new Error('Dashas not built yet (step 0.3.1)'); },
+    get panchanga(): never { throw new Error('Panchanga not built yet (step 0.9.1)'); },
+  };
 }
 
 // ---------------------------------------------------------------- data
