@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.1 Coming soon — ✅ done; v0.2 First real chart next |
-| **Current step** | 0.2.1 — Handoff: evaluate Swiss Ephemeris bindings |
-| **Next step** | 0.2.2 — Evaluation report |
-| **Then** | 0.2.3 — Choose binding (decision logged) |
-| **Blocked on** | Nothing |
+| **Milestone** | v0.2 First real chart — 🔄 in progress |
+| **Current step** | 0.2.3 — Choose the binding (Claude Project + Adithya), using `notes/0.2.1-ephemeris-evaluation.md` |
+| **Next step** | 0.2.4 — Reference births + JHora settings/export checklists |
+| **Then** | 0.2.5 — JHora installed and configured (Windows laptop) |
+| **Blocked on** | Decision 0.2.3 (binding choice) |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-20 |
 
@@ -24,7 +24,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 | Milestone | Status |
 |---|---|
 | v0.1 Coming soon | ✅ |
-| v0.2 First real chart | ⏳ |
+| v0.2 First real chart | 🔄 |
 | v0.3 Timing engine | ⏳ |
 | v0.4 Design system + app shell | ⏳ |
 | v0.5 Chart screens | ⏳ |
@@ -58,8 +58,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.1.10 Home polish: star dust in light mode, hover highlight on outer cards, no eyebrow line or "01/02/03", two-line footer with "Made by Adithya"; docs D-065–D-068 (PR #6)
 
 ### v0.2 — First real chart
-- ⏳ 0.2.1 Handoff: evaluate Swiss Ephemeris bindings
-- ⏳ 0.2.2 Evaluation report
+- ✅ 0.2.1 Handoff: evaluate Swiss Ephemeris bindings (spike tested `sweph` and `swisseph-wasm` on a Vercel preview; spike branch deleted)
+- ✅ 0.2.2 Evaluation report (`notes/0.2.1-ephemeris-evaluation.md`)
 - ⏳ 0.2.3 Choose binding (decision logged)
 - ⏳ 0.2.4 Reference births + JHora settings/export checklists
 - ⏳ 0.2.5 JHora installed and configured (Windows laptop)
@@ -112,6 +112,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-20 | 0.2.1–0.2.2 | #7 | Swiss Ephemeris options compared; `sweph` and `swisseph-wasm` both ran on a Vercel preview and agreed within 0.004″; report recommends `sweph` behind an adapter. Choice pending (0.2.3). |
 | 2026-11-20 | 0.1.10 | #6 | Home polish (star dust in both modes, gold hover border on outer cards, numbers and eyebrow line removed, "Made by Adithya" footer) plus docs D-065–D-068. Founder confirmed two-factor login (0.1.8). v0.1 complete. |
 | 2026-11-20 | 0.1.9 | #5 | Docs synced from the Claude Project: decisions D-061–D-064 (languages, mobile, language-ready, phone order), requirements FR-LANG-01/02, milestones up to v2.0. |
 | 2026-11-20 | 0.1.7 | #4 | Coming Soon page redesigned in the B2 split-screen look with gold accents in dark and light; site hidden from search engines; page text moved to `apps/web/messages/en.json`; READMEs use milestone names. |
