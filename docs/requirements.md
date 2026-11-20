@@ -127,9 +127,12 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | FR-UI-01 | Responsive: works well from 360 px phones to large desktops. Mobile-first layout. | Must |
 | FR-UI-02 | Dark and light mode; default follows the device setting; user can override with the header toggle (remembered). Dark = midnight blue + gold + ivory. Light = warm off-white + deep ink + **darker gold accents** (no blue). | Must |
 | FR-UI-03 | "Beta" label visible in the header. | Must |
-| FR-UI-04 | Footer: About, Disclaimer, Privacy, Sources & credits (GeoNames, Swiss Ephemeris), Source code (AGPL link). | Must |
+| FR-UI-04 | Footer (two lines): About, Disclaimer, Privacy, Sources & credits (GeoNames, Swiss Ephemeris), Source code (AGPL link); and "Made by Adithya" with "Adithya" underlined, linking to https://yoloadithya.com (D-068). | Must |
 | FR-UI-05 | Every interpretation block has an "i" button opening a pop-up: which factors produced it (e.g. "Saturn in 7th house · Saturn aspects 7th from 1st"), plus a small "See classical source" link to the Sources screen. | Must |
 | FR-UI-07 | Header (B2): wordmark + Beta badge, Learn link (hidden until v1.2), About, Profile (opens saved profiles), theme toggle. Mobile: Profile and menu buttons. | Must |
+| FR-UI-08 | Hover highlight: on pointer devices, the border of every outer card/box turns the accent colour on hover (subtle transition); inner cards don't react; the same highlight appears when keyboard focus is inside the card (D-066). | Must |
+| FR-UI-09 | Minimal numbering: no decorative numbers; hierarchy shown through headings, subheadings, spacing and type; numbers only where meaningful (D-067). | Must |
+| FR-UI-10 | Star-dust dot pattern on the page background in both themes (gold-tinted, low opacity), never behind card text (D-065). | Must |
 | FR-UI-06 | "Report an issue" link on every reading (opens a simple form or pre-filled email/GitHub issue; no personal data sent unless the user includes it). | Must |
 
 ### 6.2 Home page (B2 design, one screen, no onboarding screens)
@@ -137,7 +140,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-HOME-01 | One screen, layout per design "B2 — Split screen" (Decisions D-048): desktop = left hero card + right form card. **Phone order (D-064):** short intro (Indian-language words + tagline) → the birth form → the "What you'll get" cards below the form. (The Coming Soon page, which has no form, shows the hero first.) | Must |
-| FR-HOME-02 | Left hero: Indian-language words for "birth chart" (Hindi, Bengali, Telugu, Tamil, Kannada, Malayalam), the line "Vedic birth chart · Free · No account", the tagline "Know your chart, not just your sign.", a one-sentence intro, and three "What you'll get" cards (Accurate chart · Plain-language explanations · Your life timeline). | Must |
+| FR-HOME-02 | Left hero: Indian-language words for "birth chart" (Hindi, Bengali, Telugu, Tamil, Kannada, Malayalam), the tagline "Know your chart, not just your sign.", a one-sentence intro, and three "What you'll get" cards (Accurate chart · Plain-language explanations · Your life timeline), without decorative numbers (D-067). | Must |
 | FR-HOME-03 | Right card "Your birth details — Five questions, about a minute": the birth form (FR-IN-01…10) and a "See my chart" button, with the privacy line "Your details stay in this browser. Nothing is stored on our servers." under it. | Must |
 | FR-HOME-04 | No separate welcome or chart-style screens (supersedes the earlier onboarding requirements). | Must |
 | FR-HOME-05 | Progress goes live as each step is merged (Decisions D-060). Until the real form exists (v0.2), the right-hand card shows "Coming soon". Until the v1.0 launch: whole site `noindex` + `robots.txt` disallow; from v0.2 a visible "Beta — work in progress" notice on every page. | Must |

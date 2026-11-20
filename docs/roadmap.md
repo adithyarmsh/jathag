@@ -79,6 +79,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.1.7 | PROJECT → CODE | Restyle Coming Soon in the B2 look, gold accents in both modes (PR #4) | Merged; live site matches B2 structure in both modes and on phone |
 | 0.1.8 | YOU | Turn on two-factor login on GitHub and Vercel | Done |
 | 0.1.9 | PROJECT → CODE | Docs sync: decisions D-061–D-064 (languages, mobile, language-ready, phone order) and milestones v1.3–v2.0 into the repo (PR #5) | Merged; PROGRESS.md lists milestones up to v2.0 |
+| 0.1.10 | PROJECT → CODE | Home polish: star dust in light mode, hover highlight on outer cards, remove eyebrow line and "01/02/03", two-line footer with "Made by Adithya" (PR #6) | Merged; live site checked in both modes, phone + desktop |
 
 ## v0.2 — First real chart
 

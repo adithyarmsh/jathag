@@ -32,3 +32,4 @@
 - `apps/web/messages/en.json` — all website text (English); never hard-code page text in components (D-063)
 - `data/places` — GeoNames place index scripts · `tests/reference` — JHora reference tests
 - Design: home page = "B2 — Split screen" (Decisions D-048); light mode uses gold accents, not blue (D-051). Design specs arrive in handoffs.
+- Outer cards/boxes always use the `card-outer` class in `apps/web/app/globals.css` (gold border on hover/focus, D-066); inner cards use a plain border. No decorative numbers (D-067).

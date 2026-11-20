@@ -11,23 +11,19 @@
   },
   "hero": {
     "nativeWordsLabel": "“Birth chart” in Indian languages",
-    "eyebrow": "Vedic birth chart · Free · No account",
     "title": "Know your chart, [not just your sign].",
     "intro": "Jathag turns your birth details into an [accurate Vedic birth chart], then explains it in [short, honest, modern language]. No fear, no ads.",
     "featuresLabel": "What you'll get",
     "features": [
       {
-        "number": "01",
         "title": "Accurate chart",
         "text": "Calculated from your exact birth date, time and place, drawn in the style you know."
       },
       {
-        "number": "02",
         "title": "Plain-language explanations",
         "text": "Short, honest notes on what each part means. No jargon, no fear."
       },
       {
-        "number": "03",
         "title": "Your life timeline",
         "text": "Your dasha periods, the chapters of your life, laid out as a simple timeline."
       }
@@ -46,6 +42,8 @@
   },
   "footer": {
     "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
-    "sourceLink": "Source code (AGPL)"
+    "sourceLink": "Source code (AGPL)",
+    "madeBy": "Made by [Adithya]",
+    "newTab": "(opens in a new tab)"
   }
 }
