@@ -24,7 +24,7 @@ function subscribe(onChange: () => void) {
   };
 }
 
-export function ThemeSwitch() {
+export function ThemeSwitch({ label }: { label: string }) {
   // The knob's position is drawn by CSS, so it is right even before this code runs.
   const isDark = useSyncExternalStore(subscribe, () => currentTheme() === "dark", () => false);
 
@@ -43,9 +43,9 @@ export function ThemeSwitch() {
       type="button"
       role="switch"
       aria-checked={isDark}
-      aria-label="Dark mode"
+      aria-label={label}
       onClick={toggle}
-      className="relative inline-flex h-7 w-[3.125rem] shrink-0 cursor-pointer items-center rounded-full border border-gold/50 bg-bg/60 p-0.5 text-gold backdrop-blur-sm"
+      className="relative inline-flex h-7 w-[3.125rem] shrink-0 cursor-pointer items-center rounded-full border border-accent-border bg-bg p-0.5 text-accent-text"
     >
       {/* Icon shown on the side the knob is NOT on */}
       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-between px-1.5">
@@ -57,7 +57,7 @@ export function ThemeSwitch() {
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         </svg>
       </span>
-      <span aria-hidden="true" className="theme-knob relative h-5 w-5 rounded-full bg-gold" />
+      <span aria-hidden="true" className="theme-knob relative h-5 w-5 rounded-full bg-accent" />
     </button>
   );
 }

@@ -1,27 +1,8 @@
+import { getMessages, richText } from "@/lib/i18n";
 import { ThemeSwitch } from "./theme-switch";
 
-// A small, fixed starfield. Positions come from a seeded generator so every
-// visit (and every build) draws exactly the same sky.
-function makeStars(count: number) {
-  let seed = 27; // fixed seed: 27 nakshatras
-  const rand = () => {
-    seed = (seed * 16807) % 2147483647;
-    return (seed - 1) / 2147483646;
-  };
-  return Array.from({ length: count }, (_, i) => ({
-    x: +(rand() * 100).toFixed(2),
-    y: +(rand() * 100).toFixed(2),
-    r: +(0.6 + rand() * 0.9).toFixed(2),
-    o: +(0.15 + rand() * 0.35).toFixed(2),
-    twinkle: i % 6 === 0,
-    delay: +(rand() * 6).toFixed(2),
-  }));
-}
-
-const stars = makeStars(54);
-
-// "Horoscope / birth chart" in Indian languages, ordered by number of
-// first-language speakers (Census of India 2011).
+// "Birth chart" in Indian languages, ordered by number of first-language
+// speakers (Census of India 2011). These stay the same in every page language.
 const nativeWords = [
   { lang: "hi", name: "Hindi", word: "कुंडली" },
   { lang: "bn", name: "Bengali", word: "কোষ্ঠী" },
@@ -31,65 +12,62 @@ const nativeWords = [
   { lang: "ml", name: "Malayalam", word: "ജാതകം" },
 ];
 
-function Starfield() {
+const SOURCE_URL = "https://github.com/adithyarmsh/jathag";
+
+function CheckIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 h-full w-full"
-      preserveAspectRatio="none"
-    >
-      {stars.map((s, i) => (
-        <circle
-          key={i}
-          cx={`${s.x}%`}
-          cy={`${s.y}%`}
-          r={s.r}
-          fill="var(--star)"
-          opacity={s.o}
-          className={s.twinkle ? "twinkle" : undefined}
-          style={
-            s.twinkle
-              ? ({ "--o": s.o, animationDelay: `${s.delay}s` } as React.CSSProperties)
-              : undefined
-          }
-        />
-      ))}
+    <svg aria-hidden="true" viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0 text-accent">
+      <circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" strokeWidth="1.3" />
+      <path d="M6 10.2l2.7 2.6L14 7.4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-function Ornament() {
+function LockIcon() {
   return (
-    <div aria-hidden="true" className="flex items-center justify-center gap-3 text-gold">
-      <span className="h-px w-16 bg-current opacity-70 sm:w-24" />
-      <svg width="10" height="10" viewBox="0 0 10 10" className="fill-current">
-        <path d="M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z" />
-      </svg>
-      <span className="h-px w-16 bg-current opacity-70 sm:w-24" />
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 20 20" className="mt-0.5 h-4 w-4 shrink-0 text-accent">
+      <rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   );
 }
 
 export default function Home() {
+  const t = getMessages();
+
   return (
     <>
-      <Starfield />
-      <header className="relative flex justify-end px-5 pt-5 sm:px-8 sm:pt-6">
-        <ThemeSwitch />
+      <header className="border-b border-line">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+          <div>
+            <div className="flex items-center gap-3">
+              <p className="font-serif text-[26px] leading-none font-semibold lg:text-[32px]">
+                {t.header.wordmark}
+              </p>
+              <span className="rounded-full border border-accent-border px-2.5 py-[3px] text-[11px] leading-none font-semibold tracking-[.12em] text-accent-text uppercase">
+                {t.header.beta}
+              </span>
+            </div>
+            <p className="mt-1.5 text-sm font-medium text-muted">{t.header.tagline}</p>
+          </div>
+          <ThemeSwitch label={t.header.themeSwitch} />
+        </div>
       </header>
-      <main className="relative flex flex-1 items-center justify-center px-6 py-16">
-        <div className="mx-auto flex w-full max-w-xl flex-col items-center text-center">
-          <p className="font-serif text-5xl font-bold tracking-[0.1em] text-gold sm:text-6xl md:text-7xl">
-            Jathag
-          </p>
+
+      <main className="mx-auto grid w-full max-w-[1240px] flex-1 grid-cols-1 items-start gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-10 lg:px-8 lg:py-12">
+        {/* Left: hero */}
+        <section
+          aria-labelledby="hero-title"
+          className="rounded-[28px] border border-line bg-card px-6 py-8 shadow-soft sm:px-10 sm:py-10 lg:px-[52px] lg:py-12"
+        >
           <ul
-            aria-label="Jathag in Indian languages"
-            className="mt-4 grid grid-cols-3 gap-x-5 gap-y-1.5 text-sm text-muted sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-3"
+            aria-label={t.hero.nativeWordsLabel}
+            className="grid grid-cols-3 gap-x-4 gap-y-1 text-base text-muted sm:flex sm:flex-wrap sm:items-center sm:gap-x-3"
           >
             {nativeWords.map((w, i) => (
-              <li key={w.lang} className="flex items-center justify-center gap-x-3">
+              <li key={w.lang} className="flex items-center gap-x-3">
                 {i > 0 && (
-                  <span aria-hidden="true" className="hidden text-gold/70 sm:inline">
+                  <span aria-hidden="true" className="hidden sm:inline">
                     ·
                   </span>
                 )}
@@ -100,34 +78,80 @@ export default function Home() {
             ))}
           </ul>
 
-          <div className="my-10 w-full">
-            <Ornament />
-          </div>
+          <p className="mt-6 text-xs font-semibold tracking-[.14em] text-muted uppercase">
+            {t.hero.eyebrow}
+          </p>
 
-          <h1 className="font-serif text-4xl leading-tight font-normal text-balance sm:text-5xl md:text-6xl">
-            Know your chart, not just your sign.
+          <h1
+            id="hero-title"
+            className="mt-4 font-serif text-[44px] leading-none font-medium text-balance sm:text-[60px] lg:text-[80px]"
+          >
+            {richText(t.hero.title, (part, key) => (
+              <span key={key} className="highlight-band">
+                {part}
+              </span>
+            ))}
           </h1>
 
-          <p className="mt-6 max-w-md text-base leading-relaxed text-pretty text-muted sm:text-lg">
-            A calm, precise Vedic astrology app. Accurate charts, honest explanations, no ads, no
-            fear.
+          <p className="mt-6 max-w-[38rem] text-lg leading-relaxed text-pretty text-muted">
+            {richText(t.hero.intro, (part, key) => (
+              <span key={key} className="soft-highlight">
+                {part}
+              </span>
+            ))}
           </p>
 
-          <p className="mt-10 rounded-full border border-gold/50 px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-gold uppercase">
-            Coming soon
+          <h2 className="sr-only">{t.hero.featuresLabel}</h2>
+          <ol className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-3 lg:mt-10">
+            {t.hero.features.map((f) => (
+              <li key={f.number} className="rounded-[18px] border border-line bg-bg p-5">
+                <p aria-hidden="true" className="font-serif text-2xl font-semibold text-accent-text">
+                  {f.number}
+                </p>
+                <h3 className="mt-2 font-semibold">{f.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{f.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Right: the birth-details form will go here in v0.2 */}
+        <section
+          aria-labelledby="coming-soon-title"
+          className="rounded-[24px] border border-line bg-card p-6 shadow-soft sm:p-8 lg:p-10"
+        >
+          <p className="inline-block rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold tracking-[.12em] text-accent-text uppercase">
+            {t.comingSoon.label}
           </p>
-        </div>
+          <h2 id="coming-soon-title" className="mt-4 font-serif text-[32px] leading-[1.1] font-medium text-balance">
+            {t.comingSoon.title}
+          </h2>
+          <p className="mt-3 leading-relaxed text-muted">{t.comingSoon.text}</p>
+          <ul className="mt-6 space-y-3">
+            {t.comingSoon.list.map((item) => (
+              <li key={item} className="flex gap-3">
+                <CheckIcon />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 flex gap-2.5 border-t border-line pt-5 text-sm leading-relaxed text-muted">
+            <LockIcon />
+            <span>{t.comingSoon.privacy}</span>
+          </p>
+        </section>
       </main>
 
-      <footer className="relative px-6 pb-8 text-center text-sm text-muted">
-        © 2026 Jathag ·{" "}
-        <a
-          href="https://github.com/adithyarmsh/jathag"
-          className="underline decoration-gold/60 underline-offset-4 hover:text-fg"
-        >
-          Open source
-        </a>{" "}
-        (AGPL-3.0)
+      <footer className="border-t border-line">
+        <div className="mx-auto flex max-w-[1240px] flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>{t.footer.text}</p>
+          <a
+            href={SOURCE_URL}
+            className="font-medium text-accent-text underline decoration-accent-border underline-offset-4 hover:decoration-current"
+          >
+            {t.footer.sourceLink}
+          </a>
+        </div>
       </footer>
     </>
   );

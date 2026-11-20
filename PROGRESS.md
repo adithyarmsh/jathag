@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.1 Coming soon — 🔄 finishing |
-| **Current step** | 0.1.6 — Docs, PROGRESS.md and updated CLAUDE.md into the repo (PR #3) |
-| **Next step** | 0.1.7 — Restyle Coming Soon in the B2 look (PR #4) |
-| **Then** | v0.2 starts with 0.2.1 (Swiss Ephemeris binding evaluation) |
+| **Milestone** | v0.1 Coming soon — 🔄 finishing (only the founder's step 0.1.8 left) |
+| **Current step** | 0.1.8 — Founder: turn on two-factor login on GitHub and Vercel |
+| **Next step** | 0.2.1 — Handoff: evaluate Swiss Ephemeris bindings |
+| **Then** | 0.2.2 — Evaluation report |
 | **Blocked on** | Nothing |
-| **Live site** | https://jathag.vercel.app (Coming Soon) |
+| **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-20 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -48,8 +48,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.1.3 Monorepo skeleton, LICENSE (AGPL-3.0), README, CLAUDE.md, CI
 - ✅ 0.1.4 Coming Soon page live on Vercel, auto-deploy from `main` (PR #1: CI actions → Node 24)
 - ✅ 0.1.5 Indian-language words, bolder wordmark, dark/light switch (PR #2)
-- 🔄 0.1.6 Docs into `docs/`, this PROGRESS.md, updated CLAUDE.md (PR #3)
-- ⏳ 0.1.7 Coming Soon restyled in the B2 look, gold accents in both modes (PR #4)
+- ✅ 0.1.6 Docs into `docs/`, this PROGRESS.md, updated CLAUDE.md (PR #3)
+- ✅ 0.1.7 Coming Soon restyled in the B2 look, gold accents in both modes; site `noindex` + `robots.txt`; page text in a message file (PR #4)
 - ⏳ 0.1.8 Founder: two-factor login on GitHub and Vercel
 
 ### v0.2 — First real chart
@@ -107,6 +107,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-20 | 0.1.7 | #4 | Coming Soon page redesigned in the B2 split-screen look with gold accents in dark and light; site hidden from search engines; page text moved to `apps/web/messages/en.json`; READMEs use milestone names. |
 | 2026-11-20 | 0.1.6 | #3 | Docs, PROGRESS.md and updated CLAUDE.md added (prepared in the Claude Project). |
 | 2026-11-16 | 0.1.5 | #2 | Indian-language words, bolder wordmark, dark/light switch. |
 | 2026-11-16 | 0.1.4 | #1 | CI actions updated to Node 24 versions; first automatic production deploy confirmed. |

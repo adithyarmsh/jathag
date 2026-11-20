@@ -4,17 +4,18 @@ Jathag is a calm, precise Vedic astrology web app. It aims to give people accura
 
 ## Status
 
-**Coming soon.** The repository currently contains the project structure and a Coming Soon page.
+**Coming soon (beta).** The live site at https://jathag.vercel.app shows a Coming Soon page and is hidden from search engines until the v1.0 launch. Build status: [PROGRESS.md](PROGRESS.md).
 
 ## Folder structure
 
 ```
-apps/web/            Next.js website (currently the Coming Soon page)
-packages/engine/     Calculation engine (Swiss Ephemeris, AGPL). No UI code. Phase 1.
+apps/web/            Next.js website (currently the Coming Soon page; page text in apps/web/messages/)
+packages/engine/     Calculation engine (Swiss Ephemeris, AGPL). No UI code. v0.2 (step 0.2.8).
 packages/content/    Interpretation content as data. Licensed separately (TBD).
-data/places/         GeoNames place index scripts. Phase 3.
-tests/reference/     Jagannatha Hora reference test cases. Phase 1.
+data/places/         GeoNames place index scripts. v0.2 (step 0.2.11).
+tests/reference/     Jagannatha Hora reference tests. v0.2 (steps 0.2.6–0.2.7).
 docs/                Product brief, requirements, decisions log and roadmap.
+PROGRESS.md          Live build status, step by step (see docs/roadmap.md).
 .github/workflows/   Continuous integration (lint + build on every push and pull request).
 ```
 
