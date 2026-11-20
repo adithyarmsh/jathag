@@ -20,7 +20,7 @@
   --accent-border: rgba(122, 92, 30, 0.3);
   --sun-soft: #fbefcf;
   --shadow: 0 1px 2px rgba(27, 22, 36, 0.04), 0 6px 20px rgba(27, 22, 36, 0.05);
-  --stardust: none;
+  --dust: rgba(122, 92, 30, 0.3);
   color-scheme: light;
 }
 
@@ -38,7 +38,7 @@
     --accent-border: rgba(212, 178, 106, 0.35);
     --sun-soft: #3a3324;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
-    --stardust: var(--stardust-dots);
+    --dust: rgba(212, 178, 106, 0.38);
     color-scheme: dark;
   }
 }
@@ -55,14 +55,14 @@
   --accent-border: rgba(212, 178, 106, 0.35);
   --sun-soft: #3a3324;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
-  --stardust: var(--stardust-dots);
+  --dust: rgba(212, 178, 106, 0.38);
   color-scheme: dark;
 }
 
-/* Dark-mode "star dust": 14 tiny gold dots, repeated every 320px. Pure CSS, no images. */
+/* "Star dust" in both modes (D-065): 14 tiny gold dots, repeated every 320px,
+   on the page background only (cards cover it). Pure CSS, no images. */
 :root {
-  --dust: rgba(212, 178, 106, 0.38);
-  --stardust-dots:
+  --stardust:
     radial-gradient(circle at 18px 34px, var(--dust) 0.9px, transparent 1.5px),
     radial-gradient(circle at 96px 12px, var(--dust) 0.6px, transparent 1.2px),
     radial-gradient(circle at 168px 58px, var(--dust) 1.2px, transparent 1.8px),
@@ -99,6 +99,42 @@ body {
   background-image: var(--stardust);
   background-size: 320px 320px;
   color: var(--ink);
+}
+
+/*
+ * Outer cards (D-066): every outer card/box on the site uses .card-outer.
+ * Its border turns the accent colour on hover (pointer devices only) or when
+ * keyboard focus is inside. Inner cards use a plain border and never react.
+ */
+.card-outer {
+  border: 1px solid var(--line);
+  transition: border-color 200ms ease;
+}
+@media (hover: hover) {
+  .card-outer:hover {
+    border-color: var(--accent);
+  }
+}
+.card-outer:focus-within {
+  border-color: var(--accent);
+}
+
+/* Text that sits on the page background: a solid backing so no star-dust dot
+   is ever behind letters (keeps WCAG contrast exact). Invisible otherwise. */
+.text-on-dust {
+  background-color: var(--bg);
+}
+
+/* Footer links: accent text, accent underline */
+.footer-link {
+  font-weight: 500;
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-border);
+  text-underline-offset: 4px;
+}
+.footer-link:hover {
+  text-decoration-color: currentColor;
 }
 
 /* Highlighter band behind the lower 38% of the words */
@@ -154,7 +190,8 @@ body {
 
 /* No movement for people who ask their device to reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  .theme-knob {
+  .theme-knob,
+  .card-outer {
     transition: none;
   }
 }

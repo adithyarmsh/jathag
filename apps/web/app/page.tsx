@@ -13,6 +13,7 @@ const nativeWords = [
 ];
 
 const SOURCE_URL = "https://github.com/adithyarmsh/jathag";
+const AUTHOR_URL = "https://yoloadithya.com";
 
 function CheckIcon() {
   return (
@@ -39,7 +40,7 @@ export default function Home() {
     <>
       <header className="border-b border-line">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
-          <div>
+          <div className="text-on-dust">
             <div className="flex items-center gap-3">
               <p className="font-serif text-[26px] leading-none font-semibold lg:text-[32px]">
                 {t.header.wordmark}
@@ -58,7 +59,7 @@ export default function Home() {
         {/* Left: hero */}
         <section
           aria-labelledby="hero-title"
-          className="rounded-[28px] border border-line bg-card px-6 py-8 shadow-soft sm:px-10 sm:py-10 lg:px-[52px] lg:py-12"
+          className="card-outer rounded-[28px] bg-card px-6 py-8 shadow-soft sm:px-10 sm:py-10 lg:px-[52px] lg:py-12"
         >
           <ul
             aria-label={t.hero.nativeWordsLabel}
@@ -78,13 +79,9 @@ export default function Home() {
             ))}
           </ul>
 
-          <p className="mt-6 text-xs font-semibold tracking-[.14em] text-muted uppercase">
-            {t.hero.eyebrow}
-          </p>
-
           <h1
             id="hero-title"
-            className="mt-4 font-serif text-[44px] leading-none font-medium text-balance sm:text-[60px] lg:text-[80px]"
+            className="mt-6 font-serif text-[44px] leading-none font-medium text-balance sm:text-[60px] lg:text-[80px]"
           >
             {richText(t.hero.title, (part, key) => (
               <span key={key} className="highlight-band">
@@ -102,23 +99,21 @@ export default function Home() {
           </p>
 
           <h2 className="sr-only">{t.hero.featuresLabel}</h2>
-          <ol className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-3 lg:mt-10">
+          {/* Inner cards: plain border, no hover highlight (D-066), no numbers (D-067) */}
+          <ul className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-3 lg:mt-10">
             {t.hero.features.map((f) => (
-              <li key={f.number} className="rounded-[18px] border border-line bg-bg p-5">
-                <p aria-hidden="true" className="font-serif text-2xl font-semibold text-accent-text">
-                  {f.number}
-                </p>
-                <h3 className="mt-2 font-semibold">{f.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{f.text}</p>
+              <li key={f.title} className="rounded-[18px] border border-line bg-bg px-5 py-6">
+                <h3 className="text-base leading-snug font-semibold">{f.title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted">{f.text}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </section>
 
         {/* Right: the birth-details form will go here in v0.2 */}
         <section
           aria-labelledby="coming-soon-title"
-          className="rounded-[24px] border border-line bg-card p-6 shadow-soft sm:p-8 lg:p-10"
+          className="card-outer rounded-[24px] bg-card p-6 shadow-soft sm:p-8 lg:p-10"
         >
           <p className="inline-block rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold tracking-[.12em] text-accent-text uppercase">
             {t.comingSoon.label}
@@ -143,14 +138,21 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>{t.footer.text}</p>
-          <a
-            href={SOURCE_URL}
-            className="font-medium text-accent-text underline decoration-accent-border underline-offset-4 hover:decoration-current"
-          >
-            {t.footer.sourceLink}
-          </a>
+        <div className="mx-auto max-w-[1240px] space-y-2 px-4 py-6 text-sm text-muted sm:px-6 lg:px-8">
+          <p className="text-on-dust flex w-fit flex-col gap-x-4 gap-y-2 sm:flex-row sm:flex-wrap sm:items-baseline">
+            <span>{t.footer.text}</span>
+            <a href={SOURCE_URL} className="footer-link">
+              {t.footer.sourceLink}
+            </a>
+          </p>
+          <p className="text-on-dust w-fit">
+            {richText(t.footer.madeBy, (part, key) => (
+              <a key={key} href={AUTHOR_URL} target="_blank" rel="noopener noreferrer" className="footer-link">
+                {part}
+                <span className="sr-only"> {t.footer.newTab}</span>
+              </a>
+            ))}
+          </p>
         </div>
       </footer>
     </>
