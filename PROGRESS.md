@@ -35,8 +35,11 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 | v1.0 Divisional charts + Beta launch | ⏳ |
 | v1.1 Feedback fixes | ⏳ |
 | v1.2 Basic Learn | ⏳ |
+| v1.3 Mobile test build | ⏳ |
+| v1.4 Mobile test version for friends | ⏳ |
 | v1.5 Interactive Learn | ⏳ |
-| v2.x Mobile apps | ⏳ |
+| v1.6–v1.9 Indian languages, step by step | ⏳ |
+| v2.0 Multilingual Jathag + public apps | ⏳ |
 
 ---
 
@@ -51,6 +54,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.1.6 Docs into `docs/`, this PROGRESS.md, updated CLAUDE.md (PR #3)
 - ✅ 0.1.7 Coming Soon restyled in the B2 look, gold accents in both modes; site `noindex` + `robots.txt`; page text in a message file (PR #4)
 - ⏳ 0.1.8 Founder: two-factor login on GitHub and Vercel
+- ✅ 0.1.9 Docs sync (D-061–D-064, milestones to v2.0) (PR #5)
 
 ### v0.2 — First real chart
 - ⏳ 0.2.1 Handoff: evaluate Swiss Ephemeris bindings
@@ -107,6 +111,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-20 | 0.1.9 | #5 | Docs synced from the Claude Project: decisions D-061–D-064 (languages, mobile, language-ready, phone order), requirements FR-LANG-01/02, milestones up to v2.0. |
 | 2026-11-20 | 0.1.7 | #4 | Coming Soon page redesigned in the B2 split-screen look with gold accents in dark and light; site hidden from search engines; page text moved to `apps/web/messages/en.json`; READMEs use milestone names. |
 | 2026-11-20 | 0.1.6 | #3 | Docs, PROGRESS.md and updated CLAUDE.md added (prepared in the Claude Project). |
 | 2026-11-16 | 0.1.5 | #2 | Indian-language words, bolder wordmark, dark/light switch. |

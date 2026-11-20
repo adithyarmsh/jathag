@@ -1,6 +1,6 @@
-# JATHAG – ROADMAP (v0.1 → v1.5)
+# JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.0 · 2026-11-20 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.1 · 2026-11-20 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -56,8 +56,11 @@ Claude (Project) and Claude Code do not share memory. The bridges are: the hando
 | **v1.0 Divisional charts + Beta launch** | All 16 divisional charts; quality pass; domain; Jathag goes public | ⏳ |
 | v1.1 | Beta feedback fixes | ⏳ |
 | v1.2 | Basic Learn (scope decided after v1.0) | ⏳ |
+| v1.3 | Mobile test build on your own phone | ⏳ |
+| v1.4 | Mobile test version for a few friends | ⏳ |
 | v1.5 | Interactive Learn (scope decided after v1.0) | ⏳ |
-| v2.x | iOS + Android apps, accounts, offline | ⏳ |
+| v1.6 – v1.9 | Indian languages, step by step | ⏳ |
+| **v2.0** | **Multilingual Jathag + public iOS/Android apps** | ⏳ |
 
 Design (Track D) and content writing (Track C) can start early, in parallel with engine work; they are listed under the milestone where they must be finished. Time estimates: unknown until we measure pace during v0.2.
 
@@ -75,6 +78,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.1.6 | PROJECT → CODE | Docs into `docs/`, `PROGRESS.md`, updated `CLAUDE.md` (PR #3) | Merged; Claude Code reports correct status at session start |
 | 0.1.7 | PROJECT → CODE | Restyle Coming Soon in the B2 look, gold accents in both modes (PR #4) | Merged; live site matches B2 structure in both modes and on phone |
 | 0.1.8 | YOU | Turn on two-factor login on GitHub and Vercel | Done |
+| 0.1.9 | PROJECT → CODE | Docs sync: decisions D-061–D-064 (languages, mobile, language-ready, phone order) and milestones v1.3–v2.0 into the repo (PR #5) | Merged; PROGRESS.md lists milestones up to v2.0 |
 
 ## v0.2 — First real chart
 
@@ -87,7 +91,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.2.5 | YOU | Install JHora on the Windows laptop; apply the settings checklist | Settings screenshot matches |
 | 0.2.6 | YOU | Enter all births; export everything on the checklist; send files to the Jathag folder | Files in `tests/reference/raw/` |
 | 0.2.7 | CODE | Turn JHora exports into automated reference tests | Tests exist (failing is fine) |
-| 0.2.8 | CODE | Engine core: time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1′; exact signs/nakshatras/padas/D9) |
+| 0.2.8 | CODE | Engine core (outputs stable IDs, not English names — D-063): time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1′; exact signs/nakshatras/padas/D9) |
 | 0.2.9 | YOU + PROJECT | Review the test report; explain any mismatches | Signed off |
 | 0.2.10 | PROJECT | Research O-004 (pre-1955 Bombay/Calcutta local time); propose handling | Decision logged |
 | 0.2.11 | CODE | GeoNames place index (all Indian populated places + worldwide towns) + feasibility report on Vercel limits | Report reviewed |
@@ -115,7 +119,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve |
 | 0.4.3 | PROJECT | Mockups (phone + desktop): overview, charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given |
-| 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid | Merged |
+| 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged |
 | 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), validation | Merged |
 | 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged |
 
@@ -179,9 +183,19 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 1.0.8 | CODE | Public launch: remove `noindex` and the work-in-progress notice; connect the domain | Live and listed |
 | 1.0.9 | YOU + PROJECT | Collect beta feedback; plan v1.1 | Done |
 
-## After v1.0
-- **v1.1** — fixes from beta feedback.
-- **v1.2** — Basic Learn (scope decided after v1.0).
-- **v1.5** — Interactive Learn: how the lagna, Moon and Sun move through the chart, eclipses, how a chart is built (scope decided after v1.0).
-- **v2.x** — Mobile apps: framework choice (D-045), accounts (Supabase), offline, store accounts (Apple US$99/yr, Google US$25), age check.
+## After v1.0 (steps are detailed when we get there)
+
+| Milestone | What | Rough steps |
+|---|---|---|
+| **v1.1** | Beta feedback fixes | Sort feedback → fix → release |
+| **v1.2** | Basic Learn | Decide scope (after v1.0) → write → build pages |
+| **v1.3** | Mobile test build | Decide framework (D-045, prototype comparison) → engine runs on the phone (offline) → install a test build on your own phone. A free Android test install is possible; iPhone test builds via TestFlight need the Apple Developer account (US$99/yr) |
+| **v1.4** | Mobile test version for friends | Core screens on mobile → share test builds with a few friends → fix |
+| **v1.5** | Interactive Learn | Decide scope → animations driven by the engine (lagna, Moon and Sun moving through the chart; eclipses; how a chart is built) |
+| **v1.6** | Languages groundwork | Decide languages and order (after v1.5) → language picker (primary + secondary) → chart terms (rasi, nakshatra, planets, houses, dasha lords) as secondary labels in the first Indian language |
+| **v1.7** | More languages for chart terms | Add the next languages' terms; native-speaker check of each list |
+| **v1.8** | Indian-language interface | Whole interface available with an Indian language as primary, English as secondary |
+| **v1.9** | Translated readings | Interpretation content translated and reviewed by native speakers (the biggest piece) |
+| **v2.0** | **Multilingual Jathag + public apps** | Web and iOS/Android apps in stores; accounts across web and apps (Supabase); age check (DPDP); store accounts (Apple US$99/yr, Google US$25) |
+
 - Revisit the Swiss Ephemeris licence and hosting plan if Jathag ever earns money (D-006, D-043).
