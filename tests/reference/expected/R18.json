@@ -1,0 +1,1015 @@
+{
+  "id": "R18",
+  "sources": [
+    "raw/r18.pdf",
+    "raw/r18.jhd"
+  ],
+  "jhoraClockUtcOffsetMinutes": 660,
+  "printed": {
+    "name": "r18",
+    "date": "1997-01-18",
+    "time": "16:40:00",
+    "utcOffsetMinutes": 660,
+    "lat": -33.866667,
+    "lng": 151.216667,
+    "placeLabel": ", India",
+    "lines": [
+      "January 18, 1997",
+      "16:40:00 (11:00 East of GMT)",
+      "151 E 13' 00\", 33 S 52' 00\" (, India)"
+    ],
+    "utc": "1997-01-18T05:40:00Z"
+  },
+  "jhd": {
+    "date": "1997-01-18",
+    "time": "16:40:00",
+    "utcOffsetMinutes": 660,
+    "lng": 151.216667,
+    "lat": -33.866667
+  },
+  "bodies": {
+    "La": {
+      "lonArcsec": 165770.36,
+      "printedLongitude": "16 Ta 02' 50.36\"",
+      "sign": 2,
+      "nakshatra": 4,
+      "pada": 2,
+      "navamsaSign": 2,
+      "retrograde": false,
+      "longitudeSign": 2
+    },
+    "Su": {
+      "lonArcsec": 987690.18,
+      "printedLongitude": "4 Cp 21' 30.18\"",
+      "sign": 10,
+      "nakshatra": 21,
+      "pada": 3,
+      "navamsaSign": 11,
+      "retrograde": false,
+      "longitudeSign": 10
+    },
+    "Mo": {
+      "lonArcsec": 120267.87,
+      "printedLongitude": "3 Ta 24' 27.87\"",
+      "sign": 2,
+      "nakshatra": 3,
+      "pada": 3,
+      "navamsaSign": 11,
+      "retrograde": false,
+      "longitudeSign": 2
+    },
+    "Ma": {
+      "lonArcsec": 576368.21,
+      "printedLongitude": "10 Vi 06' 08.21\"",
+      "sign": 6,
+      "nakshatra": 13,
+      "pada": 1,
+      "navamsaSign": 1,
+      "retrograde": false,
+      "longitudeSign": 6
+    },
+    "Me": {
+      "lonArcsec": 903405.17,
+      "printedLongitude": "10 Sg 56' 45.17\"",
+      "sign": 9,
+      "nakshatra": 19,
+      "pada": 4,
+      "navamsaSign": 4,
+      "retrograde": false,
+      "longitudeSign": 9
+    },
+    "Ju": {
+      "lonArcsec": 991382.4,
+      "printedLongitude": "5 Cp 23' 02.40\"",
+      "sign": 10,
+      "nakshatra": 21,
+      "pada": 3,
+      "navamsaSign": 11,
+      "retrograde": false,
+      "longitudeSign": 10
+    },
+    "Ve": {
+      "lonArcsec": 922353.32,
+      "printedLongitude": "16 Sg 12' 33.32\"",
+      "sign": 9,
+      "nakshatra": 20,
+      "pada": 1,
+      "navamsaSign": 5,
+      "retrograde": false,
+      "longitudeSign": 9
+    },
+    "Sa": {
+      "lonArcsec": 1219010.49,
+      "printedLongitude": "8 Pi 36' 50.49\"",
+      "sign": 12,
+      "nakshatra": 26,
+      "pada": 2,
+      "navamsaSign": 6,
+      "retrograde": false,
+      "longitudeSign": 12
+    },
+    "Ra": {
+      "lonArcsec": 569976.61,
+      "printedLongitude": "8 Vi 19' 36.61\"",
+      "sign": 6,
+      "nakshatra": 12,
+      "pada": 4,
+      "navamsaSign": 12,
+      "retrograde": false,
+      "longitudeSign": 6
+    },
+    "Ke": {
+      "lonArcsec": 1217976.61,
+      "printedLongitude": "8 Pi 19' 36.61\"",
+      "sign": 12,
+      "nakshatra": 26,
+      "pada": 2,
+      "navamsaSign": 6,
+      "retrograde": false,
+      "longitudeSign": 12
+    }
+  },
+  "panchanga": {
+    "samvatsara": 10,
+    "lunarMonth": 10,
+    "lunarMonthKind": null,
+    "tithi": 10,
+    "tithiLeftPercent": 7.92,
+    "nakshatra": 3,
+    "nakshatraLeftPercent": 49.44,
+    "weekday": 7,
+    "yoga": 24,
+    "karana": 5,
+    "horaLord": "Su",
+    "printed": [
+      "Lunar day: Dhaata Pushya Sukla Dasami (7.92% left)",
+      "Nakshatra: Krittika (49.44% left)",
+      "Saturday, Sukla Yoga, Garija Karana, Sun Hora"
+    ]
+  },
+  "vimshottari": [
+    {
+      "lord": "Su",
+      "startDate": "1994-01-06",
+      "antardashas": [
+        {
+          "lord": "Su",
+          "startDate": "1994-01-06"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "1994-04-26"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "1994-10-25"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "1995-03-02"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "1996-01-25"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "1996-11-12"
+        },
+        {
+          "lord": "Me",
+          "startDate": "1997-10-25"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "1998-09-01"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "1999-01-06"
+        }
+      ]
+    },
+    {
+      "lord": "Mo",
+      "startDate": "2000-01-07",
+      "antardashas": [
+        {
+          "lord": "Mo",
+          "startDate": "2000-01-07"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2000-11-06"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2001-06-07"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2002-12-07"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2004-04-07"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2005-11-06"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2007-04-08"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2007-11-07"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2009-07-08"
+        }
+      ]
+    },
+    {
+      "lord": "Ma",
+      "startDate": "2010-01-06",
+      "antardashas": [
+        {
+          "lord": "Ma",
+          "startDate": "2010-01-06"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2010-06-04"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2011-06-23"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2012-05-29"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2013-07-08"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2014-07-05"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2014-12-01"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2016-01-31"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2016-06-07"
+        }
+      ]
+    },
+    {
+      "lord": "Ra",
+      "startDate": "2017-01-06",
+      "antardashas": [
+        {
+          "lord": "Ra",
+          "startDate": "2017-01-06"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2019-09-19"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2022-02-12"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2024-12-19"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2027-07-08"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2028-07-26"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2031-07-26"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2032-06-19"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2033-12-19"
+        }
+      ]
+    },
+    {
+      "lord": "Ju",
+      "startDate": "2035-01-06",
+      "antardashas": [
+        {
+          "lord": "Ju",
+          "startDate": "2035-01-06"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2037-02-24"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2039-09-07"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2041-12-13"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2042-11-19"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2045-07-20"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2046-05-08"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2047-09-07"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2048-08-13"
+        }
+      ]
+    },
+    {
+      "lord": "Sa",
+      "startDate": "2051-01-06",
+      "antardashas": [
+        {
+          "lord": "Sa",
+          "startDate": "2051-01-06"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2054-01-09"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2056-09-18"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2057-10-28"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2060-12-28"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2061-12-10"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2063-07-11"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2064-08-19"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2067-06-26"
+        }
+      ]
+    },
+    {
+      "lord": "Me",
+      "startDate": "2070-01-06",
+      "antardashas": [
+        {
+          "lord": "Me",
+          "startDate": "2070-01-06"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2072-06-04"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2073-06-01"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2076-04-01"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2077-02-05"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2078-07-08"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2079-07-05"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2082-01-21"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2084-04-28"
+        }
+      ]
+    },
+    {
+      "lord": "Ke",
+      "startDate": "2087-01-06",
+      "antardashas": [
+        {
+          "lord": "Ke",
+          "startDate": "2087-01-06"
+        },
+        {
+          "lord": "Ve",
+          "startDate": "2087-06-05"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2088-08-04"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2088-12-10"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2089-07-11"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2089-12-07"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2090-12-25"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2091-12-01"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2093-01-09"
+        }
+      ]
+    },
+    {
+      "lord": "Ve",
+      "startDate": "2094-01-06",
+      "antardashas": [
+        {
+          "lord": "Ve",
+          "startDate": "2094-01-06"
+        },
+        {
+          "lord": "Su",
+          "startDate": "2097-05-08"
+        },
+        {
+          "lord": "Mo",
+          "startDate": "2098-05-08"
+        },
+        {
+          "lord": "Ma",
+          "startDate": "2100-01-07"
+        },
+        {
+          "lord": "Ra",
+          "startDate": "2101-03-09"
+        },
+        {
+          "lord": "Ju",
+          "startDate": "2104-03-09"
+        },
+        {
+          "lord": "Sa",
+          "startDate": "2106-11-08"
+        },
+        {
+          "lord": "Me",
+          "startDate": "2110-01-07"
+        },
+        {
+          "lord": "Ke",
+          "startDate": "2112-11-07"
+        }
+      ]
+    }
+  ],
+  "pratyantardashas": null,
+  "divisional": {
+    "1": {
+      "La": 2,
+      "Mo": 2,
+      "Ma": 6,
+      "Ra": 6,
+      "Me": 9,
+      "Ve": 9,
+      "Su": 10,
+      "Ju": 10,
+      "Sa": 12,
+      "Ke": 12
+    },
+    "2": {
+      "Su": 4,
+      "Mo": 4,
+      "Ma": 4,
+      "Ju": 4,
+      "Ve": 4,
+      "Sa": 4,
+      "Ra": 4,
+      "Ke": 4,
+      "La": 5,
+      "Me": 5
+    },
+    "3": {
+      "Me": 1,
+      "Ve": 1,
+      "Mo": 2,
+      "La": 6,
+      "Ra": 6,
+      "Su": 10,
+      "Ma": 10,
+      "Ju": 10,
+      "Sa": 12,
+      "Ke": 12
+    },
+    "4": {
+      "Mo": 2,
+      "Ve": 3,
+      "Sa": 3,
+      "Ke": 3,
+      "La": 8,
+      "Ma": 9,
+      "Ra": 9,
+      "Su": 10,
+      "Ju": 10,
+      "Me": 12
+    },
+    "5": {
+      "Su": 2,
+      "Mo": 2,
+      "Ju": 2,
+      "Ma": 6,
+      "Sa": 6,
+      "Ra": 6,
+      "Ke": 6,
+      "Ve": 9,
+      "Me": 11,
+      "La": 12
+    },
+    "6": {
+      "Me": 3,
+      "Ve": 4,
+      "Su": 7,
+      "Mo": 7,
+      "Ju": 8,
+      "Sa": 8,
+      "Ra": 8,
+      "Ke": 8,
+      "Ma": 9,
+      "La": 10
+    },
+    "7": {
+      "Ra": 1,
+      "Ma": 2,
+      "Su": 5,
+      "Ju": 5,
+      "Ke": 7,
+      "Mo": 8,
+      "Sa": 8,
+      "La": 11,
+      "Me": 11,
+      "Ve": 12
+    },
+    "8": {
+      "La": 1,
+      "Su": 2,
+      "Ju": 2,
+      "Ma": 7,
+      "Me": 7,
+      "Sa": 7,
+      "Ra": 7,
+      "Ke": 7,
+      "Mo": 9,
+      "Ve": 9
+    },
+    "9": {
+      "Ma": 1,
+      "La": 2,
+      "Me": 4,
+      "Ve": 5,
+      "Sa": 6,
+      "Ke": 6,
+      "Su": 11,
+      "Mo": 11,
+      "Ju": 11,
+      "Ra": 12
+    },
+    "10": {
+      "Ve": 2,
+      "La": 3,
+      "Ra": 4,
+      "Ma": 5,
+      "Su": 7,
+      "Ju": 7,
+      "Sa": 10,
+      "Ke": 10,
+      "Mo": 11,
+      "Me": 12
+    },
+    "11": {
+      "Mo": 1,
+      "La": 5,
+      "Su": 5,
+      "Ju": 5,
+      "Sa": 5,
+      "Ke": 5,
+      "Me": 9,
+      "Ve": 10,
+      "Ma": 11,
+      "Ra": 11
+    },
+    "12": {
+      "Me": 1,
+      "Mo": 3,
+      "Ve": 3,
+      "Sa": 3,
+      "Ke": 3,
+      "La": 8,
+      "Ra": 9,
+      "Ma": 10,
+      "Su": 11,
+      "Ju": 12
+    },
+    "16": {
+      "La": 1,
+      "Sa": 1,
+      "Ra": 1,
+      "Ke": 1,
+      "Ma": 2,
+      "Me": 2,
+      "Su": 3,
+      "Ju": 3,
+      "Ve": 5,
+      "Mo": 6
+    },
+    "20": {
+      "Su": 3,
+      "Ve": 3,
+      "Ju": 4,
+      "La": 7,
+      "Sa": 10,
+      "Ra": 10,
+      "Ke": 10,
+      "Mo": 11,
+      "Ma": 11,
+      "Me": 12
+    },
+    "24": {
+      "Me": 1,
+      "La": 4,
+      "Ve": 5,
+      "Mo": 6,
+      "Su": 7,
+      "Ju": 8,
+      "Sa": 10,
+      "Ra": 10,
+      "Ke": 10,
+      "Ma": 12
+    },
+    "27": {
+      "Ma": 1,
+      "Ve": 3,
+      "Sa": 5,
+      "Ke": 5,
+      "La": 6,
+      "Su": 7,
+      "Mo": 7,
+      "Ju": 8,
+      "Me": 10,
+      "Ra": 11
+    },
+    "30": {
+      "Su": 2,
+      "Mo": 2,
+      "Ma": 6,
+      "Ju": 6,
+      "Sa": 6,
+      "Ra": 6,
+      "Ke": 6,
+      "Me": 9,
+      "Ve": 9,
+      "La": 12
+    },
+    "40": {
+      "Ju": 2,
+      "Me": 3,
+      "La": 4,
+      "Sa": 6,
+      "Ra": 6,
+      "Ke": 6,
+      "Ma": 8,
+      "Ve": 10,
+      "Mo": 11,
+      "Su": 12
+    },
+    "45": {
+      "Me": 1,
+      "La": 5,
+      "Su": 7,
+      "Ju": 9,
+      "Ve": 9,
+      "Sa": 9,
+      "Ra": 9,
+      "Ke": 9,
+      "Mo": 10,
+      "Ma": 12
+    },
+    "60": {
+      "Ma": 2,
+      "Ke": 4,
+      "Ve": 5,
+      "Sa": 5,
+      "Su": 6,
+      "Me": 6,
+      "Mo": 8,
+      "Ju": 8,
+      "La": 10,
+      "Ra": 10
+    }
+  },
+  "chartRetrograde": {
+    "1": {
+      "La": false,
+      "Mo": false,
+      "Ma": false,
+      "Ra": false,
+      "Me": false,
+      "Ve": false,
+      "Su": false,
+      "Ju": false,
+      "Sa": false,
+      "Ke": false
+    },
+    "2": {
+      "Su": false,
+      "Mo": false,
+      "Ma": false,
+      "Ju": false,
+      "Ve": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "La": false,
+      "Me": false
+    },
+    "3": {
+      "Me": false,
+      "Ve": false,
+      "Mo": false,
+      "La": false,
+      "Ra": false,
+      "Su": false,
+      "Ma": false,
+      "Ju": false,
+      "Sa": false,
+      "Ke": false
+    },
+    "4": {
+      "Mo": false,
+      "Ve": false,
+      "Sa": false,
+      "Ke": false,
+      "La": false,
+      "Ma": false,
+      "Ra": false,
+      "Su": false,
+      "Ju": false,
+      "Me": false
+    },
+    "5": {
+      "Su": false,
+      "Mo": false,
+      "Ju": false,
+      "Ma": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Ve": false,
+      "Me": false,
+      "La": false
+    },
+    "6": {
+      "Me": false,
+      "Ve": false,
+      "Su": false,
+      "Mo": false,
+      "Ju": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Ma": false,
+      "La": false
+    },
+    "7": {
+      "Ra": false,
+      "Ma": false,
+      "Su": false,
+      "Ju": false,
+      "Ke": false,
+      "Mo": false,
+      "Sa": false,
+      "La": false,
+      "Me": false,
+      "Ve": false
+    },
+    "8": {
+      "La": false,
+      "Su": false,
+      "Ju": false,
+      "Ma": false,
+      "Me": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Mo": false,
+      "Ve": false
+    },
+    "9": {
+      "Ma": false,
+      "La": false,
+      "Me": false,
+      "Ve": false,
+      "Sa": false,
+      "Ke": false,
+      "Su": false,
+      "Mo": false,
+      "Ju": false,
+      "Ra": false
+    },
+    "10": {
+      "Ve": false,
+      "La": false,
+      "Ra": false,
+      "Ma": false,
+      "Su": false,
+      "Ju": false,
+      "Sa": false,
+      "Ke": false,
+      "Mo": false,
+      "Me": false
+    },
+    "11": {
+      "Mo": false,
+      "La": false,
+      "Su": false,
+      "Ju": false,
+      "Sa": false,
+      "Ke": false,
+      "Me": false,
+      "Ve": false,
+      "Ma": false,
+      "Ra": false
+    },
+    "12": {
+      "Me": false,
+      "Mo": false,
+      "Ve": false,
+      "Sa": false,
+      "Ke": false,
+      "La": false,
+      "Ra": false,
+      "Ma": false,
+      "Su": false,
+      "Ju": false
+    },
+    "16": {
+      "La": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Ma": false,
+      "Me": false,
+      "Su": false,
+      "Ju": false,
+      "Ve": false,
+      "Mo": false
+    },
+    "20": {
+      "Su": false,
+      "Ve": false,
+      "Ju": false,
+      "La": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Mo": false,
+      "Ma": false,
+      "Me": false
+    },
+    "24": {
+      "Me": false,
+      "La": false,
+      "Ve": false,
+      "Mo": false,
+      "Su": false,
+      "Ju": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Ma": false
+    },
+    "27": {
+      "Ma": false,
+      "Ve": false,
+      "Sa": false,
+      "Ke": false,
+      "La": false,
+      "Su": false,
+      "Mo": false,
+      "Ju": false,
+      "Me": false,
+      "Ra": false
+    },
+    "30": {
+      "Su": false,
+      "Mo": false,
+      "Ma": false,
+      "Ju": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Me": false,
+      "Ve": false,
+      "La": false
+    },
+    "40": {
+      "Ju": false,
+      "Me": false,
+      "La": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Ma": false,
+      "Ve": false,
+      "Mo": false,
+      "Su": false
+    },
+    "45": {
+      "Me": false,
+      "La": false,
+      "Su": false,
+      "Ju": false,
+      "Ve": false,
+      "Sa": false,
+      "Ra": false,
+      "Ke": false,
+      "Mo": false,
+      "Ma": false
+    },
+    "60": {
+      "Ma": false,
+      "Ke": false,
+      "Ve": false,
+      "Sa": false,
+      "Su": false,
+      "Me": false,
+      "Mo": false,
+      "Ju": false,
+      "La": false,
+      "Ra": false
+    }
+  }
+}
