@@ -50,6 +50,19 @@ Rebuilds `expected/` from `raw/`. Only needed if `raw/` changes; `checks.test.ts
 - Mahadashas and antardashas are in Vimshottari order, start with the Moon's nakshatra lord, and their lengths follow the 365.25-day year.
 - Pratyantardashas: 9 per antardasha, in order, back to back, with the right lengths, matching the PDF's dasha table.
 
+## Tolerances (how close the engine must be to JHora)
+
+Set in `engine.test.ts`, chosen by the birth's **local date** in `births.json`:
+
+| Births | Longitudes (all bodies and Lagna) | Dasha times (from step 0.3.1) | Decision |
+|---|---|---|---|
+| From 1900-01-01 | within 1″ | within 1 hour | D-074 |
+| Before 1900-01-01 (today only R26) | within 3″ | within 12 hours | D-081 |
+
+Signs, nakshatras, padas, D-9, divisional signs and retrograde must be **exact** for every birth.
+
+Why two levels: JHora and Swiss Ephemeris estimate Earth's past rotation (ΔT) a little differently, so the gap grows slowly with distance from today. The Moon moves fastest, so it shows the gap most (2018 −0.21″, 1901 +0.30″, 1853 +1.47″). For 1853 that is about 3 seconds of the Moon's motion, far less than how precisely any 1800s birth time is known. Births from 1800 stay supported (FR-IN-02); the public promise (D-013: ±1′, ±1 day) is the same for all dates.
+
 ## JHora quirks to know about
 
 - **R22 (Madras Mean Time, UTC+5:21:10).** JHora's time zone has no seconds box, so R22 was typed in as 07:29:50 at UTC+5:21 — the same instant as the true 07:30:00 at UTC+5:21:10 in `births.json` (D-072). The PDF therefore shows 07:29:50; the tests compare the instant.

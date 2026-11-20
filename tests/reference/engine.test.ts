@@ -12,8 +12,10 @@
 //        panchanga   → 0.9.1  (tithi, nakshatra, weekday, yoga, karana, hora)
 //   3. Run `pnpm test`. All enabled groups must pass before the step is merged (CLAUDE.md rule 4).
 //
-// Tolerances (D-074, stricter than the public D-013 promise):
-//   longitudes ±1″ · signs, nakshatras, padas, divisional signs exact · dasha times ±1 hour.
+// Tolerances (D-074, amended by D-081; both stricter than the public D-013 promise):
+//   births from 1900-01-01 (local date): longitudes ±1″ · dasha times ±1 hour.
+//   births before 1900-01-01:            longitudes ±3″ · dasha times ±12 hours (ΔT drift, D-081).
+//   Every birth: signs, nakshatras, padas, D-9, divisional signs and retrograde EXACT.
 //
 // Settings the engine must use to match JHora (D-070, D-071, D-072, D-073):
 //   - Ayanamsa SE_SIDM_LAHIRI ("Traditional Lahiri"); apparent geocentric positions; MEAN node.
@@ -38,8 +40,21 @@ const ENABLED = {
   panchanga: false, // 0.9.1
 };
 
+// D-074: births from 1900-01-01 on.
 const TOL_LONGITUDE_ARCSEC = 1;
 const TOL_DASHA_MS = 60 * 60 * 1000;
+// D-081: births before 1900-01-01 (local date in births.json). JHora and Swiss Ephemeris estimate
+// Earth's past rotation (ΔT) differently, so the Moon drifts (R26, 1853: +1.47″).
+const PRE_1900_BEFORE = '1900-01-01';
+const TOL_LONGITUDE_ARCSEC_PRE_1900 = 3;
+const TOL_DASHA_MS_PRE_1900 = 12 * 60 * 60 * 1000;
+
+/** Tolerances for one birth, chosen by its LOCAL date (D-074 / D-081). */
+function tolerancesFor(b: { date: string }) {
+  return b.date < PRE_1900_BEFORE
+    ? { longitudeArcsec: TOL_LONGITUDE_ARCSEC_PRE_1900, dashaMs: TOL_DASHA_MS_PRE_1900 }
+    : { longitudeArcsec: TOL_LONGITUDE_ARCSEC, dashaMs: TOL_DASHA_MS };
+}
 
 // ---------------------------------------------------------------- the contract the engine is tested against
 
@@ -121,23 +136,35 @@ const arcDiff = (a: number, b: number) => {
   return Math.min(d, 1296000 - d);
 };
 
-/** Printed date-only value (JHora clock) matches an engine instant within ±1 hour. */
-function sameDateWithinHour(engineUtc: string, printedDate: string, offsetMinutes: number) {
+/** Printed date-only value (JHora clock) matches an engine instant within ±tolMs (1 hour; 12 hours before 1900). */
+function sameDateWithin(engineUtc: string, printedDate: string, offsetMinutes: number, tolMs: number) {
   const local = Date.parse(engineUtc) + offsetMinutes * 60000;
-  const dates = [local - TOL_DASHA_MS, local + TOL_DASHA_MS].map((t) => new Date(t).toISOString().slice(0, 10));
+  const dates = [local - tolMs, local + tolMs].map((t) => new Date(t).toISOString().slice(0, 10));
   return dates.includes(printedDate);
 }
 
 const cases = births.map((b) => [b.id, b] as const);
 
+// ---------------------------------------------------------------- tolerance rule (D-074 / D-081, always on)
+
+describe('tolerance rule: looser only for births before 1900 (D-081)', () => {
+  it('R26 (1853) uses 3″ / 12 h; R22 (1901) uses 1″ / 1 h', () => {
+    const byId = (id: string) => births.find((b) => b.id === id)!;
+    expect(byId('R26').date).toBe('1853-06-28');
+    expect(byId('R22').date).toBe('1901-04-12');
+    expect(tolerancesFor(byId('R26'))).toEqual({ longitudeArcsec: 3, dashaMs: 12 * 3600 * 1000 });
+    expect(tolerancesFor(byId('R22'))).toEqual({ longitudeArcsec: 1, dashaMs: 3600 * 1000 });
+  });
+});
+
 // ---------------------------------------------------------------- positions (0.2.8)
 
 describe.skipIf(!ENABLED.positions)('engine: positions (0.2.8)', () => {
-  it.each(cases)('%s: longitudes within 1″', async (id, b) => {
+  it.each(cases)('%s: longitudes within 1″ (3″ before 1900)', async (id, b) => {
     const r = await engine(b);
     for (const code of BODIES as BodyCode[]) {
       const diff = arcDiff(r.bodies[code].lonArcsec, expected[id].bodies[code].lonArcsec);
-      expect(diff, `${code} differs by ${diff.toFixed(2)}″`).toBeLessThanOrEqual(TOL_LONGITUDE_ARCSEC);
+      expect(diff, `${code} differs by ${diff.toFixed(2)}″`).toBeLessThanOrEqual(tolerancesFor(b).longitudeArcsec);
     }
   });
 
@@ -177,7 +204,7 @@ describe.skipIf(!ENABLED.divisional)('engine: divisional charts D-1 … D-60 (1.
 // ---------------------------------------------------------------- dashas (0.3.1)
 
 describe.skipIf(!ENABLED.dashas)('engine: Vimshottari dashas (0.3.1)', () => {
-  it.each(cases)('%s: mahadasha and antardasha start dates (±1 hour)', async (id, b) => {
+  it.each(cases)('%s: mahadasha and antardasha start dates (±1 hour; ±12 hours before 1900)', async (id, b) => {
     const r = await engine(b);
     const e = expected[id];
     const off = e.jhoraClockUtcOffsetMinutes;
@@ -186,13 +213,13 @@ describe.skipIf(!ENABLED.dashas)('engine: Vimshottari dashas (0.3.1)', () => {
       expect(md.antardashas.map((a) => a.lord)).toEqual(e.vimshottari[i].antardashas.map((a: { lord: string }) => a.lord));
       md.antardashas.forEach((ad, j) => {
         const printed = e.vimshottari[i].antardashas[j].startDate;
-        expect(sameDateWithinHour(ad.startUtc, printed, off), `${md.lord}-${ad.lord}: ${ad.startUtc} vs ${printed}`).toBe(true);
+        expect(sameDateWithin(ad.startUtc, printed, off, tolerancesFor(b).dashaMs), `${md.lord}-${ad.lord}: ${ad.startUtc} vs ${printed}`).toBe(true);
       });
     });
   });
 
   const withTxt = cases.filter(([id]) => expected[id].pratyantardashas);
-  it.each(withTxt)('%s: pratyantardasha start/end times (±1 hour)', async (id, b) => {
+  it.each(withTxt)('%s: pratyantardasha start/end times (±1 hour; ±12 hours before 1900)', async (id, b) => {
     const r = await engine(b);
     for (const block of expected[id].pratyantardashas) {
       const md = r.vimshottari.find((m) => m.lord === block.mahadasha.lord)!;
@@ -201,8 +228,8 @@ describe.skipIf(!ENABLED.dashas)('engine: Vimshottari dashas (0.3.1)', () => {
       block.pratyantardashas.forEach((p: { lord: string; start: { utc: string }; end: { utc: string } }, k: number) => {
         const got = ad.pratyantardashas[k];
         expect(got.lord).toBe(p.lord);
-        expect(Math.abs(Date.parse(got.startUtc) - Date.parse(p.start.utc)), `${p.lord} start`).toBeLessThanOrEqual(TOL_DASHA_MS);
-        expect(Math.abs(Date.parse(got.endUtc) - Date.parse(p.end.utc)), `${p.lord} end`).toBeLessThanOrEqual(TOL_DASHA_MS);
+        expect(Math.abs(Date.parse(got.startUtc) - Date.parse(p.start.utc)), `${p.lord} start`).toBeLessThanOrEqual(tolerancesFor(b).dashaMs);
+        expect(Math.abs(Date.parse(got.endUtc) - Date.parse(p.end.utc)), `${p.lord} end`).toBeLessThanOrEqual(tolerancesFor(b).dashaMs);
       });
     }
   });
