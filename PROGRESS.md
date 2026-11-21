@@ -8,12 +8,12 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.10 — O-004 Bombay/Calcutta time decision |
-| **Next step** | 0.2.11 — GeoNames place index + feasibility |
-| **Then** | 0.2.12 — Calculation API |
-| **Blocked on** | Nothing |
+| **Current step** | 0.2.11 — GeoNames place index + feasibility (report ready for review) |
+| **Next step** | 0.2.12 — Calculation API |
+| **Then** | 0.2.13 — Minimal form + planet table live on the site |
+| **Blocked on** | Project review of `notes/0.2.11-place-index-feasibility.md` (D-075) |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
-| **Last updated** | 2026-11-20 |
+| **Last updated** | 2026-11-21 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
 
@@ -32,14 +32,17 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 | v0.7 Interpretations | ⏳ |
 | v0.8 Approximate time, settings, downloads | ⏳ |
 | v0.9 Panchanga + legal | ⏳ |
-| v1.0 Divisional charts + Beta launch | ⏳ |
-| v1.1 Feedback fixes | ⏳ |
-| v1.2 Basic Learn | ⏳ |
-| v1.3 Mobile test build | ⏳ |
-| v1.4 Mobile test version for friends | ⏳ |
-| v1.5 Interactive Learn | ⏳ |
-| v1.6–v1.9 Indian languages, step by step | ⏳ |
-| v2.0 Multilingual Jathag + public apps | ⏳ |
+| v1.0 Beta launch | ⏳ |
+| v1.1 Feedback fixes, 16 divisional charts, accounts | ⏳ |
+| v1.2 Mobile test build | ⏳ |
+| v1.3 Mobile test version for friends | ⏳ |
+| v1.4 Basic Learn | ⏳ |
+| v1.5 Basic Learn, more detail | ⏳ |
+| v1.6 Interactive Learn | ⏳ |
+| v1.7 Indian languages, first version | ⏳ |
+| v1.8 Indian languages, step by step | ⏳ |
+| v1.9 Language verification | ⏳ |
+| v2.0 Full setup live on App Store, Play Store and web | ⏳ |
 
 ---
 
@@ -67,9 +70,9 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.7 Reference tests created: converter → `tests/reference/expected/`, 283 self-checks passing, 180 engine tests written and switched off until 0.2.8 / 0.3.1 / 0.9.1 / 1.0.1
 - ✅ 0.2.8 Engine core: time zone → UTC, sidereal positions, Lagna (D-073), whole-sign houses, D-9, dignity (D-076), aspects, combustion (D-077); `sweph` behind one adapter, data files pinned; all 100 position reference tests pass (every longitude within 0.31″ of JHora) (PR #9)
 - ✅ 0.2.9 Test report reviewed: signed off by Adithya + Project; D-079 accepted; R26 added (D-080); pre-1900 tolerance D-081 (3″ / 12 h before 1900; R26 Moon +1.47″) (PR #10)
-- ⏳ 0.2.10 O-004 Bombay/Calcutta time decision
-- ⏳ 0.2.11 GeoNames place index + feasibility
-- ⏳ 0.2.12 Calculation API
+- ✅ 0.2.10 O-004 Bombay/Calcutta/War Time clocks decided (D-082, D-083, D-085, D-086); R27–R29 JHora answer key in `tests/reference/raw/` (raw only, added to the tests in 0.2.12)
+- 🔄 0.2.11 GeoNames place index + feasibility: index, search package and tests built; Vercel measured on a spike (deleted). Report ready for review (`notes/0.2.11-place-index-feasibility.md`)
+- ⏳ 0.2.12 Calculation API (incl. R27–R29 into the tests, D-085)
 - ⏳ 0.2.13 Minimal form + planet table live on the site
 - ⏳ 0.2.14 Founder test: 20 places + own chart vs JHora
 
@@ -94,17 +97,25 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 ### v0.9 — Panchanga + legal
 - ⏳ 0.9.1 Panchanga calc · ⏳ 0.9.2 Explanations · ⏳ 0.9.3 Panchanga card · ⏳ 0.9.4 Legal drafts · ⏳ 0.9.5 Legal pages · ⏳ 0.9.6 Analytics decision
 
-### v1.0 — Divisional charts + Beta launch
-- ⏳ 1.0.1 16 divisional charts · ⏳ 1.0.2 Chart notes · ⏳ 1.0.3 Chart selector · ⏳ 1.0.4 A11y/perf audit · ⏳ 1.0.5 Device testing · ⏳ 1.0.6 Pre-launch review · ⏳ 1.0.7 Domain + beta testers · ⏳ 1.0.8 Go live · ⏳ 1.0.9 Feedback
+### v1.0 — Beta launch
+- ⏳ 1.0.1 A11y/perf audit · ⏳ 1.0.2 Device testing · ⏳ 1.0.3 Pre-launch review · ⏳ 1.0.4 Domain + beta testers · ⏳ 1.0.5 Public launch · ⏳ 1.0.6 Beta feedback
+
+### v1.1 — Feedback fixes, divisional charts, accounts
+- ⏳ 1.1.1 Sort feedback · ⏳ 1.1.2 Feedback fixes · ⏳ 1.1.3 16 divisional charts · ⏳ 1.1.4 Chart notes · ⏳ 1.1.5 Chart selector · ⏳ 1.1.6 Accounts plan · ⏳ 1.1.7 Accounts · ⏳ 1.1.8 Plan Learn + languages
+
+### v1.2–v2.0 (steps detailed later, see `docs/roadmap.md`)
+- ⏳ v1.2 Mobile test build · ⏳ v1.3 Mobile test version for friends · ⏳ v1.4 Basic Learn · ⏳ v1.5 Basic Learn, more detail · ⏳ v1.6 Interactive Learn · ⏳ v1.7 Indian languages, first version · ⏳ v1.8 Indian languages, step by step · ⏳ v1.9 Language verification · ⏳ v2.0 Public apps + web, marketing push
 
 ---
 
 ## Open questions / blockers
 - O-001 Design references for screens beyond the home page (founder, before v0.4)
 - O-003 Content licence wording (before launch)
-- O-004 Pre-1955 Bombay/Calcutta local time (during v0.2)
 - O-005 Analytics: none vs cookieless (v0.9)
 - O-006 Domain name (v1.0)
+- O-007 Historical clocks for places now in Pakistan/Bangladesh and princely states (before v1.0)
+- O-008 Accounts: sign-in options, costs, privacy (before v1.1)
+- O-009 SEO/AEO and marketing (after v1.0)
 
 ---
 
@@ -112,6 +123,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-21 | 0.2.11 | #11 | GeoNames place index built (558,033 Indian places + 230,005 worldwide towns), search package `packages/places` with tests; measured on a Vercel spike (searches < 1 ms, but loading takes 5–9 s, fixable). Report ready for review; not merged. |
+| 2026-11-21 | 0.2.10 | — | Bombay/Calcutta/War Time clock rules decided (D-082–D-086); R27–R29 JHora answer key added (raw only) |
 | 2026-11-20 | 0.2.9 | #10 | Project decision D-081: reference tests allow 3″ (dashas 12 h) for births before 1900, 1″ / 1 h unchanged from 1900; exact checks unchanged. R26 now passes; 0.2.9 signed off. |
 | 2026-11-20 | 0.2.9 | #10 | R26 (New Haven, 1853) added to the reference tests; converter now reads coordinates with seconds from the `.jhd`; all self-checks pass for 26 births and R01–R25 data unchanged. Engine matches JHora for R26 except the Moon (+1.47″ > 1″ limit), so 0.2.9 is not signed off; PR left open for the Project. |
 | 2026-11-20 | 0.2.8 | #9 | Engine core built: positions, Lagna, houses, D-9, dignity, aspects, combustion, local time → UTC; JHora position tests switched on and passing for all 25 births (constant ≈ −0.14″ offset, max 0.31″); hand-made dignity/aspect/combustion/time-zone tests added. After Project review: `@types/node` added and engine type check now runs in CI; D-078 logged. |
