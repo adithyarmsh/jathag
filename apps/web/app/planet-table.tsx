@@ -74,6 +74,7 @@ export const PlanetTable = forwardRef<HTMLHeadingElement, { result: ChartRespons
           </table>
         </div>
         <div className="mt-4 space-y-1 border-t border-line pt-4 text-xs leading-relaxed text-muted">
+          <p>{t.methodLine}</p>
           <p>{settingsLine(result.settings, t)}</p>
           <p>
             {fill(t.placeLine, {

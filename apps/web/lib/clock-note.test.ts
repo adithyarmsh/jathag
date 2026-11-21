@@ -1,7 +1,7 @@
 // The text behind the circled "i" (FR-IN-09, D-092): chosen in the browser from the API's own rule.
 import { describe, expect, it } from 'vitest';
 import en from '../messages/en.json';
-import { clockNote } from './clock-note.ts';
+import { clockNote, earlyClockNote } from './clock-note.ts';
 import { BOMBAY_TIME_SECONDS, CALCUTTA_TIME_SECONDS, clockQuestion, IST_SECONDS, WAR_TIME_SECONDS, type ClockPlace } from './clock-rule.ts';
 
 // Real GeoNames ids and admin codes (same as tests/reference/api.test.ts and packages/api tests).
@@ -97,5 +97,80 @@ describe('the fixed numbers in the notes agree with the API’s clock offsets', 
       if (/Calcutta time,/.test(text)) expect(text, key).toContain('Calcutta time, 23 minutes 20 seconds ahead of IST');
       if (/War Time,/.test(text)) expect(text, key).toContain('War Time, one hour ahead of IST');
     }
+  });
+});
+
+describe('the "i" earlier (D-094 item 5): before a place is chosen, and with only a year', () => {
+  const early = (place: ClockPlace | null, date: string | null, year: number | null) => earlyClockNote(place, date, year, en.clockNote);
+
+  it.each([
+    ['1890', 1890, 'before1906NoPlace'],
+    ['1905', 1905, 'before1906NoPlace'],
+    ['1943', 1943, 'warTime'],
+    ['1944', 1944, 'warTime'],
+  ] as const)('year %s only, no place → "If born in India: …"', (_y, year, key) => {
+    const n = early(null, null, year)!;
+    expect(n.key).toBe(key);
+    expect(n.text.startsWith('If born in India: ')).toBe(true);
+  });
+
+  it.each([1906, 1941, 1942, 1945, 1950, 1990])('year %i only (not wholly inside a window) → no "i"', (year) => {
+    expect(early(null, null, year)).toBeNull();
+  });
+
+  it('before 1906 without a place: "up to about half an hour", no number of minutes', () => {
+    const text = early(null, null, 1890)!.text;
+    expect(text).toContain('up to about half an hour different from IST');
+    expect(text).not.toMatch(/\d+ minutes?/);
+    expect(text).not.toMatch(/madras/i);
+  });
+
+  it('full date, no place: the exact all-India rule', () => {
+    expect(early(null, '1941-10-01', 1941)!.key).toBe('warTimeEarly');
+    expect(early(null, '1941-09-30', 1941)).toBeNull();
+    expect(early(null, '1942-05-14', 1942)!.key).toBe('warTimeEarly');
+    expect(early(null, '1942-05-15', 1942)).toBeNull();
+    expect(early(null, '1942-08-31', 1942)).toBeNull();
+    expect(early(null, '1942-09-01', 1942)!.key).toBe('warTime');
+    expect(early(null, '1945-10-14', 1945)!.key).toBe('warTime');
+    expect(early(null, '1945-10-15', 1945)).toBeNull();
+    expect(early(null, '1905-12-31', 1905)!.key).toBe('before1906NoPlace');
+    expect(early(null, '1906-01-01', 1906)).toBeNull();
+    for (const d of ['1941-10-01', '1942-09-01', '1890-01-01']) expect(early(null, d, Number(d.slice(0, 4)))!.text).toMatch(/^If born in India: /);
+  });
+
+  it('no place: Mumbai and West Bengal windows never show (they need the place)', () => {
+    expect(early(null, '1950-06-01', 1950)).toBeNull();
+    expect(early(null, '1930-06-01', 1930)).toBeNull();
+  });
+
+  it('1943, then Mumbai chosen → the combined Mumbai + War Time note (no "If born in India")', () => {
+    expect(early(null, null, 1943)!.key).toBe('warTime');
+    const n = early(MUMBAI, null, 1943)!;
+    expect(n.key).toBe('mumbaiWarTime');
+    expect(n.text).toBe(en.clockNote.mumbaiWarTime);
+  });
+
+  it('1943, then London chosen → no "i"', () => {
+    expect(early(LONDON, null, 1943)).toBeNull();
+    expect(early(LONDON, '1943-07-15', 1943)).toBeNull();
+  });
+
+  it('with a place and a full date it is exactly the 0.2.13 note', () => {
+    for (const [p, d] of [[NEW_DELHI, '1890-04-02'], [MUMBAI, '1940-06-01'], [KOLKATA, '1944-08-08'], [CHENNAI, '1942-09-01'], [NEW_YORK, '1890-04-02']] as const) {
+      expect(early(p, d, Number(d.slice(0, 4)))).toEqual(note(p, d));
+    }
+  });
+
+  it('with a place and only a year: Mumbai 1950 (whole year in the Bombay window) yes, Kolkata 1949 no', () => {
+    expect(early(MUMBAI, null, 1950)!.key).toBe('mumbai');
+    expect(early(KOLKATA, null, 1948)!.key).toBe('westBengal');
+    expect(early(KOLKATA, null, 1949)).toBeNull();
+    expect(early(NEW_DELHI, null, 1890)!.text).toContain('about 21 minutes behind IST');
+  });
+
+  it('no year and no date → no "i"', () => {
+    expect(early(null, null, null)).toBeNull();
+    expect(early(MUMBAI, null, null)).toBeNull();
   });
 });

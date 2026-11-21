@@ -13,22 +13,26 @@
   "hero": {
     "nativeWordsLabel": "“Birth chart” in Indian languages",
     "title": "Know your chart, [not just your sign].",
-    "intro": "Jathag turns your birth details into an [accurate Vedic birth chart], then explains it in [short, honest, modern language]. No fear, no ads.",
+    "intro": "Jathag turns your birth details into an [accurate Vedic birth chart], and soon explains it in [short, honest, modern language].",
     "featuresLabel": "What you'll get",
     "features": [
       {
         "title": "Accurate chart",
-        "text": "Calculated from your exact birth date, time and place, drawn in the style you know."
+        "text": "Calculated from your exact birth date, time and place,",
+        "soonText": "drawn in the style you know."
       },
       {
         "title": "Plain-language explanations",
-        "text": "Short, honest notes on what each part means. No jargon, no fear."
+        "text": "Short, honest notes on what each part means. No jargon, no fear.",
+        "soon": true
       },
       {
         "title": "Your life timeline",
-        "text": "Your dasha periods, the chapters of your life, laid out as a simple timeline."
+        "text": "Your dasha periods, the chapters of your life, laid out as a simple timeline.",
+        "soon": true
       }
-    ]
+    ],
+    "comingSoon": "Coming soon"
   },
   "form": {
     "title": "Generate Your Chart",
@@ -36,6 +40,7 @@
     "date": {
       "label": "Date of birth",
       "day": "Day",
+      "dayPlaceholder": "Day",
       "month": "Month",
       "monthPlaceholder": "Month",
       "year": "Year",
@@ -43,16 +48,25 @@
     },
     "time": {
       "label": "Time of birth",
-      "hint": "The exact time, in hours and minutes, as written on the birth record."
+      "hint": "The exact time, in hours and minutes, as written on the birth record.",
+      "hour": "Hour",
+      "hourPlaceholder": "Hour",
+      "minute": "Minute",
+      "minutePlaceholder": "Min",
+      "period": "AM or PM",
+      "am": "AM",
+      "pm": "PM",
+      "periodHint": "12 AM = midnight · 12 PM = noon"
     },
     "place": {
       "label": "Place of birth",
-      "hint": "Type at least 3 letters of the town or city, then pick it from the list.",
+      "hint": "Type your town or city, e.g. Madurai. To narrow it down, add the state or country after a comma: Madurai, Tamil Nadu.",
       "searching": "Searching…",
       "noResults": "No places found. Try another spelling or a nearby town.",
       "resultsCount": "{count} places found. Use the up and down arrow keys to choose one.",
       "resultsCountOne": "1 place found. Use the up and down arrow keys to choose it.",
-      "chosen": "Latitude {lat} · Longitude {lng} · Time zone {timeZone}"
+      "chosenCoordinates": "Latitude: {lat} · Longitude: {lng}",
+      "chosenTimeZone": "Time zone: {timeZone} ({offset})"
     },
     "repeatedTime": {
       "question": "This time happened twice that night: the clocks went back an hour. Which one was it?",
@@ -68,7 +82,11 @@
   "missing": {
     "date": "Please enter your date of birth: day, month and year.",
     "time": "Please enter your time of birth.",
-    "place": "Please choose your place of birth from the list."
+    "place": "Please choose your place of birth from the list.",
+    "period": "Please choose AM or PM.",
+    "yearDigits": "Please enter the year with all 4 digits, e.g. 1985.",
+    "dayTooLarge": "{month} has {days} days.",
+    "dayTooLargeFebruary": "February {year} has {days} days."
   },
   "errors": {
     "INVALID_REQUEST": "Something went wrong while sending your details. Please check them and try again.",
@@ -106,11 +124,14 @@
     "mumbaiWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Mumbai, many people also used Bombay time, 39 minutes behind IST. If the time was written in IST or in Bombay time, your chart may be different. You'll be able to switch soon.",
     "mumbaiWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Mumbai many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If the time was written in War Time or in Bombay time, your chart may be different. You'll be able to switch soon.",
     "westBengalWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Kolkata and West Bengal, many people also used Calcutta time, 23 minutes 20 seconds ahead of IST. If the time was written in IST or in Calcutta time, your chart may be different. You'll be able to switch soon.",
-    "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If the time was written in War Time or in Calcutta time, your chart may be different. You'll be able to switch soon."
+    "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If the time was written in War Time or in Calcutta time, your chart may be different. You'll be able to switch soon.",
+    "ifInIndia": "If born in India: {text}",
+    "before1906NoPlace": "Before 1906, many towns kept their own local time, up to about half an hour different from IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon."
   },
   "chart": {
     "title": "Planet positions",
     "summary": "{date} · {time} · {place}",
+    "summaryTime": "{time12} ({time24})",
     "scrollHint": "Swipe sideways to see every column.",
     "columns": {
       "body": "Planet",
@@ -131,6 +152,7 @@
     "settingsLine": "Settings: {ayanamsa} · {node} · {houses}",
     "placeLine": "Place: {lat}, {lng} · Clock used: {offset}",
     "engineLine": "Engine version {version}",
+    "methodLine": "Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · checked against Jagannatha Hora",
     "settings": {
       "ayanamsa": { "lahiri": "Lahiri ayanamsa" },
       "node": { "mean": "mean node", "true": "true node" },
@@ -174,6 +196,8 @@
   "footer": {
     "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
     "sourceLink": "Source code (AGPL)",
+    "version": "v{step} · {commit}",
+    "versionLocal": "v{step}",
     "madeBy": "Made by [Adithya]",
     "newTab": "(opens in a new tab)"
   }

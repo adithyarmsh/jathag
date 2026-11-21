@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.4 · 2026-11-21 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.6 · 2026-11-21 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -102,6 +102,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.2.12 | CODE | Calculation API (no logging of birth details); applies the "Which clock?" rule and passes the engine an explicit UTC offset to the second (D-082); adds R27–R29 to `births.json` and the reference tests (births without an IANA zone, times with seconds; D-085); all 29 births pass | Works on preview; logs checked |
 | 0.2.13 | CODE | Minimal B2 form (replaces the Coming Soon card) + plain planet-position table; "Beta — work in progress" notice; short warning note for births in the historical-clock windows (FR-IN-09) | Live on jathag.vercel.app |
 | 0.2.14 | YOU | Test 20 places you know; compare your own chart with JHora | Matches |
+| 0.2.15 | CODE | Founder test fixes (D-094): smarter place search + hint, 12-hour time with bounded pick-lists and AM/PM buttons, day/month dropdowns with live date checks, earlier old-clock "i", place details with time zone and UTC offset, fixed header, footer version, "Coming soon" tags and calculation line, no duplicate cards, form in the first page load | Live; founder re-checks |
 
 ## v0.3 — Timing engine
 
@@ -121,7 +122,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 |---|---|---|---|
 | 0.4.1 | YOU | References for the remaining screens (O-001); can start any time | Sent |
 | 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve |
-| 0.4.3 | PROJECT | Mockups (phone + desktop): overview, charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
+| 0.4.3 | PROJECT | Mockups (phone + desktop): overview (the separate chart page, see 0.5.1), charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given |
 | 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged |
 | 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged |
@@ -131,7 +132,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 
 | Step | Who | What | Done when |
 |---|---|---|---|
-| 0.5.1 | CODE | Chart overview (bird's-eye view) | You compare with JHora |
+| 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below. Until then (v0.2–v0.4) the table appears under the form on the home page | You compare with JHora |
 | 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle | Visual match with JHora |
 | 0.5.3 | CODE | Planets table + planet detail pages (numbers; text placeholders until v0.7) | Merged |
 
@@ -159,7 +160,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.8.1 | CODE | Approximate-time experience (certain vs uncertain markers, ranges) | You test "Morning" for a known birth |
 | 0.8.2 | CODE | Settings: beginner + advanced toggle, reset | Merged |
 | 0.8.3 | PROJECT | Download checklist + PDF layout design | You approve |
-| 0.8.4 | CODE | Downloads: chart-only → PNG; anything else → PDF; in-browser | All combinations work on iPhone + Android |
+| 0.8.4 | CODE | Downloads: chart-only → PNG; anything else → PDF; in-browser; the download buttons sit at the top of the chart page next to the birth details (0.5.1) and wherever else the site offers downloads | All combinations work on iPhone + Android |
 | 0.8.5 | CODE | Report-an-issue link | Merged |
 
 ## v0.9 — Panchanga + legal
