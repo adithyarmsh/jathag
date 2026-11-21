@@ -178,6 +178,9 @@ importers:
       '@jathag/engine':
         specifier: workspace:*
         version: link:packages/engine
+      '@jathag/places':
+        specifier: workspace:*
+        version: link:packages/places
       pdfjs-dist:
         specifier: 6.5.438
         version: 6.5.438
@@ -232,6 +235,15 @@ importers:
       sweph:
         specifier: 2.10.3-8
         version: 2.10.3-8
+    devDependencies:
+      '@types/node':
+        specifier: 24.19.2
+        version: 24.19.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
+  packages/places:
     devDependencies:
       '@types/node':
         specifier: 24.19.2

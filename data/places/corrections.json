@@ -1,0 +1,25 @@
+{
+  "about": "Corrections applied to GeoNames data during the build (D-088). Each entry gives the GeoNames id, the field, the value GeoNames has (the build stops if it no longer matches, so a data refresh is checked by hand) and the corrected value, with the source.",
+  "corrections": [
+    {
+      "id": 1268126,
+      "name": "Kandivli",
+      "field": "latitude",
+      "old": "17.87339",
+      "new": "19.20451",
+      "reason": "GeoNames codes Kandivli as Mumbai Suburban (IN.16.518) but places it near Satara, about 135 km south of Mumbai.",
+      "source": "Wikipedia, Kandivali (https://en.wikipedia.org/wiki/Kandivali): 19°12′16″N 72°50′16″E = 19.204511, 72.837639; same point in Wikidata Q6361552 (https://www.wikidata.org/wiki/Q6361552). GeoNames' own Kandivli railway station (11858534) is at 19.20455, 72.8521, about 1.5 km away.",
+      "date": "2026-11-21"
+    },
+    {
+      "id": 1268126,
+      "name": "Kandivli",
+      "field": "longitude",
+      "old": "73.22921",
+      "new": "72.83764",
+      "reason": "GeoNames codes Kandivli as Mumbai Suburban (IN.16.518) but places it near Satara, about 135 km south of Mumbai.",
+      "source": "Wikipedia, Kandivali (https://en.wikipedia.org/wiki/Kandivali): 19°12′16″N 72°50′16″E = 19.204511, 72.837639; same point in Wikidata Q6361552 (https://www.wikidata.org/wiki/Q6361552). GeoNames' own Kandivli railway station (11858534) is at 19.20455, 72.8521, about 1.5 km away.",
+      "date": "2026-11-21"
+    }
+  ]
+}

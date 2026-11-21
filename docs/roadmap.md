@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.1 · 2026-11-20 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.4 · 2026-11-21 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -53,14 +53,17 @@ Claude (Project) and Claude Code do not share memory. The bridges are: the hando
 | **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
 | **v0.8 Approx. time, settings, downloads** | Certain/uncertain markers, settings, PNG/PDF downloads, report-an-issue | ⏳ |
 | **v0.9 Panchanga + legal** | Panchanga card; privacy, disclaimer, about, credits pages | ⏳ |
-| **v1.0 Divisional charts + Beta launch** | All 16 divisional charts; quality pass; domain; Jathag goes public | ⏳ |
-| v1.1 | Beta feedback fixes | ⏳ |
-| v1.2 | Basic Learn (scope decided after v1.0) | ⏳ |
-| v1.3 | Mobile test build on your own phone | ⏳ |
-| v1.4 | Mobile test version for a few friends | ⏳ |
-| v1.5 | Interactive Learn (scope decided after v1.0) | ⏳ |
-| v1.6 – v1.9 | Indian languages, step by step | ⏳ |
-| **v2.0** | **Multilingual Jathag + public iOS/Android apps** | ⏳ |
+| **v1.0 Beta launch** | Quality pass; domain; Jathag (English web app) goes public | ⏳ |
+| v1.1 | Beta feedback fixes; 16 divisional charts; accounts (sign in, save profiles and charts) | ⏳ |
+| v1.2 | Mobile test build on your own phone | ⏳ |
+| v1.3 | Mobile test version for a few friends | ⏳ |
+| v1.4 | Basic Learn (scope decided after v1.1) | ⏳ |
+| v1.5 | Basic Learn with more detail | ⏳ |
+| v1.6 | Interactive Learn (web, iOS, Android) | ⏳ |
+| v1.7 | Indian languages: secondary-language terms + Indian primary language | ⏳ |
+| v1.8 | Indian languages, step by step | ⏳ |
+| v1.9 | Final check of every language (terms, translations, readings) | ⏳ |
+| **v2.0** | **Full setup live on App Store, Play Store and web; marketing push** | ⏳ |
 
 Design (Track D) and content writing (Track C) can start early, in parallel with engine work; they are listed under the milestone where they must be finished. Time estimates: unknown until we measure pace during v0.2.
 
@@ -94,10 +97,10 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.2.7 | CODE | Turn JHora exports into automated reference tests | Tests exist (failing is fine) |
 | 0.2.8 | CODE | Engine core (outputs stable IDs, not English names — D-063): time zone → UTC; sidereal positions; sign/degree/nakshatra/pada/lord; retrograde; lagna; whole-sign houses; D9; dignity; graha drishti; combustion | Position tests pass (±1″, D-074; exact signs/nakshatras/padas/D9); dignity (D-076) and combustion (D-077) tested |
 | 0.2.9 | YOU + PROJECT | Review the test report; explain any mismatches | Signed off |
-| 0.2.10 | PROJECT | Research O-004 (pre-1955 Bombay/Calcutta local time); propose handling | Decision logged |
+| 0.2.10 | PROJECT + YOU | Research O-004 (pre-1955 Bombay/Calcutta local time); propose handling; JHora check (what its atlas fills in for old Indian dates) + reference births R27–R29 (Bombay Time, Calcutta Time, Delhi local time) | Decisions logged (D-082, D-083, D-085, D-086); R27–R29 answer key in `raw/` and checked by the Project |
 | 0.2.11 | CODE | GeoNames place index (all Indian populated places + worldwide towns) + feasibility report on Vercel limits | Report reviewed |
-| 0.2.12 | CODE | Calculation API (no logging of birth details) | Works on preview; logs checked |
-| 0.2.13 | CODE | Minimal B2 form (replaces the Coming Soon card) + plain planet-position table; "Beta — work in progress" notice | Live on jathag.vercel.app |
+| 0.2.12 | CODE | Calculation API (no logging of birth details); applies the "Which clock?" rule and passes the engine an explicit UTC offset to the second (D-082); adds R27–R29 to `births.json` and the reference tests (births without an IANA zone, times with seconds; D-085); all 29 births pass | Works on preview; logs checked |
+| 0.2.13 | CODE | Minimal B2 form (replaces the Coming Soon card) + plain planet-position table; "Beta — work in progress" notice; short warning note for births in the historical-clock windows (FR-IN-09) | Live on jathag.vercel.app |
 | 0.2.14 | YOU | Test 20 places you know; compare your own chart with JHora | Matches |
 
 ## v0.3 — Timing engine
@@ -121,7 +124,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.4.3 | PROJECT | Mockups (phone + desktop): overview, charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given |
 | 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged |
-| 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), validation | Merged |
+| 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged |
 | 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged |
 
 ## v0.5 — Chart screens
@@ -170,33 +173,44 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.9.5 | CODE | Legal pages live | Merged |
 | 0.9.6 | YOU | Decide analytics (O-005) | Logged |
 
-## v1.0 — Divisional charts + Beta launch
+## v1.0 — Beta launch
 
 | Step | Who | What | Done when |
 |---|---|---|---|
-| 1.0.1 | CODE | All 16 divisional charts (D1–D60) using JHora's default methods | Every reference test matches |
-| 1.0.2 | PROJECT | 16 "what this chart is for" notes | You approve |
-| 1.0.3 | CODE | Divisional chart selector beside the main chart, both styles | Merged |
-| 1.0.4 | CODE | Accessibility + performance audit and fixes | Report clean |
-| 1.0.5 | YOU | Real-device testing with a checklist from the Project | Done |
-| 1.0.6 | PROJECT | Pre-launch review against Requirements §13 | All met |
-| 1.0.7 | YOU | Buy the domain (optional); 5–10 beta testers lined up | Done |
-| 1.0.8 | CODE | Public launch: remove `noindex` and the work-in-progress notice; connect the domain | Live and listed |
-| 1.0.9 | YOU + PROJECT | Collect beta feedback; plan v1.1 | Done |
+| 1.0.1 | CODE | Accessibility + performance audit and fixes | Report clean |
+| 1.0.2 | YOU | Real-device testing with a checklist from the Project | Done |
+| 1.0.3 | PROJECT | Pre-launch review against Requirements §13 | All met |
+| 1.0.4 | YOU | Buy the domain (optional); 5–10 beta testers lined up | Done |
+| 1.0.5 | CODE | Public launch: remove `noindex` and the work-in-progress notice; connect the domain | Live and listed |
+| 1.0.6 | YOU + PROJECT | Collect beta feedback; plan v1.1 | Done |
 
-## After v1.0 (steps are detailed when we get there)
+Marketing of the English web app may start any time after 1.0.5 (D-084). SEO/AEO and social media (Instagram) are planned in a separate, parallel chat after v1.0 (O-009); their technical groundwork goes into v0.4 and the 1.0.1 audit.
+
+## v1.1 — Feedback fixes, divisional charts, accounts
+
+| Step | Who | What | Done when |
+|---|---|---|---|
+| 1.1.1 | YOU + PROJECT | Sort beta feedback into fixes | List agreed |
+| 1.1.2 | CODE | Beta feedback fixes | Merged |
+| 1.1.3 | CODE | All 16 divisional charts (D1–D60) using JHora's default methods | Every reference test matches |
+| 1.1.4 | PROJECT | 16 "what this chart is for" notes | You approve |
+| 1.1.5 | CODE | Divisional chart selector beside the main chart, both styles | Merged |
+| 1.1.6 | PROJECT | Accounts plan (O-008): sign-in options (email, Google, Apple, phone number, maybe Facebook), costs, privacy and DPDP rules, what is stored | You decide |
+| 1.1.7 | CODE | Accounts: sign-in, profiles and charts saved and synced; moving browser-saved profiles into an account | Merged; tested on phone + desktop |
+| 1.1.8 | PROJECT | Plan scope for Learn (v1.4–v1.6) and Indian languages (v1.7–v1.9) | You approve |
+
+## After v1.1 (steps are detailed when we get there)
 
 | Milestone | What | Rough steps |
 |---|---|---|
-| **v1.1** | Beta feedback fixes | Sort feedback → fix → release |
-| **v1.2** | Basic Learn | Decide scope (after v1.0) → write → build pages |
-| **v1.3** | Mobile test build | Decide framework (D-045, prototype comparison) → engine runs on the phone (offline) → install a test build on your own phone. A free Android test install is possible; iPhone test builds via TestFlight need the Apple Developer account (US$99/yr) |
-| **v1.4** | Mobile test version for friends | Core screens on mobile → share test builds with a few friends → fix |
-| **v1.5** | Interactive Learn | Decide scope → animations driven by the engine (lagna, Moon and Sun moving through the chart; eclipses; how a chart is built) |
-| **v1.6** | Languages groundwork | Decide languages and order (after v1.5) → language picker (primary + secondary) → chart terms (rasi, nakshatra, planets, houses, dasha lords) as secondary labels in the first Indian language |
-| **v1.7** | More languages for chart terms | Add the next languages' terms; native-speaker check of each list |
-| **v1.8** | Indian-language interface | Whole interface available with an Indian language as primary, English as secondary |
-| **v1.9** | Translated readings | Interpretation content translated and reviewed by native speakers (the biggest piece) |
-| **v2.0** | **Multilingual Jathag + public apps** | Web and iOS/Android apps in stores; accounts across web and apps (Supabase); age check (DPDP); store accounts (Apple US$99/yr, Google US$25) |
+| **v1.2** | Mobile test build | Decide framework (D-045, prototype comparison) → engine runs on the phone (offline) → install a test build on your own phone. A free Android test install is possible; iPhone test builds via TestFlight need the Apple Developer account (US$99/yr) |
+| **v1.3** | Mobile test version for friends | Core screens on mobile → share test builds with a few friends → fix |
+| **v1.4** | Basic Learn | Scope (decided after v1.1) → write → build, on web and mobile |
+| **v1.5** | Basic Learn, more detail | Every chart term and detail: what it means and how it is calculated |
+| **v1.6** | Interactive Learn | Simple, intuitive interactive explanations driven by the engine: how a chart is derived, how planets move between boxes, mahadasha and antardasha |
+| **v1.7** | Indian languages, first version | Secondary-language setting (Hindi, Kannada, Telugu, Malayalam, Bengali or Tamil; off by default) showing chart terms next to the English → option to make an Indian language primary with English always secondary. Method decided after v1.1 |
+| **v1.8** | Indian languages, step by step | Complete the interface and readings language by language |
+| **v1.9** | Language verification | Reconciliation process and checkpoints so every term, translation and reading is correct in every language (native-speaker review) |
+| **v2.0** | **Full launch** | Web and iOS/Android apps live in the App Store and Play Store; store accounts (Apple US$99/yr, Google US$25); marketing push |
 
 - Revisit the Swiss Ephemeris licence and hosting plan if Jathag ever earns money (D-006, D-043).
