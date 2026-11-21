@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.12 — Calculation API |
-| **Next step** | 0.2.13 — Minimal form + planet table live on the site |
-| **Then** | 0.2.14 — Founder test: 20 places + own chart vs JHora |
-| **Blocked on** | Nothing (0.2.12 handoff from the Project) |
+| **Current step** | 0.2.13 — Minimal form + planet table live on the site |
+| **Next step** | 0.2.14 — Founder test: 20 places + own chart vs JHora |
+| **Then** | v0.3 — Timing engine (0.3.1 Dashas) |
+| **Blocked on** | Nothing (waiting for the 0.2.13 handoff from the Project) |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-21 |
 
@@ -72,7 +72,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.9 Test report reviewed: signed off by Adithya + Project; D-079 accepted; R26 added (D-080); pre-1900 tolerance D-081 (3″ / 12 h before 1900; R26 Moon +1.47″) (PR #10)
 - ✅ 0.2.10 O-004 Bombay/Calcutta/War Time clocks decided (D-082, D-083, D-085, D-086); R27–R29 JHora answer key in `tests/reference/raw/` (raw only, added to the tests in 0.2.12)
 - ✅ 0.2.11 GeoNames place index + feasibility: 558,033 Indian places + 230,005 worldwide towns; `packages/places` search (India first, 3-character minimum, ASCII labels, `isMumbai`/`isWestBengal`); index loads in 0.81 s / 463 MB on Vercel; raw files on GitHub Release `geonames-2026-11-21`; Kandivli corrected. Report reviewed and approved (D-087–D-089) (PR #11)
-- ⏳ 0.2.12 Calculation API (incl. R27–R29 into the tests, D-085)
+- ✅ 0.2.12 Calculation API: `POST /api/places/search` and `POST /api/chart` (private, `no-store`, error codes only, separate Vercel functions), "Which clock?" rule (`packages/api/src/clock.ts`, D-082/D-086/D-090), R27–R29 in the reference tests (29 births, all pass); chart 1.1 s cold / ≈0.5 s warm on Vercel, no birth data in logs. Report reviewed and approved (D-091) (PR #12)
 - ⏳ 0.2.13 Minimal form + planet table live on the site
 - ⏳ 0.2.14 Founder test: 20 places + own chart vs JHora
 
@@ -123,6 +123,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-21 | 0.2.12 | #12 | Report reviewed and approved by the Project; D-091 (edge cases: start of 1800, midnight 1906-01-01, pre-1906 IST default accepted; matched old name in search results deferred to 0.4.6) committed. Squash-merged; 0.2.12 done. Next: 0.2.13 Minimal form + planet table. |
+| 2026-11-21 | 0.2.12 | #12 | Calculation API built: place search and chart endpoints (separate Vercel functions; only search loads the index), "Which clock?" rule with tests for every window, boundary and overlap (D-090 committed unchanged), R27–R29 added (29 births, R29 at 3″; all pass, max 0.61″). On the Vercel preview: chart 1.1 s cold / ≈0.5 s warm, search 2.4 s cold / ≈0.5 s warm, logs hold no birth data or search text (first preview crashed search: it imported the engine; fixed + test). 790 tests green. Report in `notes/0.2.12-calculation-api.md`; waiting for Project review. |
 | 2026-11-21 | 0.2.11 | #11 | Report reviewed and approved by Adithya + Project (D-089: odd Indian alternate names stay; Mumbai places rank as neighbourhoods accepted). Squash-merged; 0.2.11 done. Next: 0.2.12 Calculation API. |
 | 2026-11-21 | 0.2.11 | #11 | Second follow-up (D-088): Indian places first (all names), foreign places after (main name only; their alternate names dropped), ties city/neighbourhood → village → abandoned, Mumbai places rank as neighbourhoods (founder's choice); Kandivli coordinates corrected via `corrections.json` (Wikipedia/Wikidata). Index 21.3 MB, loads in 0.81 s / 463 MB on Vercel. Waiting for Project review. |
 | 2026-11-21 | 0.2.11 | #11 | Follow-up after Project review (D-087): ASCII labels with repeats collapsed and "District"/"Division" dropped; population-first order; 3-character minimum; Mumbai list (4 places) + `isMumbai`/`isWestBengal`; index format 2 loads in 0.86 s / 518 MB on Vercel (was 5–9 s / 680 MB); raw GeoNames files on GitHub Release `geonames-2026-11-21`. Waiting for Project review. |

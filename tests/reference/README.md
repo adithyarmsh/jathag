@@ -1,19 +1,20 @@
 # JHora reference tests
 
-Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8.0) with the same settings (D-013, D-074). This folder holds JHora's answers for 26 test births and the tests that hold the engine to them.
+Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8.0) with the same settings (D-013, D-074). This folder holds JHora's answers for 29 test births and the tests that hold the engine to them.
 
-**All 26 births are synthetic.** They were designed to hit edge cases (time zones, boundaries, retrogrades, high latitude, 1901 and 1853 (R26, D-080), leap day, before sunrise). They are not real people.
+**All 29 births are synthetic.** They were designed to hit edge cases (time zones, boundaries, retrogrades, high latitude, 1901 and 1853 (R26, D-080), leap day, before sunrise, and the historical Bombay, Calcutta and town clocks (R27–R29, D-085)). They are not real people.
 
 ## What is in here
 
 | Path | What it is |
 |---|---|
-| `births.json` | The 26 births R01–R26: date, local time, **true** UTC offset, IANA time zone, latitude/longitude, and why each one is included. The engine is always fed these values. |
+| `births.json` | The 29 births R01–R29: date, local time (`HH:MM`, or `HH:MM:SS` for R27–R29), **true** UTC offset, IANA time zone (`null` for R27–R29, which have a `clock` instead, see below), latitude/longitude, and why each one is included. The engine is always fed these values. |
 | `raw/` | JHora's answer key, exactly as exported. **Never edit.** `rNN.pdf` (printed chart), `rNN.jhd` (JHora's birth file), `rNN-pratyantar.txt` (pratyantardasha times for R01, R09, R10, R15, R22), `jhora-settings-jathag.ini` (the JHora settings used, D-070). |
-| `expected/` | Clean data made from `raw/` by the converter: `R01.json` … `R26.json`. |
+| `expected/` | Clean data made from `raw/` by the converter: `R01.json` … `R29.json`. |
 | `scripts/` | `convert.mjs` (the converter), `parse.mjs` (how the PDFs and text files are read), `ids.mjs` (the stable IDs). |
 | `checks.test.ts` | Self-checks on the answer key. Always on, must always pass. |
-| `engine.test.ts` | Tests that compare the engine to `expected/`. Switched off until the engine exists; see the top of the file for how each step switches its group on. |
+| `engine.test.ts` | Tests that compare the engine to `expected/`. Positions are on (0.2.8); see the top of the file for how each later step switches its group on. |
+| `api.test.ts` | End-to-end through the chart endpoint's logic (`packages/api`, step 0.2.12): R27–R29 entered as a user would (a searched place + their "Which clock?" answer) give JHora's instant and positions; R01 and R06 as controls. |
 
 ## What `expected/RNN.json` contains
 
@@ -42,8 +43,9 @@ Rebuilds `expected/` from `raw/`. Only needed if `raw/` changes; `checks.test.ts
 
 ## What the self-checks prove
 
-- All 26 births parsed with no missing field and all 20 charts present.
-- Printed birth details and the `.jhd` files match `births.json` (R22 by instant, see below).
+- All 29 births parsed with no missing field and all 20 charts present.
+- R27–R29 have no IANA zone and a `clock` whose offset equals their `utc_offset`; every other birth has an IANA zone and no clock.
+- Printed birth details and the `.jhd` files match `births.json` (R22, R28, R29 by instant, see below).
 - In every birth: the D-1 chart drawing equals the table's Rasi column, and the D-9 drawing equals the Navamsa column, for every body; bracketed (retrograde) bodies in every chart equal the table's "(R)".
 - Every sign, nakshatra, pada and navamsa in the table agrees with its own longitude; Ketu is exactly opposite Rahu.
 - Panchanga nakshatra = Moon's nakshatra, and its "% left" agrees with the Moon's longitude.
@@ -57,7 +59,7 @@ Set in `engine.test.ts`, chosen by the birth's **local date** in `births.json`:
 | Births | Longitudes (all bodies and Lagna) | Dasha times (from step 0.3.1) | Decision |
 |---|---|---|---|
 | From 1900-01-01 | within 1″ | within 1 hour | D-074 |
-| Before 1900-01-01 (today only R26) | within 3″ | within 12 hours | D-081 |
+| Before 1900-01-01 (R26 and R29) | within 3″ | within 12 hours | D-081 |
 
 Signs, nakshatras, padas, D-9, divisional signs and retrograde must be **exact** for every birth.
 
@@ -74,3 +76,12 @@ Why two levels: JHora and Swiss Ephemeris estimate Earth's past rotation (ΔT) a
 - **Place labels** printed in the PDFs (e.g. "Madras" for R12, "(, India)" for London) are just JHora's text box; only the coordinates matter, and they are correct.
 - **Seconds in coordinates (R26).** R01–R25 have whole-minute coordinates; R26 (New Haven, 41° 18′ 29″ N, 72° 55′ 43″ W) is the first with seconds. The PDF prints them as `72 W 55' 43"`; the `.jhd` stores degrees + *decimal minutes* (`72.557167` = 72° 55.7167′). The converter reads both at full precision; the `.jhd` keeps 6 decimals, so it can differ from `births.json` by 0.000001° (≈0.004″).
 - **R26 (1853, fixed UTC−5:00, `Etc/GMT+5`).** The US had no standard time until 1883, so R26 uses a fixed offset — exactly what was typed into JHora ("5:00 West of GMT"). Birth instant 1853-06-28T12:25:00Z. No pratyantardasha file.
+- **R27–R29: fixed historical clocks (D-082, D-085).** These births are on a clock that no IANA time zone gives (the tz database models only railway time and IST for India), so `births.json` has `"iana": null` and a `clock`: the "Which clock?" option a user would pick (`packages/api/src/clock.ts`). The engine gets the fixed offset (`zone: { utcOffsetSeconds }`); the time test in `packages/engine/test/time.test.ts` checks these three by that offset instead of an IANA zone. The founder typed the time zone into JHora by hand (D-070/D-072 settings; JHora's city search never applies these clocks itself, D-085):
+
+  | Birth | Place | True local time | Clock | Typed into JHora | UTC |
+  |---|---|---|---|---|---|
+  | R27 | Mumbai 19°05′N 72°53′E | 1938-05-10 09:15:00 | `bombay` UTC+4:51 (17460 s) | 09:15:00 at +4:51 (exact) | 1938-05-10T04:24:00Z |
+  | R28 | Kolkata 22°34′N 88°22′E | 1925-11-03 16:40:20 | `calcutta` UTC+5:53:20 (21200 s) | 16:40:00 at +5:53 (same instant, like R22) | 1925-11-03T10:47:00Z |
+  | R29 | New Delhi 28°37′N 77°13′E | 1895-02-20 06:49:52 | `lmt` UTC+5:08:52 (18532 s = 77.216667 × 240) | 06:50:00 at +5:09 (same instant) | 1895-02-20T01:41:00Z |
+
+  JHora's offset box has no seconds, so the self-checks compare R28 and R29 (like R22) by instant and check that JHora's offset is the true one rounded to the minute. R29 is before 1900, so it uses 3″ (D-081). No pratyantardasha files.

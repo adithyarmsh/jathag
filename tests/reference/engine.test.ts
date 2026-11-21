@@ -118,10 +118,11 @@ const expected = Object.fromEntries(births.map((b) => [b.id,
   JSON.parse(readFileSync(join(EXPECTED_DIR, `${b.id}.json`), 'utf8'))]));
 
 function inputFor(b: Birth): EngineInput {
-  // Always the TRUE values from births.json (R22: 07:30:00 at UTC+5:21:10, not JHora's 07:29:50 at +5:21)
+  // Always the TRUE values from births.json (R22: 07:30:00 at UTC+5:21:10, not JHora's 07:29:50 at +5:21;
+  // R28 16:40:20 at +5:53:20 and R29 06:49:52 at +5:08:52 likewise)
   const [y, mo, d] = b.date.split('-').map(Number);
-  const [h, mi] = b.time.split(':').map(Number);
-  const ms = Date.UTC(y, mo - 1, d, h, mi, 0) - Math.round(b.utc_offset * 3600) * 1000;
+  const [h, mi, sec = 0] = b.time.split(':').map(Number); // R27–R29 have seconds
+  const ms = Date.UTC(y, mo - 1, d, h, mi, sec) - Math.round(b.utc_offset * 3600) * 1000;
   return { utc: new Date(ms).toISOString(), lat: b.lat, lng: b.lng };
 }
 
@@ -148,12 +149,15 @@ const cases = births.map((b) => [b.id, b] as const);
 // ---------------------------------------------------------------- tolerance rule (D-074 / D-081, always on)
 
 describe('tolerance rule: looser only for births before 1900 (D-081)', () => {
-  it('R26 (1853) uses 3″ / 12 h; R22 (1901) uses 1″ / 1 h', () => {
+  it('R26 (1853) and R29 (1895) use 3″ / 12 h; R22 (1901) and every other birth use 1″ / 1 h', () => {
     const byId = (id: string) => births.find((b) => b.id === id)!;
     expect(byId('R26').date).toBe('1853-06-28');
+    expect(byId('R29').date).toBe('1895-02-20');
     expect(byId('R22').date).toBe('1901-04-12');
     expect(tolerancesFor(byId('R26'))).toEqual({ longitudeArcsec: 3, dashaMs: 12 * 3600 * 1000 });
+    expect(tolerancesFor(byId('R29'))).toEqual({ longitudeArcsec: 3, dashaMs: 12 * 3600 * 1000 });
     expect(tolerancesFor(byId('R22'))).toEqual({ longitudeArcsec: 1, dashaMs: 3600 * 1000 });
+    expect(births.filter((b) => tolerancesFor(b).longitudeArcsec === 3).map((b) => b.id)).toEqual(['R26', 'R29']);
   });
 });
 
