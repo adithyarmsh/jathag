@@ -5,14 +5,10 @@
 // every response has Cache-Control: no-store. For an unexpected failure only the error's class name
 // and code are logged (never its message, which could contain input).
 
-import type { EphemerisAdapter } from '@jathag/engine';
-import type { PlaceIndex } from '@jathag/places';
-import { calculateChartResponse, parseChartRequest } from './chart.ts';
+// Shared by both endpoints. Must NOT import the engine: the search function on Vercel has no
+// Swiss Ephemeris binary (a test checks this).
 import { ApiError, errorBody } from './errors.ts';
-import { parseSearchRequest, searchPlaces } from './search.ts';
 
-export const MAX_CHART_BODY_BYTES = 4096;
-export const MAX_SEARCH_BODY_BYTES = 1024;
 
 const HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -20,14 +16,14 @@ const HEADERS = {
   'X-Robots-Tag': 'noindex',
 };
 
-type Timing = Record<string, number>;
+export type Timing = Record<string, number>;
 
-function respond(status: number, body: unknown, timing: Timing): Response {
+export function respond(status: number, body: unknown, timing: Timing): Response {
   const serverTiming = Object.entries(timing).map(([k, v]) => `${k};dur=${v.toFixed(1)}`).join(', ');
   return new Response(JSON.stringify(body), { status, headers: { ...HEADERS, 'Server-Timing': serverTiming } });
 }
 
-async function readJson(request: Request, maxBytes: number): Promise<unknown> {
+export async function readJson(request: Request, maxBytes: number): Promise<unknown> {
   const declared = Number(request.headers.get('content-length') ?? '0');
   if (declared > maxBytes) throw new ApiError('REQUEST_TOO_LARGE', 413);
   const text = await request.text();
@@ -40,7 +36,7 @@ async function readJson(request: Request, maxBytes: number): Promise<unknown> {
 }
 
 /** Runs fn, turning any error into a coded response; adds Server-Timing (wall and CPU time). */
-async function handle(name: string, fn: (timing: Timing) => Promise<unknown>): Promise<Response> {
+export async function handle(name: string, fn: (timing: Timing) => Promise<unknown>): Promise<Response> {
   const t0 = performance.now();
   const c0 = process.cpuUsage();
   const timing: Timing = {};
@@ -62,39 +58,3 @@ async function handle(name: string, fn: (timing: Timing) => Promise<unknown>): P
   }
 }
 
-export interface ChartHandlerOptions {
-  /** Called once per request; lets the web app create the adapter lazily with its own data path. */
-  ephemeris?: () => EphemerisAdapter;
-}
-
-/** POST /api/chart */
-export function handleChartRequest(request: Request, options: ChartHandlerOptions = {}): Promise<Response> {
-  return handle('chart', async (timing) => {
-    const body = await readJson(request, MAX_CHART_BODY_BYTES);
-    const req = parseChartRequest(body);
-    const t = performance.now();
-    const ephemeris = options.ephemeris?.();
-    const result = calculateChartResponse(req, ephemeris ? { ephemeris } : {});
-    timing.calc = performance.now() - t;
-    return result;
-  });
-}
-
-export interface SearchHandlerOptions {
-  /** Returns the place index, loading it on first use. `loadMs` = how long loading took, when it happened during this call (else null). */
-  index: () => { index: PlaceIndex; loadMs: number | null };
-}
-
-/** POST /api/places/search */
-export function handleSearchRequest(request: Request, options: SearchHandlerOptions): Promise<Response> {
-  return handle('places', async (timing) => {
-    const body = await readJson(request, MAX_SEARCH_BODY_BYTES);
-    const query = parseSearchRequest(body);
-    const { index, loadMs } = options.index();
-    if (loadMs !== null) timing.load = loadMs;
-    const t = performance.now();
-    const result = searchPlaces(index, query);
-    timing.search = performance.now() - t;
-    return result;
-  });
-}

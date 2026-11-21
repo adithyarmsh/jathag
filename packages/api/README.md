@@ -1,6 +1,6 @@
 # @jathag/api
 
-Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` / `handleSearchRequest`, so everything here is tested without a server.
+Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` (from `@jathag/api`) and `handleSearchRequest` (from `@jathag/api/search-endpoint`, which never imports the engine: the search function has no Swiss Ephemeris binary; `test/imports.test.ts` checks this), so everything here is tested without a server.
 
 **Privacy (FR-API-02, D-014):** nothing here logs, stores or caches a request. Errors never contain any part of the request. Every response has `Cache-Control: no-store`. An unexpected failure logs only the error's class name and code (never its message).
 
