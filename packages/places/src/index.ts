@@ -76,8 +76,9 @@ interface Cand {
   p: number;
   pop: number;
   exact: boolean;
-  key: string;
   kind: number;
+  /** Order bucket from the build (D-088): 0–2 India, 3–5 elsewhere; city / village / abandoned. */
+  group: number;
 }
 
 export class PlaceIndex {
@@ -87,11 +88,13 @@ export class PlaceIndex {
   readonly sources: ReadonlyArray<{ name: string; sha256: string }>;
   /** GeoNames ids of Mumbai places that have no district in GeoNames (mumbai-no-district.json). */
   readonly mumbaiExtraIds: ReadonlySet<number>;
+  /** Corrections applied to GeoNames values by the build (corrections.json): "id field old new". */
+  readonly corrections: ReadonlyArray<string>;
 
   private readonly text: string;
   /** Start of each place row in `text`. */
   private readonly rowStart: Int32Array;
-  /** Sorted search-name lines: "key\tplace(36)\tkind(36)\tpopulation(36)". */
+  /** Sorted search-name lines: "key\tplace(36)\tkind(36)\tpopulation(36)\tgroup". */
   private readonly keys: string[];
   private readonly zones: string[] = [];
   private readonly countries = new Map<string, string>();
@@ -104,6 +107,7 @@ export class PlaceIndex {
     this.text = text;
     const sources: { name: string; sha256: string }[] = [];
     const mumbai = new Set<number>();
+    const corrections: string[] = [];
     // Header lines start with '#'.
     let pos = text.indexOf('\n') + 1;
     while (text.charCodeAt(pos) === 35) {
@@ -116,11 +120,13 @@ export class PlaceIndex {
         case '#1': this.admin1.set(f[1]!, f[3] || f[2]!); break; // ASCII name
         case '#2': this.admin2.set(f[1]!, f[3] || f[2]!); break;
         case '#M': mumbai.add(Number(f[1])); break;
+        case '#X': corrections.push(f.slice(1).join(' ')); break;
       }
       pos = end + 1;
     }
     this.sources = sources;
     this.mumbaiExtraIds = mumbai;
+    this.corrections = corrections;
     // Place rows until the "#K" line.
     const kAt = text.indexOf('\n#K\n', pos - 1);
     if (kAt < 0) throw new Error('Place index has no search names (#K)');
@@ -173,14 +179,17 @@ export class PlaceIndex {
   }
 
   /**
-   * Type-ahead search (FR-IN-04, D-087). Case- and accent-insensitive prefix match on the place
-   * name, its ASCII name and its kept alternate/old names; at least 3 characters. Text after a
-   * comma narrows the result: "aurangabad, bihar" keeps places whose district, state or country
+   * Type-ahead search (FR-IN-04, D-087, D-088). Case- and accent-insensitive prefix match;
+   * at least 3 characters. Places in India match on their name, ASCII name and kept old or
+   * alternate names; places elsewhere on their name and ASCII name only. Text after a comma
+   * narrows the result: "aurangabad, bihar" keeps places whose district, state or country
    * starts with "bihar".
    *
-   * Order: population, largest first (whichever name matched). Ties, including places with no
-   * population figure: exact name match before prefix match, then alphabetical by the matched
-   * name, then by label, then GeoNames id (so the order is always the same).
+   * Order (D-088): places in India first, then the rest of the world; within each, population
+   * (largest first). Ties, including places with no population figure: cities, state/district
+   * seats and city neighbourhoods (and every place in Mumbai) before villages, villages before
+   * abandoned/historical places; then exact match before prefix; then alphabetical by label;
+   * then GeoNames id (so the order is always the same).
    */
   search(query: string, options: SearchOptions = {}): SearchResult[] {
     const limit = options.limit ?? 10;
@@ -205,12 +214,13 @@ export class PlaceIndex {
       const t1 = line.indexOf('\t');
       const t2 = line.indexOf('\t', t1 + 1);
       const t3 = line.indexOf('\t', t2 + 1);
+      const t4 = line.indexOf('\t', t3 + 1);
       const p = parseInt(line.slice(t1 + 1, t2), 36);
       const kind = parseInt(line.slice(t2 + 1, t3), 36);
       const exact = t1 === q.length;
       const prev = best.get(p);
       if (prev && (prev.exact && !exact || prev.exact === exact && prev.kind <= kind)) continue;
-      best.set(p, { p, pop: parseInt(line.slice(t3 + 1), 36), exact, key: line.slice(0, t1), kind });
+      best.set(p, { p, pop: parseInt(line.slice(t3 + 1, t4), 36), exact, kind, group: line.charCodeAt(t4 + 1) - 48 });
     }
 
     let cands = [...best.values()];
@@ -228,9 +238,12 @@ export class PlaceIndex {
       return l;
     };
     cands.sort((x, y) => {
+      const ix = x.group < 3 ? 0 : 1;
+      const iy = y.group < 3 ? 0 : 1;
+      if (ix !== iy) return ix - iy; // India first
       if (x.pop !== y.pop) return y.pop - x.pop;
+      if (x.group !== y.group) return x.group - y.group; // city / neighbourhood, village, abandoned
       if (x.exact !== y.exact) return x.exact ? -1 : 1;
-      if (x.key !== y.key) return x.key < y.key ? -1 : 1;
       const lx = label(x.p);
       const ly = label(y.p);
       if (lx !== ly) return lx < ly ? -1 : 1;

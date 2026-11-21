@@ -24,6 +24,7 @@ export const SOURCES_FILE = join(HERE, 'sources.json');
 export const OUT_DIR = join(HERE, 'index');
 export const FORMAT_VERSION = 2;
 export const MUMBAI_FILE = join(HERE, 'mumbai-no-district.json');
+export const CORRECTIONS_FILE = join(HERE, 'corrections.json');
 
 // ---------------------------------------------------------------- small helpers
 
@@ -118,6 +119,27 @@ function lines(buf) {
 
 const byCode = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
+// ---------------------------------------------------------------- order buckets (D-088)
+
+/** Cities, state/district seats and city neighbourhoods. */
+const TIER_CITY = new Set(['PPLC', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLA5', 'PPLG', 'PPLX']);
+/** Abandoned, destroyed and historical places. */
+const TIER_PAST = new Set(['PPLQ', 'PPLW', 'PPLH', 'PPLCH']);
+
+/**
+ * Order bucket for search ties (D-088): 0–2 = India, 3–5 = rest of the world; within each,
+ * 0 = city / seat / neighbourhood, 1 = village and other places, 2 = abandoned or historical.
+ * Places in Mumbai (district Mumbai City/Suburban or the Mumbai list) count as city
+ * neighbourhoods (founder's choice in the second PR #11 follow-up): GeoNames codes many
+ * suburbs, e.g. Andheri, Bandra and Kurla, as ordinary places.
+ */
+export function searchGroup(cc, fcode, a1, a2, id, mumbaiIds) {
+  let tier = TIER_CITY.has(fcode) ? 0 : TIER_PAST.has(fcode) ? 2 : 1;
+  const inMumbai = cc === 'IN' && ((a1 === '16' && (a2 === '518' || a2 === '519')) || mumbaiIds.has(id));
+  if (inMumbai && tier === 1) tier = 0;
+  return (cc === 'IN' ? 0 : 3) + tier;
+}
+
 // ---------------------------------------------------------------- build
 
 /**
@@ -126,9 +148,11 @@ const byCode = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  *           'admin2Codes.txt': Buffer, 'countryInfo.txt': Buffer }} files
  * @param {{ name: string, sha256: string }[]} sources  recorded in the header
  * @param {number[]} mumbaiIds  GeoNames ids of Mumbai places with no district (mumbai-no-district.json)
+ * @param {{ id: number, field: 'latitude' | 'longitude', old: string, new: string }[]} corrections
+ *        fixes to GeoNames values (corrections.json); the old value must match exactly
  * @returns {{ text: string, stats: object }}
  */
-export function buildIndex(files, sources, mumbaiIds = []) {
+export function buildIndex(files, sources, mumbaiIds = [], corrections = []) {
   // Look-up tables
   const countries = new Map();
   for (const l of lines(files['countryInfo.txt'])) {
@@ -175,6 +199,19 @@ export function buildIndex(files, sources, mumbaiIds = []) {
     stats.worldByFeatureCode[f[7]] = (stats.worldByFeatureCode[f[7]] ?? 0) + 1;
   }
 
+  // Corrections (D-088): the old value must still be what GeoNames has, otherwise stop.
+  const FIELD = { latitude: 4, longitude: 5 };
+  const applied = [];
+  for (const c of corrections) {
+    const f = rows.get(c.id);
+    const col = FIELD[c.field];
+    if (!f || col === undefined) throw new Error(`Correction for ${c.id} ${c.field}: place or field not found`);
+    if (f[col] !== c.old) throw new Error(`Correction for ${c.id} ${c.field}: GeoNames has ${f[col]}, expected ${c.old}`);
+    f[col] = c.new;
+    applied.push(`#X\t${c.id}\t${c.field}\t${c.old}\t${c.new}`);
+  }
+  applied.sort();
+
   // Sort everything so the output never depends on input order.
   const ids = [...rows.keys()].sort((a, b) => a - b);
   const zones = new Set();
@@ -202,28 +239,31 @@ export function buildIndex(files, sources, mumbaiIds = []) {
     const v = admin2.get(k);
     if (v) out.push(`#2\t${k}\t${v[0]}\t${v[1]}`);
   }
-  for (const m of [...new Set(mumbaiIds)].sort((a, b) => a - b)) out.push(`#M\t${m}`);
+  const mumbai = new Set(mumbaiIds);
+  for (const m of [...mumbai].sort((a, b) => a - b)) out.push(`#M\t${m}`);
+  for (const x of applied) out.push(x);
 
-  // Search names: one line per name, "key<TAB>place number<TAB>kind<TAB>population" (numbers in
-  // base 36). kind 0 = name, 1 = ASCII name, 2+n = alternate name n. Sorted as plain strings,
-  // which (because TAB sorts before every other character) is the same as sorting by key.
+  // Search names: one line per name, "key<TAB>place number<TAB>kind<TAB>population<TAB>group"
+  // (numbers in base 36). kind 0 = name, 1 = ASCII name, 2+n = alternate name n. Alternate
+  // names only for places in India (D-088). group = order bucket (see searchGroup). Sorted as
+  // plain strings, which (because TAB sorts before every other character) is sorting by key.
   const keyLines = [];
   for (const [p, id] of ids.entries()) {
     const f = rows.get(id);
     const [, name, ascii, alt, lat, lon, , fcode, cc, , a1, a2, , , pop, , , tz] = f;
-    const alts = selectAltNames(alt, name, ascii);
+    const alts = cc === 'IN' ? selectAltNames(alt, name, ascii) : [];
     stats.altNamesKept += alts.length;
     out.push([
       id, name, ascii === name ? '' : ascii, alts.join('|'), lat, lon, cc, a1, a1 ? a2 : '',
       pop === '0' ? '' : pop, fcode, tz ? zoneIdx.get(tz) : '',
     ].join('\t'));
     const p36 = p.toString(36);
-    const pop36 = (Number(pop) || 0).toString(36);
+    const tail = `${(Number(pop) || 0).toString(36)}\t${searchGroup(cc, fcode, a1, a2, id, mumbai)}`;
     const kName = normalize(name);
-    if (kName) keyLines.push(`${kName}\t${p36}\t0\t${pop36}`);
+    if (kName) keyLines.push(`${kName}\t${p36}\t0\t${tail}`);
     const kAscii = normalize(ascii || name);
-    if (kAscii && kAscii !== kName) keyLines.push(`${kAscii}\t${p36}\t1\t${pop36}`);
-    for (const [n, a] of alts.entries()) keyLines.push(`${normalize(a)}\t${p36}\t${(2 + n).toString(36)}\t${pop36}`);
+    if (kAscii && kAscii !== kName) keyLines.push(`${kAscii}\t${p36}\t1\t${tail}`);
+    for (const [n, a] of alts.entries()) keyLines.push(`${normalize(a)}\t${p36}\t${(2 + n).toString(36)}\t${tail}`);
   }
   keyLines.sort();
   out.push('#K');
@@ -235,6 +275,10 @@ export function buildIndex(files, sources, mumbaiIds = []) {
 }
 
 // ---------------------------------------------------------------- command line
+
+export function readCorrections() {
+  return JSON.parse(readFileSync(CORRECTIONS_FILE, 'utf8')).corrections;
+}
 
 export function readMumbaiIds() {
   return JSON.parse(readFileSync(MUMBAI_FILE, 'utf8')).places.map((p) => p.id);
@@ -262,7 +306,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
   const t0 = Date.now();
   const { files, sources } = readSources(dir);
-  const { text, stats } = buildIndex(files, sources, readMumbaiIds());
+  const { text, stats } = buildIndex(files, sources, readMumbaiIds(), readCorrections());
   mkdirSync(OUT_DIR, { recursive: true });
   const raw = Buffer.from(text, 'utf8');
   const gz = gzipSync(raw, { level: 9 });

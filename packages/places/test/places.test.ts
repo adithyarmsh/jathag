@@ -1,4 +1,4 @@
-// Place index + search tests (step 0.2.11, D-087). They use the committed index
+// Place index + search tests (step 0.2.11, D-087, D-088). They use the committed index
 // data/places/index/places.tsv.gz, built from the GeoNames files pinned in data/places/sources.json.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { beforeAll, describe, expect, it } from 'vitest';
 // @ts-expect-error plain JavaScript build script, no type declarations
-import { buildIndex, normalize as buildNormalize, readMumbaiIds, readSources } from '../../../data/places/build-index.mjs';
+import { buildIndex, normalize as buildNormalize, readCorrections, readMumbaiIds, readSources } from '../../../data/places/build-index.mjs';
 import { isWestBengal, MIN_QUERY_LENGTH, normalize, PlaceIndex, type Place, type SearchResult } from '../src/index.ts';
 import { makeFixtureFiles } from './fixture.ts';
 
@@ -201,64 +201,114 @@ describe('search: labels (FR-IN-04, D-087)', () => {
   });
 });
 
-/** Was this result an exact match for q, and on which (normalised) name? */
-function matchInfo(r: SearchResult, q: string) {
+/** Was this result an exact match for q? */
+function isExact(r: SearchResult, q: string) {
   const names = r.matchedName ? [r.matchedName] : [r.name, r.asciiName];
-  const keys = names.map(normalize);
-  const exact = keys.includes(q);
-  return { exact, key: exact ? q : keys.find((k) => k.startsWith(q))! };
+  return names.map(normalize).includes(q);
 }
 
-/** D-087 order: population (largest first); ties: exact before prefix, then alphabetical. */
+/** D-088 tie bucket, worked out here independently of the build: 0 city/seat/neighbourhood (and Mumbai), 1 village, 2 abandoned. */
+function tier(r: SearchResult) {
+  if (['PPLQ', 'PPLW', 'PPLH', 'PPLCH'].includes(r.featureCode)) return 2;
+  if (['PPLC', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLA5', 'PPLG', 'PPLX'].includes(r.featureCode)) return 0;
+  return idx.isMumbai(r) ? 0 : 1;
+}
+
+/** D-088 order: India first; then population (largest first); ties: tier, exact before prefix, label. */
 function expectOrdered(q: string, results: SearchResult[]) {
   const nq = normalize(q);
   for (let i = 1; i < results.length; i++) {
     const a = results[i - 1]!;
     const b = results[i]!;
-    expect(a.population, `${q}: ${a.label} vs ${b.label}`).toBeGreaterThanOrEqual(b.population);
+    const ia = a.countryCode === 'IN';
+    const ib = b.countryCode === 'IN';
+    const msg = `${q}: ${a.label} before ${b.label}`;
+    if (ia !== ib) { expect(ia, `${msg} (India first)`).toBe(true); continue; }
+    expect(a.population, msg).toBeGreaterThanOrEqual(b.population);
     if (a.population !== b.population) continue;
-    const ma = matchInfo(a, nq);
-    const mb = matchInfo(b, nq);
-    if (ma.exact !== mb.exact) { expect(ma.exact, `${q}: exact first`).toBe(true); continue; }
-    if (ma.key !== mb.key) { expect(ma.key < mb.key, `${q}: ${ma.key} before ${mb.key}`).toBe(true); continue; }
-    expect(a.label <= b.label, `${q}: ${a.label} before ${b.label}`).toBe(true);
+    if (tier(a) !== tier(b)) { expect(tier(a), msg).toBeLessThan(tier(b)); continue; }
+    const ea = isExact(a, nq);
+    const eb = isExact(b, nq);
+    if (ea !== eb) { expect(ea, `${msg} (exact first)`).toBe(true); continue; }
+    expect(a.label <= b.label, `${msg} (alphabetical)`).toBe(true);
   }
 }
 
-describe('search: order (D-087)', () => {
-  it('"che" → Chennai before Chegur…', () => {
-    const r = idx.search('che', { limit: 100_000 });
-    const chennai = r.findIndex((x) => x.id === 1264527);
-    const chegur = r.findIndex((x) => x.asciiName.startsWith('Chegur'));
-    expect(chennai).toBeGreaterThanOrEqual(0);
-    expect(chegur).toBeGreaterThan(chennai);
-    expect(idx.search('che').map((x) => x.id)).toContain(1264527); // in the top 10
+describe('search: order (D-088)', () => {
+  it.each([
+    ['che', 1264527, 'Chennai'],
+    ['bom', 1275339, 'Mumbai'],
+    ['madras', 1264527, 'Chennai'],
+    ['trivandrum', 1254163, 'Thiruvananthapuram'],
+    ['triva', 1254163, 'Thiruvananthapuram'],
+    ['calcutta', 1275004, 'Kolkata'],
+    ['colaba', 1273862, 'Colāba'],
+  ])('"%s" → %s first (%s)', (q, id, name) => {
+    const r = top(q)!;
+    expect(r.id).toBe(id);
+    expect(r.name).toBe(name);
   });
 
-  it('"triva" → Thiruvananthapuram before the Louisiana town', () => {
-    const r = idx.search('triva');
-    expect(r[0]!.id).toBe(1254163);
-    expect(r.findIndex((x) => x.id === 4320174)).toBeGreaterThan(0);
+  it('"colaba" → Colaba, Mumbai', () => {
+    expect(top('colaba')!.label).toBe('Colaba, Mumbai, Maharashtra, India');
   });
 
-  it.each(['che', 'triva', 'bom', 'aur', 'ram', 'Andheri', 'Bandra', 'Aurangabad', 'Rampur', 'kod'])(
-    '"%s": largest first; ties exact-then-alphabetical',
+  it('"andheri" → the Andheris in Mumbai before the village Andheris', () => {
+    const r = idx.search('andheri', { limit: 50 });
+    expect(r[0]!.id).toBe(1278633);
+    expect(r[0]!.label).toBe('Andheri, Mumbai Suburban, Maharashtra, India');
+    const lastMumbai = Math.max(...r.map((x, i) => (idx.isMumbai(x) ? i : -1)));
+    const firstOther = r.findIndex((x) => !idx.isMumbai(x));
+    expect(lastMumbai).toBeLessThan(firstOther);
+  });
+
+  it('"aur" → Aurangabad (Maharashtra) first, Aurangabad (Bihar) before any foreign place', () => {
+    const r = idx.search('aur', { limit: 500 });
+    expect(r[0]!.id).toBe(1278149);
+    const bihar = r.findIndex((x) => x.id === 1278148);
+    const firstForeign = r.findIndex((x) => x.countryCode !== 'IN');
+    expect(bihar).toBeGreaterThan(0);
+    expect(firstForeign).toBeGreaterThan(bihar);
+  });
+
+  it('"lond" → London (UK) appears, after every Indian "Lond…" match', () => {
+    const r = idx.search('lond', { limit: 500 });
+    const london = r.findIndex((x) => x.id === 2643743);
+    expect(london).toBeGreaterThan(0);
+    expect(r[london]!.label).toBe('London, Greater London, England, United Kingdom');
+    expect(r.slice(0, london).every((x) => x.countryCode === 'IN')).toBe(true);
+    expect(r.findIndex((x) => x.countryCode !== 'IN')).toBe(london); // the first foreign result
+    expect(idx.search('london').map((x) => x.id)).toContain(2643743);
+  });
+
+  it.each(['new y', 'new york'])('"%s" → New York appears', (q) => {
+    expect(idx.search(q).map((x) => x.id)).toContain(5128581);
+  });
+
+  it('no foreign result is matched through an alternate name', () => {
+    for (const q of ['che', 'bom', 'ram', 'ban', 'man', 'kan', 'pal', 'aur', 'lond', 'colaba', 'triva', 'san']) {
+      const r = idx.search(q, { limit: 2000 });
+      const viaAlt = r.filter((x) => x.countryCode !== 'IN' && x.matchedName).map((x) => `${x.label} via ${x.matchedName}`);
+      expect(viaAlt, q).toEqual([]);
+    }
+    expect(idx.search('che', { limit: 100_000 }).some((x) => x.id === 1787093)).toBe(false); // Yantai ("Chefoo")
+    expect(idx.search('chefoo', { limit: 100 }).some((x) => x.id === 1787093)).toBe(false);
+  });
+
+  it('foreign places keep no alternate names in the index', () => {
+    let n = 0;
+    for (const f of placeRows()) if (f[6] !== 'IN' && f[3]) n++;
+    expect(n).toBe(0);
+  });
+
+  it.each(['che', 'triva', 'bom', 'aur', 'ram', 'ban', 'Andheri', 'Bandra', 'Aurangabad', 'Rampur', 'kod', 'lond', 'new y', 'colaba'])(
+    '"%s": India first, largest first, ties city-then-village, exact, alphabetical',
     (q) => {
-      const r = idx.search(q, { limit: 300 });
+      const r = idx.search(q, { limit: 400 });
       expect(r.length).toBeGreaterThan(0);
       expectOrdered(q, r);
     },
   );
-
-  it('ties with no population: exact name before prefix, then alphabetical', () => {
-    const r = idx.search('Andheri', { limit: 300 });
-    const zero = r.filter((x) => x.population === 0);
-    const firstPrefix = zero.findIndex((x) => !matchInfo(x, 'andheri').exact);
-    expect(firstPrefix).toBeGreaterThan(0);
-    expect(zero.slice(firstPrefix).every((x) => !matchInfo(x, 'andheri').exact)).toBe(true);
-    const exactLabels = zero.slice(0, firstPrefix).map((x) => x.label);
-    expect(exactLabels).toEqual([...exactLabels].sort());
-  });
 
   it('is deterministic', () => {
     for (const q of ['che', 'ram', 'Andheri']) {
@@ -374,9 +424,8 @@ describe('admin codes and helpers for the "Which clock?" rule (D-082, D-086, D-0
       if (!coded && inside && p.admin2Code) othersInside.push(`${p.id} ${p.asciiName} ${p.admin2Code}`);
       if (inside && !idx.isMumbai(p)) notCaught.push(`${p.id} ${p.asciiName}`);
     });
-    // Kandivli 1268126 is coded Mumbai Suburban but GeoNames puts it at 17.87 N 73.23 E
-    // (about 135 km south). Recorded, not fixed (see the report).
-    expect(outside).toEqual(['1268126 Kandivli']);
+    // Kandivli 1268126 is outside in raw GeoNames (17.87 N 73.23 E); corrections.json fixes it (D-088).
+    expect(outside).toEqual([]);
     expect(othersInside).toEqual([]);
     expect(notCaught).toEqual([]); // the list is complete for the outline
   });
@@ -404,12 +453,35 @@ describe('admin codes and helpers for the "Which clock?" rule (D-082, D-086, D-0
   });
 });
 
+describe('corrections (D-088)', () => {
+  it('Kandivli (1268126) has the corrected coordinates and is still in Mumbai', () => {
+    const k = idx.get(1268126)!;
+    expect(k.asciiName).toBe('Kandivli');
+    expect(k.lat).toBe(19.20451);
+    expect(k.lng).toBe(72.83764);
+    expect(inMumbaiArea(k.lat, k.lng)).toBe(true);
+    expect(idx.isMumbai(k)).toBe(true);
+    expect(k.label).toBe('Kandivli, Mumbai Suburban, Maharashtra, India');
+  });
+
+  it('the index records exactly the corrections in corrections.json', () => {
+    const file = JSON.parse(readFileSync(join(ROOT, 'data/places/corrections.json'), 'utf8')).corrections as
+      { id: number; field: string; old: string; new: string; source: string; date: string }[];
+    expect([...idx.corrections].sort()).toEqual(file.map((c) => `${c.id} ${c.field} ${c.old} ${c.new}`).sort());
+    for (const c of file) {
+      expect(c.source.length).toBeGreaterThan(10);
+      expect(c.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+});
+
 describe('build script', () => {
   it('is deterministic: same input → byte-identical index, whatever the row order', () => {
     const sources = [{ name: 'fixture', sha256: '0'.repeat(64) }];
-    const a = buildIndex(makeFixtureFiles(false), sources, [1275339]).text;
-    const b = buildIndex(makeFixtureFiles(false), sources, [1275339]).text;
-    const c = buildIndex(makeFixtureFiles(true), sources, [1275339]).text;
+    const fix = [{ id: 1273862, field: 'latitude', old: '18.90694', new: '18.90700' }];
+    const a = buildIndex(makeFixtureFiles(false), sources, [1275339], fix).text;
+    const b = buildIndex(makeFixtureFiles(false), sources, [1275339], fix).text;
+    const c = buildIndex(makeFixtureFiles(true), sources, [1275339], fix).text;
     expect(b).toBe(a);
     expect(c).toBe(a);
     const fixtureIdx = new PlaceIndex(a);
@@ -419,6 +491,14 @@ describe('build script', () => {
     expect(fixtureIdx.size).toBe(3); // the Indian cities500 row and the non-P row are not added
     expect(fixtureIdx.isMumbai(fixtureIdx.get(1275339)!)).toBe(true);
     expect(fixtureIdx.isMumbai(fixtureIdx.get(2988507)!)).toBe(false);
+    expect(fixtureIdx.get(1273862)!.lat).toBe(18.907); // correction applied
+    expect(fixtureIdx.search('Lutetia')).toEqual([]); // foreign alternate names are dropped
+  });
+
+  it('stops if a correction no longer matches the GeoNames value', () => {
+    const sources = [{ name: 'fixture', sha256: '0'.repeat(64) }];
+    const bad = [{ id: 1273862, field: 'latitude', old: '1.0', new: '18.9' }];
+    expect(() => buildIndex(makeFixtureFiles(false), sources, [], bad)).toThrow(/expected 1.0/);
   });
 
   // Full rebuild from the real downloads. Runs only when GEONAMES_DIR points at them
@@ -427,7 +507,7 @@ describe('build script', () => {
   const dir = process.env.GEONAMES_DIR;
   it.runIf(dir && existsSync(dir))('rebuilding from the pinned GeoNames files gives the committed index', () => {
     const { files, sources } = readSources(dir!);
-    const { text: rebuilt } = buildIndex(files, sources, readMumbaiIds());
+    const { text: rebuilt } = buildIndex(files, sources, readMumbaiIds(), readCorrections());
     expect(sha256(rebuilt)).toBe(sha256(text));
   });
 });
