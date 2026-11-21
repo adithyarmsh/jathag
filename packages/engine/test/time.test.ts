@@ -3,21 +3,32 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { localToUtc, TimeError, tzdataVersion } from '../src/index.ts';
 
-type Birth = { id: string; date: string; time: string; utc_offset: number; iana: string };
+/** iana is null for R27–R29: a fixed historical clock (Bombay, Calcutta, local mean time) that no IANA zone gives. */
+type Birth = { id: string; date: string; time: string; utc_offset: number; iana: string | null; clock?: string };
 const births: Birth[] = JSON.parse(
   readFileSync(new URL('../../../tests/reference/births.json', import.meta.url), 'utf8'),
 ).births;
+const ianaBirths = births.filter((b): b is Birth & { iana: string } => b.iana !== null);
+const fixedClockBirths = births.filter((b) => b.iana === null);
 
 /** Expected instant: local time minus the TRUE offset in births.json. */
 function byOffset(b: Birth): string {
   const [y, mo, d] = b.date.split('-').map(Number);
-  const [h, mi] = b.time.split(':').map(Number);
-  return new Date(Date.UTC(y, mo - 1, d, h, mi) - Math.round(b.utc_offset * 3600) * 1000)
+  const [h, mi, s = 0] = b.time.split(':').map(Number);
+  return new Date(Date.UTC(y, mo - 1, d, h, mi, s) - Math.round(b.utc_offset * 3600) * 1000)
     .toISOString().replace('.000Z', 'Z');
 }
 
-describe('IANA time zone gives the same instant as the true offset, all 26 reference births', () => {
-  it.each(births.map((b) => [b.id, b] as const))('%s', (_id, b) => {
+describe('reference births: 26 with an IANA zone, 3 on a fixed historical clock (R27–R29)', () => {
+  it('counts', () => {
+    expect(births).toHaveLength(29);
+    expect(ianaBirths).toHaveLength(26);
+    expect(fixedClockBirths.map((b) => b.id)).toEqual(['R27', 'R28', 'R29']);
+  });
+});
+
+describe('IANA time zone gives the same instant as the true offset, the 26 reference births with a zone', () => {
+  it.each(ianaBirths.map((b) => [b.id, b] as const))('%s', (_id, b) => {
     const r = localToUtc({ date: b.date, time: b.time, zone: { iana: b.iana } });
     expect(r.utc).toBe(byOffset(b));
     expect(r.utcOffsetSeconds).toBe(Math.round(b.utc_offset * 3600));
@@ -25,8 +36,24 @@ describe('IANA time zone gives the same instant as the true offset, all 26 refer
   });
 });
 
+describe('fixed historical clocks by offset in seconds (R27–R29, D-085)', () => {
+  it.each([
+    ['R27', 17460, '1938-05-10T04:24:00Z'], // Bombay time +4:51
+    ['R28', 21200, '1925-11-03T10:47:00Z'], // Calcutta time +5:53:20
+    ['R29', 18532, '1895-02-20T01:41:00Z'], // New Delhi local mean time +5:08:52
+  ] as const)('%s', (id, offset, utc) => {
+    const b = fixedClockBirths.find((x) => x.id === id)!;
+    expect(Math.round(b.utc_offset * 3600)).toBe(offset);
+    const r = localToUtc({ date: b.date, time: b.time, zone: { utcOffsetSeconds: offset } });
+    expect(r.utc).toBe(utc);
+    expect(r.utc).toBe(byOffset(b));
+    expect(r.utcOffsetSeconds).toBe(offset);
+    expect(r.tzdataVersion).toBeNull();
+  });
+});
+
 describe('manual UTC offset (FR-IN-07)', () => {
-  it('all 26 births by offset in seconds', () => {
+  it('all 29 births by offset in seconds', () => {
     for (const b of births) {
       const off = Math.round(b.utc_offset * 3600);
       expect(localToUtc({ date: b.date, time: b.time, zone: { utcOffsetSeconds: off } }).utc, b.id).toBe(byOffset(b));

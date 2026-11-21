@@ -9,7 +9,7 @@
     "lint": "pnpm --filter @jathag/web lint",
     "test": "vitest run",
     "reference:convert": "node tests/reference/scripts/convert.mjs",
-    "typecheck": "pnpm --filter @jathag/engine --filter @jathag/places typecheck",
+    "typecheck": "pnpm --filter @jathag/engine --filter @jathag/places --filter @jathag/api typecheck",
     "places:build": "node data/places/build-index.mjs"
   },
   "engines": {
@@ -20,6 +20,7 @@
     "@jathag/engine": "workspace:*",
     "pdfjs-dist": "6.5.438",
     "vitest": "5.1.1",
-    "@jathag/places": "workspace:*"
+    "@jathag/places": "workspace:*",
+    "@jathag/api": "workspace:*"
   }
 }

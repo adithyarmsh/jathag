@@ -1,5 +1,5 @@
 {
- "note": "Synthetic reference births for JHora answer-key tests (step 0.2.4). Not real people. Lat/long are exact degree-minute values (R26: degree-minute-second). R26 was added after step 0.2.8.",
+ "note": "Synthetic reference births for JHora answer-key tests (step 0.2.4). Not real people. Lat/long are exact degree-minute values (R26: degree-minute-second). R26 was added after step 0.2.8. R27–R29 (step 0.2.12, D-085) are on a fixed historical clock that no IANA zone gives: they have \"iana\": null and a \"clock\" (the \"Which clock?\" option, D-082), and times with seconds.",
  "births": [
   {
    "id": "R01",
@@ -286,6 +286,42 @@
    "place": "New Haven, Connecticut, USA",
    "lat": 41.308056,
    "lng": -72.928611
+  },
+  {
+   "id": "R27",
+   "why": "Bombay local time (UTC+4:51), Mumbai 1938 (D-082, D-085)",
+   "date": "1938-05-10",
+   "time": "09:15:00",
+   "utc_offset": 4.85,
+   "iana": null,
+   "clock": "bombay",
+   "place": "Mumbai, India",
+   "lat": 19.083333,
+   "lng": 72.883333
+  },
+  {
+   "id": "R28",
+   "why": "Calcutta local time (UTC+5:53:20), Kolkata 1925 (D-082, D-085)",
+   "date": "1925-11-03",
+   "time": "16:40:20",
+   "utc_offset": 5.888889,
+   "iana": null,
+   "clock": "calcutta",
+   "place": "Kolkata, India",
+   "lat": 22.566667,
+   "lng": 88.366667
+  },
+  {
+   "id": "R29",
+   "why": "Before 1906: town local mean time (UTC+5:08:52 = longitude x 4 min), New Delhi 1895 (D-082, D-085)",
+   "date": "1895-02-20",
+   "time": "06:49:52",
+   "utc_offset": 5.147778,
+   "iana": null,
+   "clock": "lmt",
+   "place": "New Delhi, India",
+   "lat": 28.616667,
+   "lng": 77.216667
   }
  ]
 }

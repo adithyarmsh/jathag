@@ -9,7 +9,7 @@ import { convertAll, loadBirths, localToUtc, EXPECTED_DIR } from './scripts/pars
 import { BODIES, VIMSHOTTARI, VIMSHOTTARI_YEARS } from './scripts/ids.mjs';
 
 type Birth = {
-  id: string; date: string; time: string; utc_offset: number; iana: string; lat: number; lng: number;
+  id: string; date: string; time: string; utc_offset: number; iana: string | null; clock?: string; lat: number; lng: number;
 };
 const births: Birth[] = loadBirths();
 const expected = births.map((b) => JSON.parse(readFileSync(join(EXPECTED_DIR, `${b.id}.json`), 'utf8')));
@@ -17,6 +17,16 @@ const expected = births.map((b) => JSON.parse(readFileSync(join(EXPECTED_DIR, `$
 const DAY = 86400000;
 const YEAR_DAYS = 365.25; // D-011 / D-070
 const ms = (iso: string) => Date.parse(iso.endsWith('Z') ? iso : `${iso}Z`);
+/** "HH:MM" → "HH:MM:00"; "HH:MM:SS" unchanged (R27–R29 have seconds). */
+const withSeconds = (t: string) => (t.length === 5 ? `${t}:00` : t);
+/** Typed into JHora differently from the true values (no seconds box for the offset): same instant. */
+const ENTERED_AS_SAME_INSTANT = ['R22', 'R28', 'R29'];
+/** Fixed historical clocks (D-082, D-085): offsets in seconds; lmt = longitude × 240 s. */
+const FIXED_CLOCK_SECONDS: Record<string, (b: Birth) => number> = {
+  bombay: () => 17460,
+  calcutta: () => 21200,
+  lmt: (b) => Math.round(b.lng * 240),
+};
 const sequenceFrom = (lord: string) => {
   const i = VIMSHOTTARI.indexOf(lord);
   return [...VIMSHOTTARI.slice(i), ...VIMSHOTTARI.slice(0, i)];
@@ -30,10 +40,24 @@ describe('expected/ is up to date with raw/', () => {
   });
 });
 
-describe('all 26 births parsed', () => {
-  it('has 26 births R01–R26', () => {
-    expect(births.map((b) => b.id)).toEqual(Array.from({ length: 26 }, (_, i) => `R${String(i + 1).padStart(2, '0')}`));
-    expect(expected).toHaveLength(26);
+describe('all 29 births parsed', () => {
+  it('has 29 births R01–R29', () => {
+    expect(births.map((b) => b.id)).toEqual(Array.from({ length: 29 }, (_, i) => `R${String(i + 1).padStart(2, '0')}`));
+    expect(expected).toHaveLength(29);
+  });
+
+  it('R27–R29 are on a fixed historical clock (no IANA zone); every other birth has an IANA zone and no clock', () => {
+    for (const b of births) {
+      if (['R27', 'R28', 'R29'].includes(b.id)) {
+        expect(b.iana, b.id).toBeNull();
+        expect(Object.keys(FIXED_CLOCK_SECONDS), b.id).toContain(b.clock);
+        expect(Math.round(b.utc_offset * 3600), `${b.id} offset = its clock`).toBe(FIXED_CLOCK_SECONDS[b.clock!]!(b));
+      } else {
+        expect(typeof b.iana, b.id).toBe('string');
+        expect(b.clock, b.id).toBeUndefined();
+      }
+    }
+    expect(births.filter((b) => b.clock).map((b) => [b.id, b.clock])).toEqual([['R27', 'bombay'], ['R28', 'calcutta'], ['R29', 'lmt']]);
   });
 
   it.each(expected.map((e) => [e.id, e]))('%s: no missing fields', (_id, e) => {
@@ -60,13 +84,16 @@ describe('all 26 births parsed', () => {
 describe('printed birth details match births.json', () => {
   it.each(births.map((b, i) => [b.id, b, expected[i]]))('%s', (id, b, e) => {
     const offsetMinutes = Math.round(b.utc_offset * 3600) / 60; // R22: 5.352778 h → 321.17 min
-    const utc = localToUtc(b.date, `${b.time}:00`, 0);
+    const utc = localToUtc(b.date, withSeconds(b.time), 0);
     const birthInstant = ms(utc) - offsetMinutes * 60000;
-    // Same instant (R22 was entered as 07:29:50 at UTC+5:21 — see README)
+    // Same instant (R22, R28, R29 were typed into JHora at the offset rounded to the minute, with
+    // the time moved to match — see README)
     expect(Math.abs(ms(e.printed.utc) - birthInstant), 'instant').toBeLessThan(1000);
-    if (id !== 'R22') {
+    if (ENTERED_AS_SAME_INSTANT.includes(id)) {
+      expect(e.printed.utcOffsetMinutes, 'JHora offset = true offset to the minute').toBe(Math.round(offsetMinutes));
+    } else {
       expect(e.printed.date).toBe(b.date);
-      expect(e.printed.time).toBe(`${b.time}:00`);
+      expect(e.printed.time).toBe(withSeconds(b.time));
       expect(e.printed.utcOffsetMinutes).toBe(offsetMinutes);
     }
     expect(e.printed.lat).toBeCloseTo(b.lat, 5);
