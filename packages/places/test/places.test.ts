@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gunzipSync } from 'node:zlib';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 // @ts-expect-error plain JavaScript build script, no type declarations
 import { buildIndex, normalize as buildNormalize, readCorrections, readMumbaiIds, readSources } from '../../../data/places/build-index.mjs';
 import { isWestBengal, MIN_QUERY_LENGTH, normalize, PlaceIndex, type Place, type SearchResult } from '../src/index.ts';
@@ -198,6 +198,86 @@ describe('search: labels (FR-IN-04, D-087)', () => {
     expect(r[0]!.id).toBe(1278148);
     expect(r.every((x) => x.admin1 === 'Bihar')).toBe(true);
     expect(idx.search('Madras, United States')[0]!.label).toBe('Madras, Jefferson County, Oregon, United States');
+  });
+});
+
+describe('search: last word(s) as district/state/country when nothing else is found (D-094 item 1)', () => {
+  it.each([
+    ['london canada', 'London, Middlesex County, Ontario, Canada'],
+    ['london ontario', 'London, Middlesex County, Ontario, Canada'],
+    ['paris texas', 'Paris, Lamar County, Texas, United States'],
+    ['springfield illinois', 'Springfield, Sangamon County, Illinois, United States'],
+    ['london united kingdom', 'London, Greater London, England, United Kingdom'],
+    ['aurangabad bihar', 'Aurangabad, Bihar, India'],
+    ['salem tamil nadu', 'Salem, Tamil Nadu, India'],
+    ['madurai tamil nadu', 'Madurai, Tamil Nadu, India'],
+    ['rampur uttar pradesh', 'Rampur, Uttar Pradesh, India'],
+  ])('"%s" → %s first', (q, label) => {
+    expect(top(q)!.label).toBe(label);
+  });
+
+  it('gives the same results as the comma form', () => {
+    for (const [plain, comma] of [['london canada', 'london, canada'], ['aurangabad bihar', 'aurangabad, bihar'], ['salem tamil nadu', 'salem, tamil nadu'], ['paris texas', 'paris, texas']]) {
+      expect(idx.search(plain!).map((r) => r.id), plain).toEqual(idx.search(comma!).map((r) => r.id));
+    }
+  });
+
+  it('Indian same-name places: the state picks the right one', () => {
+    expect(idx.search('aurangabad bihar').every((r) => r.admin1 === 'Bihar')).toBe(true);
+    expect(idx.search('aurangabad maharashtra')[0]!.id).toBe(1278149);
+    expect(idx.search('aurangabad maharashtra').every((r) => r.admin1 === 'Maharashtra')).toBe(true);
+    const rampur = idx.search('rampur himachal pradesh');
+    expect(rampur.length).toBeGreaterThan(0);
+    expect(rampur.every((r) => r.admin1 === 'Himachal Pradesh')).toBe(true);
+  });
+
+  it('names of several words are found as a whole first (unchanged)', () => {
+    // Delhi first (through its alternate name "New Delhi"), then New Delhi itself, as before 0.2.15.
+    expect(idx.search('new delhi').map((r) => r.label)).toEqual(['Delhi, India', 'New Delhi, Delhi, India']);
+    expect(idx.search('new york').map((x) => x.id)).toContain(5128581);
+    expect(idx.search('salt lake').every((r) => normalize(r.asciiName).startsWith('salt lake'))).toBe(true);
+    expect(idx.search('new delhi').every((r) => normalize(r.matchedName ?? r.asciiName).startsWith('new delhi'))).toBe(true);
+  });
+
+  it('the second try only happens when the whole text finds nothing', () => {
+    const spy = vi.spyOn(idx as unknown as { searchOnce: (...a: unknown[]) => SearchResult[] }, 'searchOnce');
+    try {
+      idx.search('new delhi');
+      expect(spy).toHaveBeenCalledTimes(1);
+      spy.mockClear();
+      idx.search('salt lake');
+      expect(spy).toHaveBeenCalledTimes(1);
+      spy.mockClear();
+      idx.search('aurangabad, bihar'); // a comma: never a second try
+      expect(spy).toHaveBeenCalledTimes(1);
+      spy.mockClear();
+      idx.search('london canada');
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy.mock.calls[0]!.slice(0, 2)).toEqual(['london canada', []]);
+      expect(spy.mock.calls[1]!.slice(0, 2)).toEqual(['london', ['canada']]);
+      spy.mockClear();
+      idx.search('salem tamil nadu'); // last word first, then moving left
+      expect(spy.mock.calls.map((c) => c.slice(0, 2))).toEqual([
+        ['salem tamil nadu', []],
+        ['salem tamil', ['nadu']],
+        ['salem', ['tamil nadu']],
+      ]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('nothing found at all → no results; the name part still needs 3 characters', () => {
+    expect(idx.search('xyzzy abc')).toEqual([]);
+    expect(idx.search('ab canada')).toEqual([]);
+  });
+
+  it('keeps the D-088 order in the second try', () => {
+    for (const q of ['aurangabad bihar', 'rampur uttar pradesh', 'london canada']) {
+      const r = idx.search(q, { limit: 400 });
+      expect(r.length).toBeGreaterThan(0);
+      expectOrdered(q.split(' ')[0]!, r);
+    }
   });
 });
 

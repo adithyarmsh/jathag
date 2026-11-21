@@ -302,3 +302,115 @@ body {
 .planet-table tbody tr:last-child td {
   border-bottom: none;
 }
+
+/* ---------------------------------------------------------------- 0.2.15: founder test fixes (D-094) */
+
+/* Fixed header (item 7): solid so the page scrolls cleanly under it. Fields scrolled to by focus or
+   by "See my chart" stop below it instead of hiding behind it. */
+.site-header {
+  background-color: var(--bg);
+}
+html {
+  scroll-padding-top: 7rem;
+}
+@media (width >= 64rem) {
+  html {
+    scroll-padding-top: 8.5rem;
+  }
+}
+
+/* "What you'll get" is rendered once (item 10a). Desktop: inside the hero card. Phones and tablets:
+   the hero box dissolves, so its intro (a card of its own) and the cards become items of the page
+   grid; the cards go last, after the form and the planet table (D-064). */
+@media (width < 64rem) {
+  .hero {
+    display: contents;
+  }
+  .hero-features {
+    order: 1;
+  }
+}
+@media (width >= 64rem) {
+  /* Inside the hero card on desktop the intro is not a card of its own. */
+  .hero-intro {
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+/* "Coming soon" tag (item 9): small and calm, on promises not live yet */
+.coming-soon {
+  display: inline-block;
+  vertical-align: 0.1em;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Dropdowns (items 2–3): one arrow style for Day, Month, Hour and Minute, a few pixels in from the edge */
+.select-wrap {
+  position: relative;
+  display: block;
+}
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-left: 0.6rem;
+  padding-right: 1.6rem;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+/* AM | PM (item 2): two side-by-side buttons, neither pre-selected; the pressed one is filled */
+.period-group {
+  display: inline-flex;
+  border: 1px solid var(--field-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.period-group[data-invalid] {
+  border-color: var(--error);
+  box-shadow: 0 0 0 1px var(--error);
+}
+.period-button {
+  min-width: 3.5rem;
+  min-height: 2.875rem;
+  padding: 0 0.9rem;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.period-button + .period-button {
+  border-left: 1px solid var(--field-border);
+}
+.period-button[aria-pressed="true"] {
+  background-color: var(--accent-text);
+  color: var(--card);
+}
+.period-button:focus-visible {
+  outline-offset: -3px;
+  border-radius: 0.6rem;
+}

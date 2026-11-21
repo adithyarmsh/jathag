@@ -19,21 +19,29 @@ type Status = "idle" | "searching" | "done" | "error";
 export function PlaceSearch({
   t,
   searchError,
+  inputId,
   place,
+  offset,
   onChange,
+  onLeave,
   error,
   errorId,
 }: {
   t: Messages["form"]["place"];
   searchError: string;
+  /** Id of the text box (the form moves focus here when no place is chosen). */
+  inputId: string;
   place: PlaceSearchResult | null;
+  /** The UTC offset to show for the chosen place, e.g. "UTC+5:30" (worked out by the form, D-094 item 6). */
+  offset: string;
   onChange: (place: PlaceSearchResult | null) => void;
+  /** Called when the text box loses focus; true if it has text in it. */
+  onLeave: (hasText: boolean) => void;
   /** A friendly message for this field (from the form), or null. */
   error: string | null;
   errorId: string;
 }) {
   const id = useId();
-  const inputId = `${id}-input`;
   const listId = `${id}-list`;
   const hintId = `${id}-hint`;
   const chosenId = `${id}-chosen`;
@@ -168,7 +176,10 @@ export function PlaceSearch({
         value={text}
         onChange={(e) => onType(e.target.value)}
         onKeyDown={onKeyDown}
-        onBlur={() => setOpen(false)}
+        onBlur={() => {
+          setOpen(false);
+          onLeave(text.trim().length > 0);
+        }}
         onFocus={() => {
           if (!place && results.length) setOpen(true);
         }}
@@ -179,7 +190,7 @@ export function PlaceSearch({
         role="listbox"
         aria-label={t.label}
         hidden={!showList}
-        className="absolute right-0 left-0 z-20 mt-1 max-h-72 overflow-y-auto rounded-xl border border-line bg-card py-1 shadow-soft"
+        className="absolute right-0 left-0 z-40 mt-1 max-h-72 overflow-y-auto rounded-xl border border-line bg-card py-1 shadow-soft"
       >
         {results.map((r, i) => (
           <li
@@ -201,13 +212,15 @@ export function PlaceSearch({
         {liveText}
       </p>
       {place && (
-        <p id={chosenId} className="mt-2 text-xs text-muted">
-          {fill(t.chosen, {
-            lat: formatCoordinate(place.lat, "lat"),
-            lng: formatCoordinate(place.lng, "lng"),
-            timeZone: place.timeZone,
-          })}
-        </p>
+        <div id={chosenId} className="mt-2 space-y-0.5 text-xs text-muted">
+          <p>
+            {fill(t.chosenCoordinates, {
+              lat: formatCoordinate(place.lat, "lat"),
+              lng: formatCoordinate(place.lng, "lng"),
+            })}
+          </p>
+          <p>{fill(t.chosenTimeZone, { timeZone: place.timeZone, offset })}</p>
+        </div>
       )}
     </div>
   );

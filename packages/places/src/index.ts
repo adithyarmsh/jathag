@@ -185,6 +185,12 @@ export class PlaceIndex {
    * narrows the result: "aurangabad, bihar" keeps places whose district, state or country
    * starts with "bihar".
    *
+   * Without a comma (D-094 item 1): the whole text is always tried first, so names of several
+   * words ("new delhi", "salt lake") are found as before. Only if that finds nothing, the last
+   * word(s) are tried as a district/state/country filter instead, starting with the last word
+   * and moving left: "london canada" → name "london" + filter "canada"; "salem tamil nadu" →
+   * "salem tamil" + "nadu", then "salem" + "tamil nadu". The first try that finds something wins.
+   *
    * Order (D-088): places in India first, then the rest of the world; within each, population
    * (largest first). Ties, including places with no population figure: cities, state/district
    * seats and city neighbourhoods (and every place in Mumbai) before villages, villages before
@@ -198,7 +204,22 @@ export class PlaceIndex {
     const q = normalize(head);
     if (q.length < MIN_QUERY_LENGTH || limit <= 0) return [];
     const filters = rest.map(normalize).filter((s) => s.length > 0);
+    const first = this.searchOnce(q, filters, limit, exclude);
+    if (first.length > 0 || rest.length > 0) return first;
 
+    // Nothing found and no comma: try the last word(s) as a filter (D-094 item 1).
+    const words = q.split(' ');
+    for (let k = 1; k < words.length; k++) {
+      const name = words.slice(0, words.length - k).join(' ');
+      if (name.length < MIN_QUERY_LENGTH) break;
+      const found = this.searchOnce(name, [words.slice(words.length - k).join(' ')], limit, exclude);
+      if (found.length > 0) return found;
+    }
+    return [];
+  }
+
+  /** One search: places whose name starts with q (normalised), narrowed by filters, in D-088 order. */
+  private searchOnce(q: string, filters: string[], limit: number, exclude: Set<string> | undefined): SearchResult[] {
     // First line >= q, then walk while the key starts with q.
     const keys = this.keys;
     let lo = 0;

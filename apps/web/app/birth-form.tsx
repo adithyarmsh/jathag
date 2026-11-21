@@ -1,17 +1,24 @@
 "use client";
 
-// The minimal birth form (step 0.2.13, D-092): date, exact time (hours and minutes) and place.
+// The minimal birth form (steps 0.2.13 and 0.2.15; D-092, D-094): date, exact time and place.
 // "See my chart" sends them to POST /api/chart (always the DEFAULT clock, no clock choice is sent)
 // and shows the planet table below. Nothing about the birth is stored in the browser: it lives only
 // in this component's memory and is gone when the page is closed or reloaded (NFR-PRIV-01).
+//
+// 0.2.15: Day and Month are dropdowns (Day only lists days that exist), Year is typed; time is
+// Hour and Minute pick-lists plus AM | PM buttons with neither pre-selected; problems show as the
+// user goes (once the date is complete or a field is left), and "See my chart" never calculates
+// while something is wrong: it moves focus to the first field to fix instead.
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type FocusEvent } from "react";
 import type { ChartResponse, PlaceSuggestion } from "@jathag/api";
 import { errorFor, networkError, type FieldError, type FormField } from "@/lib/api-errors";
-import { clockNote } from "@/lib/clock-note";
-import { clockQuestion } from "@/lib/clock-rule";
-import { birthDate, isUsableDate } from "@/lib/birth-date";
-import { fill } from "@/lib/chart-format";
+import { earlyClockNote } from "@/lib/clock-note";
+import { birthDate, daysInMonth, isUsableDate, usableYear } from "@/lib/birth-date";
+import { fill, formatUtcOffset } from "@/lib/chart-format";
+import { checkDate, checkTime, type DatePart, type TimePart } from "@/lib/form-checks";
+import { shownOffsetSeconds } from "@/lib/place-offset";
+import { HOURS, MINUTES, to12hText, to24h, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
@@ -19,6 +26,9 @@ import { PlanetTable } from "./planet-table";
 
 type Errors = Partial<Record<FormField, string>>;
 type Repeated = "earlier" | "later";
+type Group = "date" | "time" | "place";
+
+const two = (n: number) => String(n).padStart(2, "0");
 
 function LockIcon() {
   return (
@@ -38,6 +48,9 @@ function ErrorText({ id, text }: { id: string; text?: string }) {
   );
 }
 
+/** True when focus has left the element (and everything inside it). */
+const left = (e: FocusEvent<HTMLElement>) => !e.currentTarget.contains(e.relatedTarget as Node | null);
+
 export function BirthForm({ t }: { t: Messages }) {
   const f = t.form;
   const id = useId();
@@ -45,8 +58,14 @@ export function BirthForm({ t }: { t: Messages }) {
     day: `${id}-day`,
     month: `${id}-month`,
     year: `${id}-year`,
-    time: `${id}-time`,
+    hour: `${id}-hour`,
+    minute: `${id}-minute`,
+    period: `${id}-am`, // the AM button: first of the AM | PM pair
+    periodLabel: `${id}-period-label`,
+    timeLegend: `${id}-time-legend`,
     timeHint: `${id}-time-hint`,
+    periodHint: `${id}-period-hint`,
+    place: `${id}-place`,
     dateError: `${id}-date-error`,
     timeError: `${id}-time-error`,
     placeError: `${id}-place-error`,
@@ -57,66 +76,108 @@ export function BirthForm({ t }: { t: Messages }) {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
-  const [time, setTime] = useState("");
+  const [hour, setHour] = useState("");
+  const [minute, setMinute] = useState("");
+  const [period, setPeriod] = useState<Period | null>(null);
   const [place, setPlace] = useState<PlaceSuggestion | null>(null);
   const [ambiguous, setAmbiguous] = useState(false);
   const [repeated, setRepeated] = useState<Repeated | null>(null);
-  const [errors, setErrors] = useState<Errors>({});
+  /** Messages from the API (by field). */
+  const [serverErrors, setServerErrors] = useState<Errors>({});
+  /** Which groups may show their live check (left once with something in them, or after "See my chart"). */
+  const [shown, setShown] = useState<Record<Group, boolean>>({ date: false, time: false, place: false });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ data: ChartResponse; summary: string } | null>(null);
   const tableHeading = useRef<HTMLHeadingElement>(null);
 
-  const date = birthDate(day, month, year);
+  const fullDate = birthDate(day, month, year);
+  const date = fullDate && isUsableDate(fullDate) ? fullDate : null;
+  const time = to24h(hour, minute, period);
+  const yearNumber = usableYear(year);
+  const maxDay = daysInMonth(month ? Number(month) : null, /^\d{4}$/.test(year) ? Number(year) : null);
 
-  // The "i" note: worked out in the browser with the API's own rule, as soon as date and place are set.
-  const note = useMemo(() => {
-    if (!place || !date || !isUsableDate(date)) return null;
-    return clockNote(clockQuestion(place, date), t.clockNote);
-  }, [place, date, t.clockNote]);
+  // Live checks (D-094 items 3–4).
+  const dateCheck = checkDate(day, month, year, { missing: t.missing, errors: t.errors, months: f.date.months });
+  const timeCheck = checkTime(hour, minute, period, t);
+  const dateComplete = Boolean(day && month && year.length === 4);
+  const dateLive = dateCheck && (shown.date || dateCheck.immediate || dateComplete) ? dateCheck : null;
+  const timeLive = timeCheck && shown.time ? timeCheck : null;
+  const placeLive = !place && shown.place;
 
+  const dateMessage = serverErrors.date ?? dateLive?.message;
+  const timeMessage = serverErrors.time ?? timeLive?.message;
+  const placeMessage = serverErrors.place ?? (placeLive ? t.missing.place : undefined);
+  const dateBad = (p: DatePart) => Boolean(serverErrors.date || dateLive?.parts.includes(p));
+  const timeBad = (p: TimePart) => Boolean(serverErrors.time || timeLive?.parts.includes(p));
+
+  // The "i" note: as soon as the date (or a whole year) falls in a window, before a place is chosen.
+  const note = useMemo(
+    () => earlyClockNote(place, date, yearNumber, t.clockNote),
+    [place, date, yearNumber, t.clockNote],
+  );
+
+  // The UTC offset under the place: the default clock in a window, else the zone on that date.
+  const offset = useMemo(
+    () => (place ? formatUtcOffset(shownOffsetSeconds(place, date, time)) : ""),
+    [place, date, time],
+  );
+
+  // After a successful calculation: scroll smoothly down to the table (instantly with reduced motion).
   useEffect(() => {
-    if (result) tableHeading.current?.focus();
+    const heading = tableHeading.current;
+    if (!result || !heading) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }, [result]);
 
-  /** Any change to the birth clears that field's message and the "which one?" question. */
+  /** Any change to the birth clears that field's API message and the "which one?" question. */
   function changed(field: FormField) {
-    setErrors((e) => ({ ...e, [field]: undefined, form: undefined }));
+    setServerErrors((e) => ({ ...e, [field]: undefined, form: undefined }));
     setAmbiguous(false);
     setRepeated(null);
   }
 
-  // After a failed "See my chart", move keyboard focus to the first field with a message.
+  const show = (g: Group) => setShown((s) => (s[g] ? s : { ...s, [g]: true }));
+
+  // Move keyboard focus after the messages are on screen (so screen readers read them with the field).
+  const pendingFocus = useRef<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const focusError = useRef(false);
   useEffect(() => {
-    if (!focusError.current) return;
-    focusError.current = false;
-    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
-  }, [errors]);
+    const target = pendingFocus.current;
+    if (!target) return;
+    pendingFocus.current = null;
+    const el =
+      target === "first-invalid"
+        ? formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        : document.getElementById(target);
+    el?.focus();
+  });
 
   async function calculate(repeatedTime: Repeated | null) {
-    const missing: Errors = {};
-    if (!date) missing.date = t.missing.date;
-    if (!time) missing.time = t.missing.time;
-    if (!place) missing.place = t.missing.place;
-    if (Object.keys(missing).length) {
-      focusError.current = true;
-      setErrors(missing);
+    // Something wrong: don't calculate; show every message and go to the first field to fix.
+    if (dateCheck || timeCheck || !place || !date || !time) {
+      setShown({ date: true, time: true, place: true });
+      pendingFocus.current = dateCheck
+        ? ids[dateCheck.parts[0]!]
+        : timeCheck
+          ? ids[timeCheck.parts[0]!]
+          : ids.place;
       return;
     }
-    setErrors({});
+    setServerErrors({});
     setSubmitting(true);
     const body = {
       date,
       time,
       place: {
-        geonameId: place!.geonameId,
-        lat: place!.lat,
-        lng: place!.lng,
-        timeZone: place!.timeZone,
-        countryCode: place!.countryCode,
-        admin1Code: place!.admin1Code,
-        admin2Code: place!.admin2Code,
+        geonameId: place.geonameId,
+        lat: place.lat,
+        lng: place.lng,
+        timeZone: place.timeZone,
+        countryCode: place.countryCode,
+        admin1Code: place.admin1Code,
+        admin2Code: place.admin2Code,
       },
       ...(repeatedTime ? { repeatedTime } : {}),
     };
@@ -130,12 +191,13 @@ export function BirthForm({ t }: { t: Messages }) {
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data?.chart) {
-        const [y, m, d] = date!.split("-").map(Number);
+        const [y, m, d] = date.split("-").map(Number);
         const when = `${d} ${f.date.months[m! - 1]} ${y}`;
         const which = repeatedTime
           ? ` (${repeatedTime === "earlier" ? f.repeatedTime.summaryEarlier : f.repeatedTime.summaryLater})`
           : "";
-        setResult({ data: data as ChartResponse, summary: fill(t.chart.summary, { date: when, time: time + which, place: place!.label }) });
+        const shownTime = fill(t.chart.summaryTime, { time12: to12hText(time, f.time.am, f.time.pm), time24: time });
+        setResult({ data: data as ChartResponse, summary: fill(t.chart.summary, { date: when, time: shownTime + which, place: place.label }) });
         setAmbiguous(false);
       } else {
         problem = errorFor(data?.error?.code, t.errors);
@@ -150,8 +212,8 @@ export function BirthForm({ t }: { t: Messages }) {
         setAmbiguous(true);
         setRepeated(null);
       } else {
-        focusError.current = problem.field !== "form";
-        setErrors({ [problem.field]: problem.message });
+        if (problem.field !== "form") pendingFocus.current = "first-invalid";
+        setServerErrors({ [problem.field]: problem.message });
       }
     }
   }
@@ -161,12 +223,21 @@ export function BirthForm({ t }: { t: Messages }) {
     void calculate(r);
   }
 
-  const dateDescribedBy = errors.date ? ids.dateError : undefined;
-  const timeDescribedBy = [ids.timeHint, errors.time ? ids.timeError : null, ambiguous ? ids.repeated : null].filter(Boolean).join(" ");
+  const dateDescribedBy = dateMessage ? ids.dateError : undefined;
+  const timeDescribedBy = [ids.timeHint, timeMessage ? ids.timeError : null, ambiguous ? ids.repeated : null].filter(Boolean).join(" ");
+  const periodDescribedBy = [ids.periodHint, timeMessage ? ids.timeError : null].filter(Boolean).join(" ");
+
+  // The Day list: only days that exist for the chosen month and year. A day chosen earlier that no
+  // longer exists (31 → April) stays visible, flagged, until it is changed.
+  const dayOptions = Array.from({ length: maxDay }, (_, i) => i + 1);
+  if (day && Number(day) > maxDay) dayOptions.push(Number(day));
 
   return (
     <>
-      <section aria-labelledby="birth-form-title" className="card-outer rounded-[24px] bg-card p-6 shadow-soft sm:p-8 lg:p-10">
+      <section
+        aria-labelledby="birth-form-title"
+        className="card-outer rounded-[24px] bg-card p-6 shadow-soft sm:p-8 lg:p-10"
+      >
         <h2 id="birth-form-title" className="font-serif text-[32px] leading-[1.1] font-medium text-balance">
           {f.title}
         </h2>
@@ -181,8 +252,13 @@ export function BirthForm({ t }: { t: Messages }) {
             void calculate(ambiguous ? repeated : null);
           }}
         >
-          {/* Date of birth: day, month, year (plain fields, so old years are quick to type) */}
-          <fieldset aria-describedby={dateDescribedBy}>
+          {/* Date of birth: Day and Month dropdowns, Year typed (D-094 item 3) */}
+          <fieldset
+            aria-describedby={dateDescribedBy}
+            onBlur={(e) => {
+              if (left(e) && (day || month || year)) show("date");
+            }}
+          >
             <legend className="sr-only">{f.date.label}</legend>
             <div className="relative flex items-center gap-2">
               <span aria-hidden="true" className="font-semibold">
@@ -190,48 +266,56 @@ export function BirthForm({ t }: { t: Messages }) {
               </span>
               {note && <ClockNoteButton label={t.clockNote.buttonLabel} text={note.text} />}
             </div>
-            <div className="mt-2 grid grid-cols-[3.5rem_minmax(0,1fr)_4.75rem] gap-2 sm:grid-cols-[4.5rem_minmax(0,1fr)_5.5rem] sm:gap-3">
+            <div className="mt-2 grid grid-cols-[4.5rem_minmax(0,1fr)_4.25rem] gap-2 sm:grid-cols-[5.5rem_minmax(0,1fr)_5.5rem] sm:gap-3">
               <div>
                 <label htmlFor={ids.day} className="block text-sm text-muted">
                   {f.date.day}
                 </label>
-                <input
-                  id={ids.day}
-                  inputMode="numeric"
-                  autoComplete="off"
-                  maxLength={2}
-                  value={day}
-                  aria-invalid={errors.date ? true : undefined}
-                  aria-describedby={dateDescribedBy}
-                  onChange={(e) => {
-                    setDay(e.target.value.replace(/\D/g, ""));
-                    changed("date");
-                  }}
-                  className="form-input mt-1"
-                />
+                <span className="select-wrap mt-1">
+                  <select
+                    id={ids.day}
+                    value={day}
+                    aria-invalid={dateBad("day") || undefined}
+                    aria-describedby={dateDescribedBy}
+                    onChange={(e) => {
+                      setDay(e.target.value);
+                      changed("date");
+                    }}
+                    className="form-input form-select"
+                  >
+                    <option value="">{f.date.dayPlaceholder}</option>
+                    {dayOptions.map((n) => (
+                      <option key={n} value={String(n)}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </span>
               </div>
               <div>
                 <label htmlFor={ids.month} className="block text-sm text-muted">
                   {f.date.month}
                 </label>
-                <select
-                  id={ids.month}
-                  value={month}
-                  aria-invalid={errors.date ? true : undefined}
-                  aria-describedby={dateDescribedBy}
-                  onChange={(e) => {
-                    setMonth(e.target.value);
-                    changed("date");
-                  }}
-                  className="form-input mt-1"
-                >
-                  <option value="">{f.date.monthPlaceholder}</option>
-                  {f.date.months.map((name, i) => (
-                    <option key={name} value={String(i + 1)}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
+                <span className="select-wrap mt-1">
+                  <select
+                    id={ids.month}
+                    value={month}
+                    aria-invalid={dateBad("month") || undefined}
+                    aria-describedby={dateDescribedBy}
+                    onChange={(e) => {
+                      setMonth(e.target.value);
+                      changed("date");
+                    }}
+                    className="form-input form-select"
+                  >
+                    <option value="">{f.date.monthPlaceholder}</option>
+                    {f.date.months.map((name, i) => (
+                      <option key={name} value={String(i + 1)}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </span>
               </div>
               <div>
                 <label htmlFor={ids.year} className="block text-sm text-muted">
@@ -243,7 +327,7 @@ export function BirthForm({ t }: { t: Messages }) {
                   autoComplete="off"
                   maxLength={4}
                   value={year}
-                  aria-invalid={errors.date ? true : undefined}
+                  aria-invalid={dateBad("year") || undefined}
                   aria-describedby={dateDescribedBy}
                   onChange={(e) => {
                     setYear(e.target.value.replace(/\D/g, ""));
@@ -253,31 +337,116 @@ export function BirthForm({ t }: { t: Messages }) {
                 />
               </div>
             </div>
-            <ErrorText id={ids.dateError} text={errors.date} />
+            <div aria-live="polite">
+              <ErrorText id={ids.dateError} text={dateMessage} />
+            </div>
           </fieldset>
 
-          {/* Time of birth: hours and minutes only (D-092) */}
-          <div>
-            <label htmlFor={ids.time} className="block font-semibold">
+          {/* Time of birth: Hour, Minute, AM | PM (D-094 item 2). No AM/PM is pre-selected. */}
+          <fieldset
+            aria-describedby={timeDescribedBy}
+            onBlur={(e) => {
+              if (left(e) && (hour || minute || period)) show("time");
+            }}
+          >
+            <legend id={ids.timeLegend} className="block font-semibold">
               {f.time.label}
-            </label>
+            </legend>
             <p id={ids.timeHint} className="mt-1 text-sm text-muted">
               {f.time.hint}
             </p>
-            <input
-              id={ids.time}
-              type="time"
-              step={60}
-              value={time}
-              aria-invalid={errors.time ? true : undefined}
-              aria-describedby={timeDescribedBy}
-              onChange={(e) => {
-                setTime(e.target.value.slice(0, 5));
-                changed("time");
-              }}
-              className="form-input mt-2 max-w-[12rem]"
-            />
-            <ErrorText id={ids.timeError} text={errors.time} />
+            <div className="mt-2 flex flex-wrap items-end gap-x-3 gap-y-3">
+              <div className="flex items-end gap-1.5">
+                <div className="w-[5.25rem] sm:w-[5.5rem]">
+                  <label htmlFor={ids.hour} className="block text-sm text-muted">
+                    {f.time.hour}
+                  </label>
+                  <span className="select-wrap mt-1">
+                    <select
+                      id={ids.hour}
+                      value={hour}
+                      aria-invalid={timeBad("hour") || undefined}
+                      aria-describedby={timeDescribedBy}
+                      onChange={(e) => {
+                        setHour(e.target.value);
+                        changed("time");
+                      }}
+                      className="form-input form-select"
+                    >
+                      <option value="">{f.time.hourPlaceholder}</option>
+                      {HOURS.map((h) => (
+                        <option key={h} value={String(h)}>
+                          {h}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                </div>
+                <span aria-hidden="true" className="pb-2.5 text-lg font-semibold">
+                  :
+                </span>
+                <div className="w-[5.25rem] sm:w-[5.5rem]">
+                  <label htmlFor={ids.minute} className="block text-sm text-muted">
+                    {f.time.minute}
+                  </label>
+                  <span className="select-wrap mt-1">
+                    <select
+                      id={ids.minute}
+                      value={minute}
+                      aria-invalid={timeBad("minute") || undefined}
+                      aria-describedby={timeDescribedBy}
+                      onChange={(e) => {
+                        setMinute(e.target.value);
+                        changed("time");
+                      }}
+                      className="form-input form-select"
+                    >
+                      <option value="">{f.time.minutePlaceholder}</option>
+                      {MINUTES.map((m) => (
+                        <option key={m} value={String(m)}>
+                          {two(m)}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span id={ids.periodLabel} className="block text-sm text-muted">
+                  {f.time.period}
+                </span>
+                <div
+                  role="group"
+                  aria-labelledby={ids.periodLabel}
+                  aria-describedby={periodDescribedBy}
+                  data-invalid={timeBad("period") || undefined}
+                  className="period-group mt-1"
+                >
+                  {(["am", "pm"] as const).map((p) => (
+                    <button
+                      key={p}
+                      id={p === "am" ? ids.period : `${id}-pm`}
+                      type="button"
+                      aria-pressed={period === p}
+                      aria-describedby={periodDescribedBy}
+                      onClick={() => {
+                        setPeriod(p);
+                        changed("time");
+                      }}
+                      className="period-button"
+                    >
+                      {p === "am" ? f.time.am : f.time.pm}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p id={ids.periodHint} className="mt-2 text-sm text-muted">
+              {f.time.periodHint}
+            </p>
+            <div aria-live="polite">
+              <ErrorText id={ids.timeError} text={timeMessage} />
+            </div>
             {/* Clocks went back (AMBIGUOUS_LOCAL_TIME): ask which of the two it was, then calculate again */}
             <div aria-live="polite">
               {ambiguous && (
@@ -309,32 +478,41 @@ export function BirthForm({ t }: { t: Messages }) {
                 </div>
               )}
             </div>
-          </div>
+          </fieldset>
 
-          <PlaceSearch
-            t={f.place}
-            searchError={t.errors.search}
-            place={place}
-            onChange={(p) => {
-              setPlace(p);
-              changed("place");
-            }}
-            error={errors.place ?? null}
-            errorId={ids.placeError}
-          />
-          <ErrorText id={ids.placeError} text={errors.place} />
+          <div>
+            <PlaceSearch
+              t={f.place}
+              searchError={t.errors.search}
+              inputId={ids.place}
+              place={place}
+              offset={offset}
+              onChange={(p) => {
+                setPlace(p);
+                changed("place");
+              }}
+              onLeave={(hasText) => {
+                if (hasText) show("place");
+              }}
+              error={placeMessage ?? null}
+              errorId={ids.placeError}
+            />
+            <div aria-live="polite">
+              <ErrorText id={ids.placeError} text={placeMessage} />
+            </div>
+          </div>
 
           <div>
             <button
               type="submit"
               disabled={submitting}
-              aria-describedby={errors.form ? ids.formError : undefined}
+              aria-describedby={serverErrors.form ? ids.formError : undefined}
               className="w-full cursor-pointer rounded-full bg-accent-text px-6 py-3.5 text-base font-semibold text-card transition-opacity disabled:cursor-wait disabled:opacity-70"
             >
               {submitting ? f.submitting : f.submit}
             </button>
             <div role="alert">
-              <ErrorText id={ids.formError} text={errors.form} />
+              <ErrorText id={ids.formError} text={serverErrors.form} />
             </div>
           </div>
         </form>

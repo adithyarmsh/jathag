@@ -8,11 +8,11 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.14 — Founder test: 20 places + own chart vs JHora |
+| **Current step** | 0.2.15 — Founder test fixes (D-094) |
 | **Next step** | 0.3.1 — Dashas (v0.3 Timing engine) |
 | **Then** | v0.3 — Timing engine |
-| **Blocked on** | Nothing (0.2.14 is the founder's test; tip from D-093: type the coordinates shown under the table into JHora) |
-| **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice; hidden from search engines) |
+| **Blocked on** | Project review of PR #14 (0.2.15), then the founder's re-check on the live site |
+| **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice; hidden from search engines; 0.2.15 fixes on the PR preview until merged) |
 | **Last updated** | 2026-11-21 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -74,7 +74,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.11 GeoNames place index + feasibility: 558,033 Indian places + 230,005 worldwide towns; `packages/places` search (India first, 3-character minimum, ASCII labels, `isMumbai`/`isWestBengal`); index loads in 0.81 s / 463 MB on Vercel; raw files on GitHub Release `geonames-2026-11-21`; Kandivli corrected. Report reviewed and approved (D-087–D-089) (PR #11)
 - ✅ 0.2.12 Calculation API: `POST /api/places/search` and `POST /api/chart` (private, `no-store`, error codes only, separate Vercel functions), "Which clock?" rule (`packages/api/src/clock.ts`, D-082/D-086/D-090), R27–R29 in the reference tests (29 births, all pass); chart 1.1 s cold / ≈0.5 s warm on Vercel, no birth data in logs. Report reviewed and approved (D-091) (PR #12)
 - ✅ 0.2.13 Minimal form + planet table live: date/time/place form with type-ahead search, planet table (degrees cut to the second like JHora's digits), friendly error messages, first/second-time choice, old-clock "i" note, Beta notice; approved with founder wording (D-093) (PR #13)
-- ⏳ 0.2.14 Founder test: 20 places + own chart vs JHora
+- ✅ 0.2.14 Founder test passed: places worldwide found correctly; own chart matches JHora on all 10 rows to the second (D-094)
+- 🔄 0.2.15 Founder test fixes (D-094): smarter place search, 12-hour time with AM/PM buttons, day/month dropdowns with live checks, earlier old-clock "i", place details with UTC offset, fixed header, footer version, "Coming soon" tags + calculation line, cards rendered once. Built and checked on the preview; waiting for Project review (PR #14)
 
 ### v0.3 — Timing engine
 - ⏳ 0.3.1 Dashas (3 levels) · ⏳ 0.3.2 Transits + Sade Sati · ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
@@ -123,6 +124,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-21 | 0.2.15 | #14 | Founder test fixes built (D-094 items 1–10): place search retries with the last word(s) as state/country ("london canada"), 12-hour time with bounded pick-lists and AM/PM buttons (none pre-selected), Day dropdown with only real days, live checks, "i" from the date alone ("If born in India"), place details with the UTC offset the chart uses, sticky header, footer version, "Coming soon" tags, cards rendered once. The form was already in the first HTML (10b, nothing to fix). 1,010 tests green. D-094 docs committed unchanged. Waiting for Project review. |
 | 2026-11-21 | 0.2.13 | #13 | Report approved by the Project (D-093): form title "Generate Your Chart", new Beta notice and page description; D-093 docs committed unchanged. Squash-merged; live on jathag.vercel.app. Next: 0.2.14 founder test. |
 | 2026-11-21 | 0.2.13 | #13 | Minimal form + planet table built: date/time/place form with type-ahead search, friendly message for every API error code, first/second-time choice when clocks went back, old-clock "i" note worked out in the browser with the API's own rule, plain planet table (degrees cut to the second, like JHora's digits), Beta notice. Table matches JHora for all 29 births (244 of 290 degrees identical, rest 1″). 903 tests green. D-092 docs committed unchanged. Waiting for Project review. |
 | 2026-11-21 | 0.2.12 | #12 | Report reviewed and approved by the Project; D-091 (edge cases: start of 1800, midnight 1906-01-01, pre-1906 IST default accepted; matched old name in search results deferred to 0.4.6) committed. Squash-merged; 0.2.12 done. Next: 0.2.13 Minimal form + planet table. |
