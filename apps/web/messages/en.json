@@ -1,8 +1,9 @@
 {
   "meta": {
     "title": "Jathag — Know your chart, not just your sign.",
-    "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Coming soon."
+    "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Beta, work in progress."
   },
+  "betaNotice": "Beta — work in progress. Jathag is still being built and checked, so things may change.",
   "header": {
     "wordmark": "Jathag",
     "beta": "Beta",
@@ -29,16 +30,146 @@
       }
     ]
   },
-  "comingSoon": {
-    "label": "Coming soon",
-    "title": "Your chart is on its way",
-    "text": "We're building Jathag carefully, accuracy first. Every chart will be checked against trusted reference calculations before we open the doors.",
-    "list": [
-      "Rasi and Navamsa charts, South or North Indian style",
-      "Your dasha timeline, past, present and future",
-      "Plain-English explanations, no fear-selling"
+  "form": {
+    "title": "Your birth details",
+    "subtitle": "Date, time and place of birth.",
+    "date": {
+      "label": "Date of birth",
+      "day": "Day",
+      "month": "Month",
+      "monthPlaceholder": "Month",
+      "year": "Year",
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    },
+    "time": {
+      "label": "Time of birth",
+      "hint": "The exact time, in hours and minutes, as written on the birth record."
+    },
+    "place": {
+      "label": "Place of birth",
+      "hint": "Type at least 3 letters of the town or city, then pick it from the list.",
+      "searching": "Searching…",
+      "noResults": "No places found. Try another spelling or a nearby town.",
+      "resultsCount": "{count} places found. Use the up and down arrow keys to choose one.",
+      "resultsCountOne": "1 place found. Use the up and down arrow keys to choose it.",
+      "chosen": "Latitude {lat} · Longitude {lng} · Time zone {timeZone}"
+    },
+    "repeatedTime": {
+      "question": "This time happened twice that night: the clocks went back an hour. Which one was it?",
+      "earlier": "The first time",
+      "later": "The second time (after the clocks went back)",
+      "summaryEarlier": "the first time",
+      "summaryLater": "the second time"
+    },
+    "submit": "See my chart",
+    "submitting": "Calculating…",
+    "privacy": "Your details are only used to calculate your chart. Nothing is stored on our servers."
+  },
+  "missing": {
+    "date": "Please enter your date of birth: day, month and year.",
+    "time": "Please enter your time of birth.",
+    "place": "Please choose your place of birth from the list."
+  },
+  "errors": {
+    "INVALID_REQUEST": "Something went wrong while sending your details. Please check them and try again.",
+    "REQUEST_TOO_LARGE": "Something went wrong while sending your details. Please check them and try again.",
+    "INVALID_DATE": "This date doesn't exist. Please check the day, month and year.",
+    "DATE_OUT_OF_RANGE": "Please enter a date between 1 January 1800 and 31 December 2100.",
+    "INVALID_TIME": "Please enter the time of birth in hours and minutes.",
+    "NONEXISTENT_LOCAL_TIME": "This time didn't exist on that day in that place: the clocks jumped forward. Please check the time.",
+    "AMBIGUOUS_LOCAL_TIME": "This time happened twice that night: the clocks went back an hour. Please choose which one it was.",
+    "INVALID_REPEATED_TIME": "Please choose whether it was the first or the second time.",
+    "MISSING_PLACE": "Please choose your place of birth from the list.",
+    "INVALID_PLACE": "We couldn't use this place. Please search for it again and pick it from the list.",
+    "INVALID_LOCATION": "We couldn't use this place's location. Please search for it again and pick it from the list.",
+    "INVALID_TIME_ZONE": "We couldn't find the time zone for this place. Please try a nearby town.",
+    "INVALID_UTC_OFFSET": "We couldn't use the time zone for this place. Please search for it again and pick it from the list.",
+    "INVALID_CLOCK_CHOICE": "We couldn't use that clock for this date and place. Please try again.",
+    "UNKNOWN_SETTING": "One of the chart settings isn't available yet. Please try again.",
+    "SETTING_NOT_SUPPORTED": "One of the chart settings isn't available yet. Please try again.",
+    "INTERNAL_ERROR": "Something went wrong on our side. Please try again in a moment.",
+    "network": "We couldn't reach Jathag. Please check your internet connection and try again.",
+    "unknown": "Something went wrong. Please try again in a moment.",
+    "search": "Place search isn't working just now. Please try again in a moment."
+  },
+  "clockNote": {
+    "buttonLabel": "About the clock used for this date",
+    "mumbai": "In Mumbai until the 1950s, many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If your family used Bombay time, your chart may be different. You'll be able to switch soon.",
+    "westBengal": "In Kolkata and West Bengal until the late 1940s, many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If your family used Calcutta time, your chart may be different. You'll be able to switch soon.",
+    "warTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. If the time was written in IST, your chart may be different. You'll be able to switch soon.",
+    "warTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. We've calculated your chart with IST. If the time was written in War Time, your chart may be different. You'll be able to switch soon.",
+    "before1906": "Before 1906, many towns kept their own local time. Here that was about {minutes} minutes {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon.",
+    "before1906OneMinute": "Before 1906, many towns kept their own local time. Here that was about 1 minute {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon.",
+    "before1906Same": "Before 1906, many towns kept their own local time. Here it was within a minute of IST, so your chart is very unlikely to change. We've calculated your chart with IST.",
+    "behind": "behind",
+    "ahead": "ahead of",
+    "mumbaiWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Mumbai, many people also used Bombay time, 39 minutes behind IST. If the time was written in IST or in Bombay time, your chart may be different. You'll be able to switch soon.",
+    "mumbaiWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Mumbai many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If the time was written in War Time or in Bombay time, your chart may be different. You'll be able to switch soon.",
+    "westBengalWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Kolkata and West Bengal, many people also used Calcutta time, 23 minutes 20 seconds ahead of IST. If the time was written in IST or in Calcutta time, your chart may be different. You'll be able to switch soon.",
+    "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If the time was written in War Time or in Calcutta time, your chart may be different. You'll be able to switch soon."
+  },
+  "chart": {
+    "title": "Planet positions",
+    "summary": "{date} · {time} · {place}",
+    "scrollHint": "Swipe sideways to see every column.",
+    "columns": {
+      "body": "Planet",
+      "sign": "Sign",
+      "degree": "Degree",
+      "nakshatra": "Nakshatra",
+      "pada": "Pada",
+      "house": "House",
+      "dignity": "Dignity",
+      "retrograde": "Retrograde",
+      "combust": "Combust"
+    },
+    "notApplicable": "—",
+    "notApplicableLabel": "Does not apply",
+    "retrograde": "R",
+    "retrogradeLabel": "Retrograde",
+    "combust": "Combust",
+    "settingsLine": "Settings: {ayanamsa} · {node} · {houses}",
+    "placeLine": "Place: {lat}, {lng} · Clock used: {offset}",
+    "engineLine": "Engine version {version}",
+    "settings": {
+      "ayanamsa": { "lahiri": "Lahiri ayanamsa" },
+      "node": { "mean": "mean node", "true": "true node" },
+      "houseSystem": { "whole-sign": "whole-sign houses" }
+    },
+    "clockNames": {
+      "ist": "IST",
+      "war": "War Time",
+      "bombay": "Bombay time",
+      "calcutta": "Calcutta time",
+      "lmt": "local time"
+    },
+    "bodies": {
+      "La": "Lagna",
+      "Su": "Sun",
+      "Mo": "Moon",
+      "Ma": "Mars",
+      "Me": "Mercury",
+      "Ju": "Jupiter",
+      "Ve": "Venus",
+      "Sa": "Saturn",
+      "Ra": "Rahu",
+      "Ke": "Ketu"
+    },
+    "signs": ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"],
+    "nakshatras": [
+      "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+      "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+      "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
     ],
-    "privacy": "When it opens, your details will stay in your browser. Nothing stored on our servers."
+    "dignity": {
+      "EX": "Exalted",
+      "MT": "Moolatrikona",
+      "OS": "Own sign",
+      "FR": "Friendly sign",
+      "NE": "Neutral sign",
+      "EN": "Enemy sign",
+      "DB": "Debilitated"
+    }
   },
   "footer": {
     "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
