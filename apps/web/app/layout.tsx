@@ -35,7 +35,8 @@ const tamil = Noto_Serif_Tamil({ variable: "--font-ta", subsets: ["tamil"], weig
 const kannada = Noto_Serif_Kannada({ variable: "--font-kn", subsets: ["kannada"], weight: ["400"], display: "swap", preload: false });
 const malayalam = Noto_Serif_Malayalam({ variable: "--font-ml", subsets: ["malayalam"], weight: ["400"], display: "swap", preload: false });
 
-const { title, description } = getMessages().meta;
+const messages = getMessages();
+const { title, description } = messages.meta;
 
 export const metadata: Metadata = {
   title,
@@ -71,7 +72,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {/* On every page until the v1.0 launch (FR-HOME-05, D-060) */}
+        <p className="beta-notice border-b border-line px-4 py-2 text-center text-xs leading-snug text-muted sm:text-[13px]">
+          {messages.betaNotice}
+        </p>
+        {children}
+      </body>
     </html>
   );
 }
