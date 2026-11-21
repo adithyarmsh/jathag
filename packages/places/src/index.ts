@@ -72,6 +72,17 @@ export function isWestBengal(p: Pick<Place, 'countryCode' | 'admin1Code'>): bool
   return p.countryCode === 'IN' && p.admin1Code === WEST_BENGAL_ADMIN1;
 }
 
+/**
+ * Short country names people type as a filter (D-095), after a comma or in the D-094 fallback:
+ * "london uk", "dallas, usa", "dubai uae". Normalised form → the country's normalised name.
+ * ("us" already works through the country code, "england" through the state name.)
+ */
+const COUNTRY_ALIASES: Readonly<Record<string, string>> = {
+  uk: 'united kingdom',
+  usa: 'united states',
+  uae: 'united arab emirates',
+};
+
 interface Cand {
   p: number;
   pop: number;
@@ -291,7 +302,11 @@ export class PlaceIndex {
       this.countries.get(cc) ?? '',
     ].map(normalize);
     parts.push(cc.toLowerCase());
-    return filters.every((flt) => parts.some((part) => part.startsWith(flt)));
+    const country = parts[2]!;
+    return filters.every((flt) => {
+      const alias = COUNTRY_ALIASES[flt];
+      return parts.some((part) => part.startsWith(flt)) || (alias !== undefined && country === alias);
+    });
   }
 
   private place(i: number): Place {

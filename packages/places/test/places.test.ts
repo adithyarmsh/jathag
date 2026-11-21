@@ -281,6 +281,34 @@ describe('search: last word(s) as district/state/country when nothing else is fo
   });
 });
 
+describe('search: country aliases UK, USA, UAE (D-095)', () => {
+  it.each([
+    ['london uk', 2643743, 'London, Greater London, England, United Kingdom'],
+    ['london, uk', 2643743, 'London, Greater London, England, United Kingdom'],
+    ['dallas usa', 4684888, 'Dallas, Dallas County, Texas, United States'],
+    ['dallas, usa', 4684888, 'Dallas, Dallas County, Texas, United States'],
+    ['dubai uae', 292223, 'Dubai, United Arab Emirates'],
+    ['dubai, uae', 292223, 'Dubai, United Arab Emirates'],
+  ])('"%s" → %s (%s)', (q, id, label) => {
+    const r = top(q)!;
+    expect(r.id).toBe(id);
+    expect(r.label).toBe(label);
+  });
+
+  it('every result is in that country', () => {
+    expect(idx.search('london uk').every((r) => r.countryCode === 'GB')).toBe(true);
+    expect(idx.search('dallas usa').every((r) => r.countryCode === 'US')).toBe(true);
+    expect(idx.search('dubai uae').every((r) => r.countryCode === 'AE')).toBe(true);
+  });
+
+  it('same results with or without the comma, and in D-088 order', () => {
+    for (const [plain, comma] of [['london uk', 'london, uk'], ['dallas usa', 'dallas, usa'], ['dubai uae', 'dubai, uae']]) {
+      expect(idx.search(plain!).map((r) => r.id)).toEqual(idx.search(comma!).map((r) => r.id));
+      expectOrdered(plain!.split(' ')[0]!, idx.search(plain!, { limit: 400 }));
+    }
+  });
+});
+
 /** Was this result an exact match for q? */
 function isExact(r: SearchResult, q: string) {
   const names = r.matchedName ? [r.matchedName] : [r.name, r.asciiName];
