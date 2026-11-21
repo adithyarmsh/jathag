@@ -1,8 +1,13 @@
 /**
- * @jathag/places — birth-place search over the GeoNames place index (step 0.2.11).
+ * @jathag/places — birth-place search over the GeoNames place index (steps 0.2.11, D-087).
  *
  * Pure TypeScript, no UI, no file access (see `./node.ts` for loading the index file in Node).
  * Nothing here logs or stores queries: a birthplace is birth data (FR-API-02).
+ *
+ * Index format 2 (see data/places/README.md): the place rows plus the search names, already
+ * normalised and sorted at build time. Loading only finds where each row starts and splits the
+ * search-name lines; a place row is parsed only when it is shown. That keeps the cold start on
+ * Vercel's single CPU at about a second.
  */
 import { normalize } from './normalize.ts';
 
@@ -15,7 +20,10 @@ export interface Place {
   name: string;
   /** Plain-ASCII name ("Aurangabad"). */
   asciiName: string;
-  /** "Place, District, State, Country"; parts GeoNames does not have are left out (FR-IN-04). */
+  /**
+   * "Place, District, State, Country" in plain ASCII, repeats collapsed, the words "District" and
+   * "Division" dropped; parts GeoNames does not have are left out (FR-IN-04, D-087).
+   */
   label: string;
   /** Decimal degrees, north positive. Full GeoNames precision. */
   lat: number;
@@ -46,149 +54,105 @@ export interface SearchResult extends Place {
 export interface SearchOptions {
   /** Maximum number of results (default 10). */
   limit?: number;
-  /** GeoNames feature codes to leave out, e.g. ['PPLQ', 'PPLH', 'PPLW']. Default: none. */
+  /** GeoNames feature codes to leave out, e.g. ['PPLQ']. Default: none (D-087 keeps all). */
   excludeFeatureCodes?: readonly string[];
 }
 
-/** Queries shorter than this (after normalising) return no results. */
-export const MIN_QUERY_LENGTH = 2;
+/** Queries shorter than this (after normalising) return no results (D-087). */
+export const MIN_QUERY_LENGTH = 3;
 
-const KIND_NAME = 0;
-const KIND_ASCII = 1;
-const KIND_ALT = 2;
+/** GeoNames codes used by the "Which clock?" rule (D-082, D-086, D-087). */
+export const WEST_BENGAL_ADMIN1 = '28';
+export const MAHARASHTRA_ADMIN1 = '16';
+export const MUMBAI_CITY_ADMIN2 = '519';
+export const MUMBAI_SUBURBAN_ADMIN2 = '518';
 
-/** Bigger settlement types first when population is equal (mostly villages with no population figure). */
-const FEATURE_RANK: Record<string, number> = {
-  PPLC: 0, PPLA: 1, PPLA2: 2, PPLA3: 3, PPLA4: 4, PPLA5: 5, PPLG: 5, PPL: 6, PPLS: 7, PPLF: 7,
-  PPLR: 7, PPLL: 7, PPLX: 8, STLMT: 8, PPLCH: 9, PPLH: 9, PPLQ: 9, PPLW: 9,
-};
+/** True for places in West Bengal (GeoNames state IN.28). */
+export function isWestBengal(p: Pick<Place, 'countryCode' | 'admin1Code'>): boolean {
+  return p.countryCode === 'IN' && p.admin1Code === WEST_BENGAL_ADMIN1;
+}
+
+interface Cand {
+  p: number;
+  pop: number;
+  exact: boolean;
+  key: string;
+  kind: number;
+}
 
 export class PlaceIndex {
   /** Number of places. */
   readonly size: number;
   /** SHA-256 of each GeoNames source file, from the index header. */
   readonly sources: ReadonlyArray<{ name: string; sha256: string }>;
+  /** GeoNames ids of Mumbai places that have no district in GeoNames (mumbai-no-district.json). */
+  readonly mumbaiExtraIds: ReadonlySet<number>;
 
-  private readonly ids: Int32Array;
-  private readonly names: string[];
-  private readonly asciiNames: string[];
-  private readonly alts: string[];
-  private readonly lat: Float64Array;
-  private readonly lng: Float64Array;
-  private readonly pop: Float64Array;
-  private readonly tz: Uint16Array;
-  private readonly cc: string[];
-  private readonly a1: string[];
-  private readonly a2: string[];
-  private readonly fcode: string[];
-  private readonly zones: string[];
-  private readonly countries: Map<string, string>;
-  private readonly admin1: Map<string, string>;
-  private readonly admin2: Map<string, string>;
-  private readonly idToIdx: Map<number, number>;
-
-  // Search keys, sorted: keys[i] belongs to place keyPlace[i]; keyKind[i] = name/ascii/alt
-  // (for alt: keyAlt[i] = position in that place's alternate-name list).
+  private readonly text: string;
+  /** Start of each place row in `text`. */
+  private readonly rowStart: Int32Array;
+  /** Sorted search-name lines: "key\tplace(36)\tkind(36)\tpopulation(36)". */
   private readonly keys: string[];
-  private readonly keyPlace: Int32Array;
-  private readonly keyKind: Uint8Array;
-  private readonly keyAlt: Uint16Array;
+  private readonly zones: string[] = [];
+  private readonly countries = new Map<string, string>();
+  private readonly admin1 = new Map<string, string>();
+  private readonly admin2 = new Map<string, string>();
 
-  /** Parses the text of places.tsv (see data/places/README.md for the format). */
+  /** Parses the text of places.tsv, format 2 (see data/places/README.md). */
   constructor(text: string) {
-    const lines = text.split('\n');
-    if (!lines[0]?.startsWith('JATHAG-PLACES\t1')) throw new Error('Not a Jathag place index (format 1)');
+    if (!text.startsWith('JATHAG-PLACES\t2\n')) throw new Error('Not a Jathag place index (format 2)');
+    this.text = text;
     const sources: { name: string; sha256: string }[] = [];
-    this.zones = [];
-    this.countries = new Map();
-    this.admin1 = new Map();
-    this.admin2 = new Map();
-    let first = 1;
-    for (; first < lines.length; first++) {
-      const l = lines[first]!;
-      if (l[0] !== '#') break;
-      const f = l.split('\t');
+    const mumbai = new Set<number>();
+    // Header lines start with '#'.
+    let pos = text.indexOf('\n') + 1;
+    while (text.charCodeAt(pos) === 35) {
+      const end = text.indexOf('\n', pos);
+      const f = text.slice(pos, end).split('\t');
       switch (f[0]) {
         case '#S': sources.push({ name: f[1]!, sha256: f[2]! }); break;
         case '#Z': this.zones[Number(f[1])] = f[2]!; break;
-        case '#C': this.countries.set(f[1]!, f[2]!); break;
-        case '#1': this.admin1.set(f[1]!, f[2]!); break;
-        case '#2': this.admin2.set(f[1]!, f[2]!); break;
+        case '#C': this.countries.set(f[1]!, asciiOnly(f[2]!)); break;
+        case '#1': this.admin1.set(f[1]!, f[3] || f[2]!); break; // ASCII name
+        case '#2': this.admin2.set(f[1]!, f[3] || f[2]!); break;
+        case '#M': mumbai.add(Number(f[1])); break;
       }
+      pos = end + 1;
     }
     this.sources = sources;
-    let n = lines.length - first;
-    while (n > 0 && lines[first + n - 1] === '') n--;
-    this.size = n;
-    this.ids = new Int32Array(n);
-    this.names = new Array(n);
-    this.asciiNames = new Array(n);
-    this.alts = new Array(n);
-    this.lat = new Float64Array(n);
-    this.lng = new Float64Array(n);
-    this.pop = new Float64Array(n);
-    this.tz = new Uint16Array(n);
-    this.cc = new Array(n);
-    this.a1 = new Array(n);
-    this.a2 = new Array(n);
-    this.fcode = new Array(n);
-    this.idToIdx = new Map();
-
-    const keyList: { k: string; p: number; kind: number; alt: number }[] = [];
-    for (let i = 0; i < n; i++) {
-      const f = lines[first + i]!.split('\t');
-      const id = Number(f[0]);
-      this.ids[i] = id;
-      this.idToIdx.set(id, i);
-      const name = f[1]!;
-      const ascii = f[2] || name;
-      this.names[i] = name;
-      this.asciiNames[i] = ascii;
-      this.alts[i] = f[3]!;
-      this.lat[i] = Number(f[4]);
-      this.lng[i] = Number(f[5]);
-      this.cc[i] = f[6]!;
-      this.a1[i] = f[7]!;
-      this.a2[i] = f[8]!;
-      this.pop[i] = f[9] ? Number(f[9]) : 0;
-      this.fcode[i] = f[10]!;
-      this.tz[i] = f[11] ? Number(f[11]) : 0xffff;
-
-      const kName = normalize(name);
-      keyList.push({ k: kName, p: i, kind: KIND_NAME, alt: 0 });
-      const kAscii = normalize(ascii);
-      if (kAscii !== kName) keyList.push({ k: kAscii, p: i, kind: KIND_ASCII, alt: 0 });
-      if (f[3]) {
-        const altNames = f[3].split('|');
-        for (let a = 0; a < altNames.length; a++) {
-          keyList.push({ k: normalize(altNames[a]!), p: i, kind: KIND_ALT, alt: a });
-        }
-      }
+    this.mumbaiExtraIds = mumbai;
+    // Place rows until the "#K" line.
+    const kAt = text.indexOf('\n#K\n', pos - 1);
+    if (kAt < 0) throw new Error('Place index has no search names (#K)');
+    const starts: number[] = [];
+    while (pos <= kAt) {
+      starts.push(pos);
+      pos = text.indexOf('\n', pos) + 1;
     }
-    keyList.sort((x, y) => (x.k < y.k ? -1 : x.k > y.k ? 1 : x.p - y.p || x.kind - y.kind));
-    const m = keyList.length;
-    this.keys = new Array(m);
-    this.keyPlace = new Int32Array(m);
-    this.keyKind = new Uint8Array(m);
-    this.keyAlt = new Uint16Array(m);
-    for (let j = 0; j < m; j++) {
-      const e = keyList[j]!;
-      this.keys[j] = e.k;
-      this.keyPlace[j] = e.p;
-      this.keyKind[j] = e.kind;
-      this.keyAlt[j] = e.alt;
-    }
+    this.rowStart = Int32Array.from(starts);
+    this.size = starts.length;
+    const keyText = text.slice(kAt + 4);
+    this.keys = keyText.split('\n');
+    if (this.keys[this.keys.length - 1] === '') this.keys.pop();
   }
 
-  /** Number of search keys (names + ASCII names + alternate names). */
+  /** Number of search names (names + ASCII names + alternate names). */
   get keyCount(): number {
     return this.keys.length;
   }
 
   /** The place with this GeoNames id, or undefined. */
   get(id: number): Place | undefined {
-    const i = this.idToIdx.get(id);
-    return i === undefined ? undefined : this.place(i);
+    let lo = 0;
+    let hi = this.size - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1;
+      const s = this.rowStart[mid]!;
+      const v = Number(this.text.slice(s, this.text.indexOf('\t', s)));
+      if (v === id) return this.place(mid);
+      if (v < id) lo = mid + 1; else hi = mid - 1;
+    }
+    return undefined;
   }
 
   /** Calls fn for every place (for tests and reports). */
@@ -197,112 +161,165 @@ export class PlaceIndex {
   }
 
   /**
-   * Type-ahead search. Case- and accent-insensitive prefix match on the place name, its
-   * ASCII name and its kept alternate/old names. Text after a comma narrows the result:
-   * "aurangabad, bihar" keeps only places whose district, state or country starts with "bihar".
+   * True for places in Mumbai for the "Which clock?" rule (D-082, D-086, D-087): district Mumbai
+   * City (IN.16.519) or Mumbai Suburban (IN.16.518), or on the list of Mumbai places that have
+   * no district in GeoNames.
+   */
+  isMumbai(p: Pick<Place, 'id' | 'countryCode' | 'admin1Code' | 'admin2Code'>): boolean {
+    if (p.countryCode !== 'IN') return false;
+    if (p.admin1Code === MAHARASHTRA_ADMIN1
+      && (p.admin2Code === MUMBAI_CITY_ADMIN2 || p.admin2Code === MUMBAI_SUBURBAN_ADMIN2)) return true;
+    return this.mumbaiExtraIds.has(p.id);
+  }
+
+  /**
+   * Type-ahead search (FR-IN-04, D-087). Case- and accent-insensitive prefix match on the place
+   * name, its ASCII name and its kept alternate/old names; at least 3 characters. Text after a
+   * comma narrows the result: "aurangabad, bihar" keeps places whose district, state or country
+   * starts with "bihar".
    *
-   * Ranking: exact name matches first, then larger population (a match on an alternate name
-   * counts as 10× smaller, because GeoNames alternate names include many foreign-language
-   * spellings), then bigger settlement type
-   * (capital > state/district seat > town > neighbourhood > abandoned/historical), then a
-   * match on the main name before an alternate name, then GeoNames id (so it is stable).
+   * Order: population, largest first (whichever name matched). Ties, including places with no
+   * population figure: exact name match before prefix match, then alphabetical by the matched
+   * name, then by label, then GeoNames id (so the order is always the same).
    */
   search(query: string, options: SearchOptions = {}): SearchResult[] {
     const limit = options.limit ?? 10;
-    const exclude = options.excludeFeatureCodes ? new Set(options.excludeFeatureCodes) : undefined;
+    const exclude = options.excludeFeatureCodes?.length ? new Set(options.excludeFeatureCodes) : undefined;
     const [head = '', ...rest] = query.split(',');
     const q = normalize(head);
     if (q.length < MIN_QUERY_LENGTH || limit <= 0) return [];
     const filters = rest.map(normalize).filter((s) => s.length > 0);
 
-    // Binary search for the first key >= q, then walk while keys start with q.
+    // First line >= q, then walk while the key starts with q.
+    const keys = this.keys;
     let lo = 0;
-    let hi = this.keys.length;
+    let hi = keys.length;
     while (lo < hi) {
       const mid = (lo + hi) >>> 1;
-      if (this.keys[mid]! < q) lo = mid + 1; else hi = mid;
+      if (keys[mid]! < q) lo = mid + 1; else hi = mid;
     }
-    // Best key per place: exact (1/0), kind (lower better), key position.
-    const best = new Map<number, number>();
-    for (let j = lo; j < this.keys.length; j++) {
-      const k = this.keys[j]!;
-      if (!k.startsWith(q)) break;
-      const p = this.keyPlace[j]!;
+    const best = new Map<number, Cand>();
+    for (let j = lo; j < keys.length; j++) {
+      const line = keys[j]!;
+      if (!line.startsWith(q)) break;
+      const t1 = line.indexOf('\t');
+      const t2 = line.indexOf('\t', t1 + 1);
+      const t3 = line.indexOf('\t', t2 + 1);
+      const p = parseInt(line.slice(t1 + 1, t2), 36);
+      const kind = parseInt(line.slice(t2 + 1, t3), 36);
+      const exact = t1 === q.length;
       const prev = best.get(p);
-      if (prev === undefined || this.better(j, prev, q)) best.set(p, j);
+      if (prev && (prev.exact && !exact || prev.exact === exact && prev.kind <= kind)) continue;
+      best.set(p, { p, pop: parseInt(line.slice(t3 + 1), 36), exact, key: line.slice(0, t1), kind });
     }
 
-    const cands: { p: number; j: number; exact: boolean }[] = [];
-    for (const [p, j] of best) {
-      if (exclude?.has(this.fcode[p]!)) continue;
-      if (filters.length > 0 && !this.matchesFilters(p, filters)) continue;
-      cands.push({ p, j, exact: this.keys[j] === q });
+    let cands = [...best.values()];
+    if (exclude || filters.length > 0) {
+      cands = cands.filter((c) => {
+        const f = this.row(c.p);
+        if (exclude?.has(f[10]!)) return false;
+        return filters.length === 0 || this.matchesFilters(f, filters);
+      });
     }
+    const labels = new Map<number, string>();
+    const label = (p: number) => {
+      let l = labels.get(p);
+      if (l === undefined) { l = this.place(p).label; labels.set(p, l); }
+      return l;
+    };
     cands.sort((x, y) => {
+      if (x.pop !== y.pop) return y.pop - x.pop;
       if (x.exact !== y.exact) return x.exact ? -1 : 1;
-      const dp = this.rankPop(y.p, y.j) - this.rankPop(x.p, x.j);
-      if (dp !== 0) return dp;
-      const df = (FEATURE_RANK[this.fcode[x.p]!] ?? 6) - (FEATURE_RANK[this.fcode[y.p]!] ?? 6);
-      if (df !== 0) return df;
-      const dk = (this.keyKind[x.j] === KIND_ALT ? 1 : 0) - (this.keyKind[y.j] === KIND_ALT ? 1 : 0);
-      if (dk !== 0) return dk;
-      return this.ids[x.p]! - this.ids[y.p]!;
+      if (x.key !== y.key) return x.key < y.key ? -1 : 1;
+      const lx = label(x.p);
+      const ly = label(y.p);
+      if (lx !== ly) return lx < ly ? -1 : 1;
+      return x.p - y.p; // rows are in GeoNames id order
     });
 
-    return cands.slice(0, limit).map(({ p, j }) => {
-      const r: SearchResult = this.place(p);
-      if (this.keyKind[j] === KIND_ALT) r.matchedName = this.alts[p]!.split('|')[this.keyAlt[j]!]!;
+    return cands.slice(0, limit).map((c) => {
+      const r: SearchResult = this.place(c.p);
+      if (c.kind >= 2) r.matchedName = this.row(c.p)[3]!.split('|')[c.kind - 2]!;
       return r;
     });
   }
 
-  /** Population used for ranking; a match on an alternate name counts as a place 10× smaller. */
-  private rankPop(p: number, j: number): number {
-    return this.keyKind[j] === KIND_ALT ? this.pop[p]! / 10 : this.pop[p]!;
+  private row(i: number): string[] {
+    const s = this.rowStart[i]!;
+    return this.text.slice(s, this.text.indexOf('\n', s)).split('\t');
   }
 
-  private better(j: number, prev: number, q: string): boolean {
-    const ej = this.keys[j] === q;
-    const ep = this.keys[prev] === q;
-    if (ej !== ep) return ej;
-    return this.keyKind[j]! < this.keyKind[prev]!;
-  }
-
-  private matchesFilters(p: number, filters: string[]): boolean {
-    const cc = this.cc[p]!;
+  private matchesFilters(f: string[], filters: string[]): boolean {
+    const cc = f[6]!;
     const parts = [
-      this.admin2.get(`${cc}.${this.a1[p]}.${this.a2[p]}`) ?? '',
-      this.admin1.get(`${cc}.${this.a1[p]}`) ?? '',
+      this.admin2.get(`${cc}.${f[7]}.${f[8]}`) ?? '',
+      this.admin1.get(`${cc}.${f[7]}`) ?? '',
       this.countries.get(cc) ?? '',
     ].map(normalize);
     parts.push(cc.toLowerCase());
-    return filters.every((f) => parts.some((part) => part.startsWith(f)));
+    return filters.every((flt) => parts.some((part) => part.startsWith(flt)));
   }
 
   private place(i: number): Place {
-    const cc = this.cc[i]!;
-    const a1 = this.a1[i]!;
-    const a2 = this.a2[i]!;
+    const f = this.row(i);
+    const name = f[1]!;
+    const asciiName = f[2] || name;
+    const cc = f[6]!;
+    const a1 = f[7]!;
+    const a2 = f[8]!;
     const country = this.countries.get(cc) ?? '';
     const admin1 = a1 ? this.admin1.get(`${cc}.${a1}`) ?? '' : '';
     const admin2 = a1 && a2 ? this.admin2.get(`${cc}.${a1}.${a2}`) ?? '' : '';
-    const name = this.names[i]!;
+    const tz = f[11] ? this.zones[Number(f[11])] ?? '' : '';
     return {
-      id: this.ids[i]!,
+      id: Number(f[0]),
       name,
-      asciiName: this.asciiNames[i]!,
-      label: [name, admin2, admin1, country].filter((s) => s.length > 0).join(', '),
-      lat: this.lat[i]!,
-      lng: this.lng[i]!,
-      timeZone: this.tz[i] === 0xffff ? '' : this.zones[this.tz[i]!]!,
+      asciiName,
+      label: makeLabel([asciiOnly(asciiName), asciiOnly(cleanAdmin(admin2)), asciiOnly(cleanAdmin(admin1)), country]),
+      lat: Number(f[4]),
+      lng: Number(f[5]),
+      timeZone: tz,
       countryCode: cc,
       country,
       admin1Code: a1,
       admin1,
       admin2Code: a2,
       admin2,
-      population: this.pop[i]!,
-      featureCode: this.fcode[i]!,
+      population: f[9] ? Number(f[9]) : 0,
+      featureCode: f[10]!,
     };
   }
 }
+
+/**
+ * Plain letters (D-087): accents removed and the few remaining Latin letters spelled out
+ * ("Curaçao" → "Curacao", "Hœnheim" → "Hoenheim"; GeoNames' ASCII names still contain œ).
+ */
+function asciiOnly(s: string): string {
+  if (/^[\x20-\x7e]*$/.test(s)) return s;
+  return s
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/œ/g, 'oe').replace(/Œ/g, 'Oe').replace(/æ/g, 'ae').replace(/Æ/g, 'Ae')
+    .replace(/ß/g, 'ss').replace(/ø/g, 'o').replace(/Ø/g, 'O').replace(/ł/g, 'l').replace(/Ł/g, 'L')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/þ/g, 'th').replace(/Þ/g, 'Th').replace(/ı/g, 'i');
+}
+
+/** Drops the words "District" and "Division" (D-087): "Malda District" → "Malda". */
+function cleanAdmin(s: string): string {
+  return s.replace(/\b(District|Division)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/** Joins the non-empty parts, leaving out a part that repeats an earlier one ("Kolkata, Kolkata"). */
+function makeLabel(parts: string[]): string {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const k = normalize(part);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push(part);
+  }
+  return out.join(', ');
+}
+

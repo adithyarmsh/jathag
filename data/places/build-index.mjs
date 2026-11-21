@@ -10,6 +10,8 @@
 //
 // Plain Node, no dependencies. The same input files always give a byte-identical
 // places.tsv (the uncompressed text); see data/places/README.md for the format.
+// Format 2 also holds the search names, already normalised and sorted, so the server
+// can load the index without parsing every place (≈ 0.8 s instead of 5–9 s on Vercel).
 
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -20,7 +22,8 @@ import { gzipSync, inflateRawSync } from 'node:zlib';
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const SOURCES_FILE = join(HERE, 'sources.json');
 export const OUT_DIR = join(HERE, 'index');
-export const FORMAT_VERSION = 1;
+export const FORMAT_VERSION = 2;
+export const MUMBAI_FILE = join(HERE, 'mumbai-no-district.json');
 
 // ---------------------------------------------------------------- small helpers
 
@@ -62,7 +65,10 @@ export function readZipEntry(zip, entryName) {
 }
 
 /** Search key: accents removed, lower case, anything that is not a letter/digit → one space. */
+const PLAIN = /^[A-Za-z0-9]+( [A-Za-z0-9]+)*$/;
+
 export function normalize(s) {
+  if (PLAIN.test(s)) return s.toLowerCase();
   return s
     .normalize('NFKD')
     .replace(/\p{M}/gu, '')
@@ -119,9 +125,10 @@ const byCode = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  * @param {{ 'IN.zip': Buffer, 'cities500.zip': Buffer, 'admin1CodesASCII.txt': Buffer,
  *           'admin2Codes.txt': Buffer, 'countryInfo.txt': Buffer }} files
  * @param {{ name: string, sha256: string }[]} sources  recorded in the header
+ * @param {number[]} mumbaiIds  GeoNames ids of Mumbai places with no district (mumbai-no-district.json)
  * @returns {{ text: string, stats: object }}
  */
-export function buildIndex(files, sources) {
+export function buildIndex(files, sources, mumbaiIds = []) {
   // Look-up tables
   const countries = new Map();
   for (const l of lines(files['countryInfo.txt'])) {
@@ -195,7 +202,13 @@ export function buildIndex(files, sources) {
     const v = admin2.get(k);
     if (v) out.push(`#2\t${k}\t${v[0]}\t${v[1]}`);
   }
-  for (const id of ids) {
+  for (const m of [...new Set(mumbaiIds)].sort((a, b) => a - b)) out.push(`#M\t${m}`);
+
+  // Search names: one line per name, "key<TAB>place number<TAB>kind<TAB>population" (numbers in
+  // base 36). kind 0 = name, 1 = ASCII name, 2+n = alternate name n. Sorted as plain strings,
+  // which (because TAB sorts before every other character) is the same as sorting by key.
+  const keyLines = [];
+  for (const [p, id] of ids.entries()) {
     const f = rows.get(id);
     const [, name, ascii, alt, lat, lon, , fcode, cc, , a1, a2, , , pop, , , tz] = f;
     const alts = selectAltNames(alt, name, ascii);
@@ -204,13 +217,28 @@ export function buildIndex(files, sources) {
       id, name, ascii === name ? '' : ascii, alts.join('|'), lat, lon, cc, a1, a1 ? a2 : '',
       pop === '0' ? '' : pop, fcode, tz ? zoneIdx.get(tz) : '',
     ].join('\t'));
+    const p36 = p.toString(36);
+    const pop36 = (Number(pop) || 0).toString(36);
+    const kName = normalize(name);
+    if (kName) keyLines.push(`${kName}\t${p36}\t0\t${pop36}`);
+    const kAscii = normalize(ascii || name);
+    if (kAscii && kAscii !== kName) keyLines.push(`${kAscii}\t${p36}\t1\t${pop36}`);
+    for (const [n, a] of alts.entries()) keyLines.push(`${normalize(a)}\t${p36}\t${(2 + n).toString(36)}\t${pop36}`);
   }
+  keyLines.sort();
+  out.push('#K');
+  for (const l of keyLines) out.push(l);
+  stats.keys = keyLines.length;
   stats.total = ids.length;
   stats.zones = zoneList.length;
   return { text: `${out.join('\n')}\n`, stats };
 }
 
 // ---------------------------------------------------------------- command line
+
+export function readMumbaiIds() {
+  return JSON.parse(readFileSync(MUMBAI_FILE, 'utf8')).places.map((p) => p.id);
+}
 
 export function readSources(dir) {
   const pinned = JSON.parse(readFileSync(SOURCES_FILE, 'utf8'));
@@ -234,7 +262,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
   const t0 = Date.now();
   const { files, sources } = readSources(dir);
-  const { text, stats } = buildIndex(files, sources);
+  const { text, stats } = buildIndex(files, sources, readMumbaiIds());
   mkdirSync(OUT_DIR, { recursive: true });
   const raw = Buffer.from(text, 'utf8');
   const gz = gzipSync(raw, { level: 9 });

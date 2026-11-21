@@ -1,0 +1,10 @@
+{
+  "about": "Places in Mumbai (Mumbai City or Mumbai Suburban) that GeoNames gives no district. Used by the \"Which clock?\" rule (D-082, D-086, D-087): a place counts as Mumbai if its district is IN.16.519 or IN.16.518, or its GeoNames id is listed here. Found in step 0.2.11 by checking every Indian populated place inside `area` (a rough outline of Mumbai City + Mumbai Suburban). The outline is checked by tests: it holds every place GeoNames codes as Mumbai (except Kandivli 1268126, whose GeoNames coordinates are wrong) and no place coded as another district.",
+  "area": [[18.88, 72.77], [19.10, 72.76], [19.255, 72.78], [19.27, 72.88], [19.185, 72.94], [19.16, 72.985], [19.05, 72.96], [19.00, 72.93], [18.88, 72.86]],
+  "places": [
+    { "id": 1264186, "name": "Malabar Hill" },
+    { "id": 1268447, "name": "Kalba Devi" },
+    { "id": 1273797, "name": "Cumballa Hill" },
+    { "id": 1275339, "name": "Mumbai" }
+  ]
+}
