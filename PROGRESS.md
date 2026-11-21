@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.2 First real chart — 🔄 in progress |
-| **Current step** | 0.2.11 — GeoNames place index + feasibility (report ready for review) |
+| **Current step** | 0.2.11 — GeoNames place index + feasibility (follow-up applied, waiting for Project review) |
 | **Next step** | 0.2.12 — Calculation API |
 | **Then** | 0.2.13 — Minimal form + planet table live on the site |
-| **Blocked on** | Project review of `notes/0.2.11-place-index-feasibility.md` (D-075) |
+| **Blocked on** | Project review of the D-087 follow-up (`notes/0.2.11-place-index-feasibility.md`, section 0; D-075) |
 | **Live site** | https://jathag.vercel.app (Coming Soon in the B2 design; hidden from search engines) |
 | **Last updated** | 2026-11-21 |
 
@@ -71,7 +71,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.8 Engine core: time zone → UTC, sidereal positions, Lagna (D-073), whole-sign houses, D-9, dignity (D-076), aspects, combustion (D-077); `sweph` behind one adapter, data files pinned; all 100 position reference tests pass (every longitude within 0.31″ of JHora) (PR #9)
 - ✅ 0.2.9 Test report reviewed: signed off by Adithya + Project; D-079 accepted; R26 added (D-080); pre-1900 tolerance D-081 (3″ / 12 h before 1900; R26 Moon +1.47″) (PR #10)
 - ✅ 0.2.10 O-004 Bombay/Calcutta/War Time clocks decided (D-082, D-083, D-085, D-086); R27–R29 JHora answer key in `tests/reference/raw/` (raw only, added to the tests in 0.2.12)
-- 🔄 0.2.11 GeoNames place index + feasibility: index, search package and tests built; Vercel measured on a spike (deleted). Report ready for review (`notes/0.2.11-place-index-feasibility.md`)
+- 🔄 0.2.11 GeoNames place index + feasibility: follow-up applied (D-087: labels, population order, 3-character minimum, Mumbai list + helpers, fast-load format, raw files on GitHub Release `geonames-2026-11-21`), waiting for Project review
 - ⏳ 0.2.12 Calculation API (incl. R27–R29 into the tests, D-085)
 - ⏳ 0.2.13 Minimal form + planet table live on the site
 - ⏳ 0.2.14 Founder test: 20 places + own chart vs JHora
@@ -123,6 +123,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-21 | 0.2.11 | #11 | Follow-up after Project review (D-087): ASCII labels with repeats collapsed and "District"/"Division" dropped; population-first order; 3-character minimum; Mumbai list (4 places) + `isMumbai`/`isWestBengal`; index format 2 loads in 0.86 s / 518 MB on Vercel (was 5–9 s / 680 MB); raw GeoNames files on GitHub Release `geonames-2026-11-21`. Waiting for Project review. |
 | 2026-11-21 | 0.2.11 | #11 | GeoNames place index built (558,033 Indian places + 230,005 worldwide towns), search package `packages/places` with tests; measured on a Vercel spike (searches < 1 ms, but loading takes 5–9 s, fixable). Report ready for review; not merged. |
 | 2026-11-21 | 0.2.10 | — | Bombay/Calcutta/War Time clock rules decided (D-082–D-086); R27–R29 JHora answer key added (raw only) |
 | 2026-11-20 | 0.2.9 | #10 | Project decision D-081: reference tests allow 3″ (dashas 12 h) for births before 1900, 1″ / 1 h unchanged from 1900; exact checks unchanged. R26 now passes; 0.2.9 signed off. |
