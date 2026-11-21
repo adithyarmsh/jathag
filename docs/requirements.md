@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.4 · 2026-11-21 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.5 · 2026-11-21 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -35,8 +35,8 @@ A free, ad-free, private-by-default web app that turns a person's birth details 
 | FR-IN-01 | Input form: Name (free text, used as profile name), Date of birth, Time of birth, Place of birth. | Must |
 | FR-IN-02 | Date range supported: 1 Jan 1800 – 31 Dec 2100. Dates outside are rejected with a clear message. | Must |
 | FR-IN-03 | Time of birth has four modes: (a) **Exact** time (hour, minute; seconds optional in advanced); (b) **Custom range** (from–to, e.g. 07:00–08:00); (c) **Preset (part of day)** — Morning 6 am–12 noon, Afternoon 12 noon–4 pm, Evening 4 pm–8 pm, Night 8 pm–6 am (next day); (d) **Don't know** (whole day). | Must |
-| FR-IN-04 | Place search with type-ahead suggestions. Each suggestion shows place, district/state, country (e.g. "Kumbakonam, Thanjavur, Tamil Nadu, India") to disambiguate duplicates. | Must |
-| FR-IN-05 | Place coverage: every populated place in India in GeoNames (cities, towns, villages) plus worldwide places with population ≥ 500 (or larger coverage if technically feasible within free hosting limits). | Must |
+| FR-IN-04 | Place search with type-ahead suggestions, starting at 3 characters. Each suggestion shows "Place, District, State, Country" (e.g. "Kumbakonam, Thanjavur, Tamil Nadu, India") to disambiguate duplicates: plain names without accents, repeats collapsed, the words "District"/"Division" dropped. Suggestions are ordered by population, largest first (e.g. "che" → Chennai before Chegur); ties by closest name match, then alphabetical. Old and alternate names find the modern place (e.g. "Bombay" → Mumbai). (D-087) | Must |
+| FR-IN-05 | Place coverage: every populated place in India in GeoNames (cities, towns, villages, neighbourhoods, including abandoned and historical places) plus worldwide places with population ≥ 500. Every populated place worldwide does not fit the free plan (D-087). | Must |
 | FR-IN-06 | After a place is chosen, show its latitude, longitude and time zone in small text (expanded in advanced mode) so users can sanity-check. | Should |
 | FR-IN-07 | Advanced: manual entry of latitude, longitude and time zone / UTC offset (for places not found or for historical local time). | Must |
 | FR-IN-08 | Input validation with friendly messages (e.g. missing place, impossible date like 31 Feb). | Must |
