@@ -1,0 +1,45 @@
+{
+  "about": "GeoNames dumps used to build the place index (step 0.2.11). Licence: CC BY 4.0, https://www.geonames.org/. The raw downloads are not committed.",
+  "files": [
+    {
+      "name": "IN.zip",
+      "url": "https://download.geonames.org/export/dump/IN.zip",
+      "downloaded": "2026-11-21",
+      "lastModified": "2026-11-21T02:45:10Z",
+      "bytes": 15755098,
+      "sha256": "27d90b18bdca2fb5f92f2fc861eead16993ee3ec3bdc3cfc2adc906dcaef2df8"
+    },
+    {
+      "name": "cities500.zip",
+      "url": "https://download.geonames.org/export/dump/cities500.zip",
+      "downloaded": "2026-11-21",
+      "lastModified": "2026-11-21T02:49:22Z",
+      "bytes": 13935407,
+      "sha256": "86c76d7f3eec04b51650877da433a1dd5c384c31e99c940300c1b37cb716a649"
+    },
+    {
+      "name": "admin1CodesASCII.txt",
+      "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+      "downloaded": "2026-11-21",
+      "lastModified": "2026-11-21T02:49:22Z",
+      "bytes": 151571,
+      "sha256": "2e4867f5397acb056ea26377601b57af37cb4c81399770225018e9e439e91ad3"
+    },
+    {
+      "name": "admin2Codes.txt",
+      "url": "https://download.geonames.org/export/dump/admin2Codes.txt",
+      "downloaded": "2026-11-21",
+      "lastModified": "2026-11-21T02:49:22Z",
+      "bytes": 2371428,
+      "sha256": "6dac23d72035181f6cbbdfaeb80c6b73cbecffccf9148734e45c4a8540e3c978"
+    },
+    {
+      "name": "countryInfo.txt",
+      "url": "https://download.geonames.org/export/dump/countryInfo.txt",
+      "downloaded": "2026-11-21",
+      "lastModified": "2026-11-21T02:55:02Z",
+      "bytes": 32112,
+      "sha256": "79f8f59ea01cbb40438bf1856dd6c2ff201f03f8fc72d0530b2646aaf603ef04"
+    }
+  ]
+}

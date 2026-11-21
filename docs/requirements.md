@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.1 · 2026-11-20 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.4 · 2026-11-21 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -41,12 +41,12 @@ A free, ad-free, private-by-default web app that turns a person's birth details 
 | FR-IN-07 | Advanced: manual entry of latitude, longitude and time zone / UTC offset (for places not found or for historical local time). | Must |
 | FR-IN-08 | Input validation with friendly messages (e.g. missing place, impossible date like 31 Feb). | Must |
 | FR-IN-10 | Question 5 of the form: "Which chart style did you grow up with?" South Indian / North Indian, with small chart icons. First chart ever: South Indian pre-selected. After that: the user's last choice is pre-selected. Always visible and editable on the form. | Must |
-| FR-IN-09 | Warning for births in Mumbai/Kolkata region before 1955 about historical local time (see Open item O-004; final wording after research). | Should |
+| FR-IN-09 | **"Which clock?" question for births in historical-clock windows (D-082).** Shown only when place and date fall in: anywhere in India before 1906-01-01 (IST or not sure / the town's own local time); Mumbai City + Mumbai Suburban 1906-01-01 – 1955-12-31 (IST or not sure / Bombay local time UTC+4:51); West Bengal 1906-01-01 – 1948-12-31 (IST or not sure / Calcutta local time UTC+5:53:20); anywhere in India 1941-10-01 – 1942-05-14 (IST or not sure / War Time UTC+6:30); anywhere in India 1942-09-01 – 1945-10-14 (War Time or not sure, UTC+6:30, pre-selected / IST UTC+5:30; D-086). Default pre-selected: "IST (or not sure)" (UTC+5:30), except in the 1942-09-01 – 1945-10-14 window, where "War Time (or not sure)" is pre-selected. No question outside these windows. v0.2 (0.2.13): a short warning note only; v0.4 (0.4.6): the question. | Should |
 | FR-PROF-01 | Profiles saved in the browser (local storage). Unlimited profiles. Each has a user-given name. | Must |
 | FR-PROF-02 | Profile list: view, open, edit (re-calculates), delete (with confirmation). | Must |
 | FR-PROF-03 | Clear notice: "Profiles are saved only in this browser. Clearing browser data removes them." | Must |
 | FR-PROF-04 | Settings (chart style, theme, advanced options) saved in the browser. | Must |
-| FR-PROF-05 | Accounts, sync across devices. | Later (mobile phase) |
+| FR-PROF-05 | **Accounts (v1.1):** sign-in with email, Google, Apple, phone number, and maybe Facebook; users save profiles and charts and see them on any device. Cost, privacy and provider details decided at the start of v1.1 (O-008, D-084). | Later (v1.1) |
 
 ## 5. Calculations (the engine)
 
@@ -56,7 +56,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-CALC-01 | Convert local birth date/time + place to UTC using the IANA time zone database with historical offsets (incl. Indian War Time 1942–45, foreign daylight saving rules). | Must |
+| FR-CALC-01 | Convert local birth date/time + place to UTC using the IANA time zone database with historical offsets (incl. Indian War Time 1942–45, foreign daylight saving rules), or using an explicit UTC offset given to the second (manual entry, FR-IN-07, or the "Which clock?" answer, FR-IN-09). | Must |
 | FR-CALC-02 | Sidereal longitudes (Lahiri default) for the 9 grahas: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu (Ketu = Rahu + 180°). | Must |
 | FR-CALC-03 | For each graha: sign, degree within sign (deg/min/sec), nakshatra, pada, nakshatra lord, retrograde status, speed. | Must |
 | FR-CALC-04 | Dignity for each graha: exalted, debilitated, moolatrikona, own sign, or neutral/friend/enemy sign (natural relationships), from a fixed, documented table. | Must |
@@ -65,7 +65,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | FR-CALC-07 | Navamsa (D9) placement for lagna and all grahas. | Must |
 | FR-CALC-08 | Aspects: classical graha drishti only (all → 7th; Mars + 4th, 8th; Jupiter + 5th, 9th; Saturn + 3rd, 10th). Output: which planets aspect which houses and which planets. No Rahu/Ketu aspects. | Must |
 | FR-CALC-09 | Combustion (planet too close to the Sun) flag, using a documented standard set of orbs. | Should |
-| FR-CALC-10 | **Divisional charts (v1.0):** all 16 Shodashavarga charts — D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45, D60 — for lagna and all grahas, using JHora's default method for each, reference-tested. | Must (v1.0) |
+| FR-CALC-10 | **Divisional charts (v1.1):** all 16 Shodashavarga charts — D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45, D60 — for lagna and all grahas, using JHora's default method for each, reference-tested. | Later (v1.1) |
 | FR-CALC-11 | **Panchanga at birth (v0.9):** tithi (with paksha), vara (weekday, sunrise-based as in JHora), nakshatra, yoga, karana — reference-tested against JHora. | Must (v0.9) |
 
 ### 5.2 Timing
@@ -129,7 +129,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | FR-UI-03 | "Beta" label visible in the header. | Must |
 | FR-UI-04 | Footer (two lines): About, Disclaimer, Privacy, Sources & credits (GeoNames, Swiss Ephemeris), Source code (AGPL link); and "Made by Adithya" with "Adithya" underlined, linking to https://yoloadithya.com (D-068). | Must |
 | FR-UI-05 | Every interpretation block has an "i" button opening a pop-up: which factors produced it (e.g. "Saturn in 7th house · Saturn aspects 7th from 1st"), plus a small "See classical source" link to the Sources screen. | Must |
-| FR-UI-07 | Header (B2): wordmark + Beta badge, Learn link (hidden until v1.2), About, Profile (opens saved profiles), theme toggle. Mobile: Profile and menu buttons. | Must |
+| FR-UI-07 | Header (B2): wordmark + Beta badge, Learn link (hidden until v1.4), About, Profile (opens saved profiles), theme toggle. Mobile: Profile and menu buttons. | Must |
 | FR-UI-08 | Hover highlight: on pointer devices, the border of every outer card/box turns the accent colour on hover (subtle transition); inner cards don't react; the same highlight appears when keyboard focus is inside the card (D-066). | Must |
 | FR-UI-09 | Minimal numbering: no decorative numbers; hierarchy shown through headings, subheadings, spacing and type; numbers only where meaningful (D-067). | Must |
 | FR-UI-10 | Star-dust dot pattern on the page background in both themes (gold-tinted, low opacity), never behind card text (D-065). | Must |
@@ -163,7 +163,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | FR-CH-02 | Drawn as SVG by code; crisp at any size; themed for dark/light. | Must |
 | FR-CH-03 | Planet abbreviations with degree; retrograde marked (R); lagna marked. | Must |
 | FR-CH-04 | Tap/click a planet in the chart → its planet detail page. | Should |
-| FR-CH-05 | **Divisional chart selector (v1.0):** beside the main chart, a list/selector of all 16 divisional charts; selecting one shows it in the chosen style with its short "what this chart is for" note. | Must (v1.0) |
+| FR-CH-05 | **Divisional chart selector (v1.1):** beside the main chart, a list/selector of all 16 divisional charts; selecting one shows it in the chosen style with its short "what this chart is for" note. | Later (v1.1) |
 | FR-CH-06 | Chart style toggle (South/North) on the chart screen; changing it updates the remembered preference. | Must |
 
 ### 6.5 Planets
@@ -246,6 +246,7 @@ Confirmed by the founder on 2026-11-20:
 |---|---|---|
 | FR-SRC-01 | Reachable only from "i" pop-ups and the footer — not in main navigation. | Must |
 | FR-SRC-02 | For each content entry: classical citation (text, chapter, verse) and our own short summary of what the source says. No copied modern translations. | Must |
+| FR-SRC-03 | A short "About the calculations" section on the Sources & credits page: ephemeris and settings used, known small differences vs JHora (D-079, D-081, D-083), and how historical Indian clocks are handled (D-082). | Must (v0.9) |
 
 ---
 
@@ -256,13 +257,13 @@ Confirmed by the founder on 2026-11-20:
 | FR-CONT-01 | Style: matches the Saturn-in-7th sample — 50–120 words, simple modern language, "In a nutshell" one-liner, reminds that the whole chart matters, suitable for 16+. | Must |
 | FR-CONT-02 | Tone rules: constructive; no fear; no fatalistic predictions ("you will divorce"); no remedies; doshas stated factually with balancing context; health = general wellness + disclaimer. | Must |
 | FR-CONT-03 | Each entry stored as data with fields: ID, factor (e.g. "saturn_house_7"), title, body, nutshell, source citation, source summary, status (draft / founder-approved), version. | Must |
-| FR-CONT-04 | v1 inventory (basic): Lagna in 12 signs (12); planets in signs (9×12 = 108, short); planets in houses (9×12 = 108); Moon nakshatras (27); Mahadashas (9); Antardasha one-liners (81); house-lord-in-house blocks for life areas (12×12 = 144, short); transit one-liners (~108, short); Sade Sati phases (3); dosha explainers (few); "what this chart is for" notes for 16 divisional charts (16, v1.0); explanations of the 5 parts of panchanga (5, v0.9). **≈ 620 entries, most short.** | Must (one-liners may be "Should") |
+| FR-CONT-04 | v1 inventory (basic): Lagna in 12 signs (12); planets in signs (9×12 = 108, short); planets in houses (9×12 = 108); Moon nakshatras (27); Mahadashas (9); Antardasha one-liners (81); house-lord-in-house blocks for life areas (12×12 = 144, short); transit one-liners (~108, short); Sade Sati phases (3); dosha explainers (few); "what this chart is for" notes for 16 divisional charts (16, v1.1); explanations of the 5 parts of panchanga (5, v0.9). **≈ 620 entries, most short.** | Must (one-liners may be "Should") |
 | FR-CONT-05 | All content written in original words by Claude, reviewed and approved by the founder for tone; source citation required before an entry is marked approved. | Must |
 | FR-CONT-06 | Content stored separately from code, under a separate licence (wording TBD, O-003). | Must |
 | FR-CONT-07 | Deeper, synthesised readings; per-planet readings for divisional charts other than D1/D9; other languages; AI readings. | Later |
 | FR-LANG-01 | **Language-ready architecture (v0.2 onward):** engine returns stable IDs, not names; all UI strings in message files from v0.4; content entries carry a language field (Decisions D-063). | Must |
-| FR-LANG-02 | **Primary + secondary language (v1.6 → v2.0):** user chooses a primary and a secondary language. English primary + Indian secondary shows chart terms in both; Indian primary shows most of the site in that language with English as secondary. Languages, order and details decided after v1.5 (D-061). | Later (v1.6–v2.0) |
-| FR-CONT-08 | **Learn section:** basic Learn (v1.2) and interactive Learn (v1.5); scope decided after v1.0. | Later (v1.2 / v1.5) |
+| FR-LANG-02 | **Indian languages (v1.7 → v1.9, D-084):** optional secondary language (Hindi, Kannada, Telugu, Malayalam, Bengali or Tamil), off by default, showing chart terms next to the English (e.g. "Cancer கடகம்"); option to make one of these the primary language with English always kept as secondary. v1.8 completes it step by step; v1.9 verifies every term, translation and reading with native-speaker checkpoints. Scope and method decided after v1.1. | Later (v1.7–v1.9) |
+| FR-CONT-08 | **Learn section (D-084):** basic Learn (v1.4), more detailed (v1.5), interactive (v1.6), on web, iOS and Android. Explains everything shown in the chart: terms, what they mean, how they are calculated, how planets move between boxes, dashas. Scope decided after v1.1. | Later (v1.4–v1.6) |
 
 ---
 
@@ -270,7 +271,7 @@ Confirmed by the founder on 2026-11-20:
 
 | ID | Requirement | Priority |
 |---|---|---|
-| NFR-PRIV-01 | No accounts; no birth data stored on servers; profiles only in the user's browser. | Must |
+| NFR-PRIV-01 | No accounts; no birth data stored on servers; profiles only in the user's browser. (Applies until v1.0; accounts in v1.1 change this, rules decided in O-008.) | Must |
 | NFR-PRIV-02 | No ad trackers, no third-party marketing cookies. Analytics: none or a free cookieless option (O-005). | Must |
 | NFR-PRIV-03 | Privacy page in plain language explaining exactly what is (not) collected. | Must |
 | NFR-LEG-01 | Disclaimer: astrology for self-reflection; not medical, legal, financial or psychological advice. | Must |
@@ -337,7 +338,7 @@ Reference case coverage (Claude will specify exact births):
 
 ## 12. Out of scope for web v1
 
-Accounts and sync · payments and ads · offline mode · tarot · compatibility (porutham) · AI readings · Indian-language interface (v1.6–v2.0) · mobile apps (test builds v1.3–v1.4, public v2.0) · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.2 basic, v1.5 interactive) · per-planet readings for divisional charts other than D1/D9.
+Accounts and sync (v1.1) · 16 divisional charts (v1.1) · payments and ads · offline mode · tarot · compatibility (porutham) · AI readings · Indian languages (v1.7–v1.9) · mobile apps (test builds v1.2–v1.3, public v2.0) · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.4–v1.6) · per-planet readings for divisional charts other than D1/D9.
 
 ## 13. Definition of done for the v1 beta launch
 
@@ -361,11 +362,14 @@ Accounts and sync · payments and ads · offline mode · tarot · compatibility 
 | v0.7 Interpretations | Style guide; ~600 approved entries; "i" pop-ups; Sources screen; life-area pages | FR-CONT-*, FR-UI-05, FR-SRC-*, FR-LA-* |
 | v0.8 Approximate time, settings, downloads | Certain/uncertain UX; beginner/advanced settings; PNG/PDF downloads; report-an-issue | FR-APX-04, FR-SET-*, FR-ST-*, FR-DL-*, FR-UI-06 |
 | v0.9 Panchanga + legal | Panchanga calc + card; privacy, disclaimer, about, credits, content licence | FR-CALC-11, FR-PAN-01, NFR-PRIV-*, NFR-LEG-* |
-| v1.0 Divisional charts + Beta launch | 16 divisional charts; quality pass; domain; `noindex` removed (public launch) | FR-CALC-10, FR-CH-05, NFR-ACC-01, NFR-PERF-01, NFR-BRW-01, §13 |
-| v1.1 | Beta feedback fixes | — |
-| v1.2 | Basic Learn | FR-CONT-08 |
-| v1.3 | Mobile test build (founder's phone); framework decided | FR-PROF-05 (planning) |
-| v1.4 | Mobile test version for a few friends | — |
-| v1.5 | Interactive Learn | FR-CONT-08 |
-| v1.6 – v1.9 | Indian languages, step by step (details after v1.5) | FR-LANG-02 |
-| v2.0 | Multilingual Jathag on web + public iOS/Android apps; accounts across web and apps | FR-LANG-02, FR-PROF-05 |
+| v1.0 Beta launch | Quality pass; domain; `noindex` removed (public launch, English web app) | NFR-ACC-01, NFR-PERF-01, NFR-BRW-01, §13 |
+| v1.1 | Beta feedback fixes; 16 divisional charts; accounts (sign-in, saved profiles and charts) | FR-CALC-10, FR-CH-05, FR-PROF-05 |
+| v1.2 | Mobile test build (founder's phone); framework decided | — |
+| v1.3 | Mobile test version for a few friends | — |
+| v1.4 | Basic Learn | FR-CONT-08 |
+| v1.5 | Basic Learn, more detail | FR-CONT-08 |
+| v1.6 | Interactive Learn (web, iOS, Android) | FR-CONT-08 |
+| v1.7 | Indian languages: secondary-language terms; Indian primary language with English secondary | FR-LANG-02 |
+| v1.8 | Indian languages, step-by-step completion | FR-LANG-02 |
+| v1.9 | Verification of all languages (terms, translations, readings) | FR-LANG-02 |
+| v2.0 | Full setup live on App Store, Play Store and web; marketing push | — |
