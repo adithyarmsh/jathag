@@ -89,6 +89,7 @@
   --color-accent-text: var(--accent-text);
   --color-accent-soft: var(--accent-soft);
   --color-accent-border: var(--accent-border);
+  --color-field-border: var(--field-border);
   --shadow-soft: var(--shadow);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-cormorant);
@@ -194,4 +195,110 @@ body {
   .card-outer {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------------------- 0.2.13: minimal form + planet table */
+
+/* Beta notice on every page (FR-HOME-05): a calm strip, solid so no star dust sits behind the text */
+.beta-notice {
+  background-color: var(--card);
+}
+
+/* Form fields. The border is darker than --line so the field edge passes WCAG's 3:1 for controls. */
+:root {
+  --field-border: #8d8794;
+  --error: #a3341f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --field-border: #7d87a3;
+    --error: #f1a08c;
+  }
+}
+:root[data-theme="dark"] {
+  --field-border: #7d87a3;
+  --error: #f1a08c;
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  min-height: 2.875rem;
+  border: 1px solid var(--field-border);
+  border-radius: 0.75rem;
+  background-color: var(--bg);
+  color: var(--ink);
+  padding: 0.6rem 0.85rem;
+  font-size: 1rem; /* 16px: stops iPhones zooming into the field */
+}
+.form-input:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 1px;
+  border-radius: 0.75rem;
+}
+.form-input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+.field-error {
+  color: var(--error);
+}
+
+/* The circled "i" next to the date (D-092): ink = black in light mode, ivory in dark mode, NOT gold.
+   The pop-over is positioned against the date row, so it is never wider than the card. */
+.clock-note-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.clock-note-button:focus-visible {
+  border-radius: 9999px;
+  outline-offset: 1px;
+}
+.clock-note-popover {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: block;
+  border: 1px solid var(--field-border);
+  border-radius: 0.875rem;
+  background-color: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+.clock-note-popover[hidden] {
+  display: none;
+}
+
+/* Planet table */
+.planet-table th,
+.planet-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  white-space: nowrap;
+}
+.planet-table thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.planet-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.planet-table tbody tr:last-child th,
+.planet-table tbody tr:last-child td {
+  border-bottom: none;
 }
