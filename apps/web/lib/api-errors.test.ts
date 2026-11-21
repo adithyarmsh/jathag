@@ -51,7 +51,13 @@ describe('error messages', () => {
   });
 });
 
-describe('fixed wording from the handoff (D-092)', () => {
+describe('fixed wording from the handoff (D-092, D-093)', () => {
+  it('form title, Beta notice and page description (D-093)', () => {
+    expect(en.form.title).toBe('Generate Your Chart');
+    expect(en.form.subtitle).toBe('Date, time and place of birth.');
+    expect(en.betaNotice).toBe('Jathag Beta — The stars are still aligning. We are actively refining our features and design. Expect occasional shifts as we calibrate the cosmos.');
+    expect(en.meta.description.endsWith('Beta, stars are being aligned.')).toBe(true);
+  });
   it('privacy line', () => {
     expect(en.form.privacy).toBe('Your details are only used to calculate your chart. Nothing is stored on our servers.');
   });

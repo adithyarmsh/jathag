@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Jathag — Know your chart, not just your sign.",
-    "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Beta, work in progress."
+    "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Beta, stars are being aligned."
   },
-  "betaNotice": "Beta — work in progress. Jathag is still being built and checked, so things may change.",
+  "betaNotice": "Jathag Beta — The stars are still aligning. We are actively refining our features and design. Expect occasional shifts as we calibrate the cosmos.",
   "header": {
     "wordmark": "Jathag",
     "beta": "Beta",
@@ -31,7 +31,7 @@
     ]
   },
   "form": {
-    "title": "Your birth details",
+    "title": "Generate Your Chart",
     "subtitle": "Date, time and place of birth.",
     "date": {
       "label": "Date of birth",
