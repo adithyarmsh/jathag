@@ -58,7 +58,7 @@ for (const b of births) {
 
 console.log('## 1. Engine minus JHora\n');
 console.log(`Check of the method: JHora's printed pratyantardasha times vs times rebuilt from JHora's Moon: max ${(rebuiltCheckMax / 1000).toFixed(0)} s.\n`);
-console.log('| Birth | Antardasha starts: max |diff| | median diff | Pratyantar start/end: max |diff| | AD dates one day apart (before tolerance) |');
+console.log('| Birth | Antardasha starts: largest difference | typical (median) | Pratyantar start/end: largest difference | AD dates one day apart (before tolerance) |');
 console.log('|---|---|---|---|---|');
 for (const r of rows) {
   const max = Math.max(...r.ad.map(Math.abs));
@@ -67,8 +67,8 @@ for (const r of rows) {
 for (const [label, sel] of [['from 1900', (r: (typeof rows)[0]) => !r.pre1900], ['before 1900', (r: (typeof rows)[0]) => r.pre1900]] as const) {
   const ad = rows.filter(sel).flatMap((r) => r.ad);
   const pd = rows.filter(sel).flatMap((r) => r.pd);
-  console.log(`\nSummary ${label}: antardasha starts max ${fmtMin(Math.max(...ad.map(Math.abs)))}, median |diff| ${fmtMin(median(ad.map(Math.abs)))}` +
-    (pd.length ? `; pratyantar max ${fmtMin(Math.max(...pd.map(Math.abs)))}, median |diff| ${fmtMin(median(pd.map(Math.abs)))} (${pd.length} times)` : ''));
+  console.log(`\nSummary ${label}: antardasha starts max ${fmtMin(Math.max(...ad.map(Math.abs)))}, median of the size ${fmtMin(median(ad.map(Math.abs)))}` +
+    (pd.length ? `; pratyantar max ${fmtMin(Math.max(...pd.map(Math.abs)))}, median of the size ${fmtMin(median(pd.map(Math.abs)))} (${pd.length} times)` : ''));
 }
 console.log(`\nAntardasha dates one day apart from JHora before the tolerance: ${rows.reduce((n, r) => n + r.dayOff, 0)} of ${rows.length * 81}.`);
 
