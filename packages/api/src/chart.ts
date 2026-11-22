@@ -14,6 +14,7 @@ import {
   resolveSettings,
   SettingsError,
   TimeError,
+  transitsForChart,
   vimshottariForChart,
   vimshottariNow,
   type BirthZone,
@@ -21,6 +22,7 @@ import {
   type DashaNow,
   type EphemerisAdapter,
   type Settings,
+  type Transits,
   type VimshottariTimeline,
 } from '@jathag/engine';
 import { CLOCK_IDS, ClockChoiceError, resolveClock, type ClockId, type ClockQuestion, clockQuestion } from './clock.ts';
@@ -105,6 +107,14 @@ export interface ChartResponse {
     current: DashaNow['current'];
     next: DashaNow['next'];
   };
+  /**
+   * Transits and Sade Sati (step 0.3.2, D-099), for the same `asOf` as `dashas`: the 9 grahas at asOf
+   * with houses from the natal Moon and Lagna signs, the sign changes of Saturn, Jupiter, Rahu and Ketu
+   * (from the latest "enters" up to asOf, then 10 years ahead), and every Sade Sati from birth to
+   * 120 years after birth with phases and the status at asOf. Exact UTC times only; shown on the
+   * clock at birth from 0.3.7 (D-099 item 6, D-098).
+   */
+  transits: Transits;
 }
 
 // ---------------------------------------------------------------- validation helpers
@@ -228,6 +238,8 @@ export interface ChartOptions {
    * request time.
    */
   asOf: string;
+  /** If given, the milliseconds spent on transits are written to `timing.transits` (Server-Timing). */
+  timing?: Record<string, number>;
 }
 
 /** Validated request → full response. Throws ApiError (expected problems) or anything else (bugs). */
@@ -296,6 +308,9 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
 
   const vimshottari = vimshottariForChart(chart);
   const now = vimshottariNow(vimshottari, options.asOf);
+  const t0 = performance.now();
+  const transits = transitsForChart(chart, { asOf: now.asOf, ...(options.ephemeris ? { ephemeris: options.ephemeris } : {}) });
+  if (options.timing) options.timing.transits = performance.now() - t0;
 
   return {
     apiVersion: API_VERSION,
@@ -307,5 +322,6 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
     clockQuestion: question,
     chart,
     dashas: { asOf: now.asOf, vimshottari, current: now.current, next: now.next },
+    transits,
   };
 }

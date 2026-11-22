@@ -46,9 +46,9 @@ describe('chart: a normal birth', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('cache-control')).toBe('no-store');
     expect(res.headers.get('content-type')).toContain('application/json');
-    expect(res.headers.get('server-timing')).toMatch(/calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
+    expect(res.headers.get('server-timing')).toMatch(/transits;dur=[\d.]+, calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
     expect(json.apiVersion).toBe(1);
-    expect(json.engineVersion).toBe('0.2.0');
+    expect(json.engineVersion).toBe('0.3.0');
     expect(json.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(json.place).toEqual({ kind: 'search', ...CHENNAI });
     expect(json.clock).toEqual({ source: 'timeZone', id: null, chosen: false, utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata', tzdataVersion: process.versions.tz });
@@ -300,5 +300,53 @@ describe('place search endpoint', () => {
     expect(res.status).toBe(status);
     expect(json).toEqual({ error: { code } });
     for (const bit of ['che', 'mumbai', 'kumbakonam', '123']) expect(text).not.toContain(bit);
+  });
+});
+
+describe('chart: transits + Sade Sati (step 0.3.2)', () => {
+  const AS_OF = '2026-11-22T10:00:00.000Z';
+  const withAsOf = async (body: unknown, asOf = AS_OF) => {
+    const res = await handleChartRequest(post(body), { asOf: () => asOf });
+    return { res, text: await res.clone().text(), json: await res.json() as ChartResponse };
+  };
+
+  it('returns positions now, sign changes and Sade Sati for the same asOf as the dashas', async () => {
+    const { res, json } = await withAsOf(BASE);
+    expect(res.status).toBe(200);
+    expect(Object.keys(json)).toEqual(['apiVersion', 'engineVersion', 'settings', 'place', 'clock', 'utc', 'clockQuestion', 'chart', 'dashas', 'transits']);
+    const t = json.transits;
+    expect(Object.keys(t)).toEqual(['asOf', 'natal', 'positions', 'signChanges', 'sadeSati']);
+    expect(t.asOf).toBe(json.dashas.asOf);
+    expect(Object.keys(t.positions)).toEqual(['Su', 'Mo', 'Ma', 'Me', 'Ju', 'Ve', 'Sa', 'Ra', 'Ke']);
+    expect(Object.keys(t.signChanges)).toEqual(['Sa', 'Ju', 'Ra', 'Ke']);
+    expect(t.natal).toEqual({ moonSign: json.chart.bodies.Mo.sign, lagnaSign: json.chart.bodies.La.sign });
+    // R01: Moon in Aquarius (11). A Sade Sati was already running at birth (from 1990); in 2026 Saturn
+    // is in Pisces, the 2nd from the Moon: the setting phase of the 2020–2028 period.
+    expect(t.sadeSati.moonSign).toBe(11);
+    expect(t.sadeSati.periods[0]).toMatchObject({ startedBeforeBirth: true });
+    expect(t.sadeSati.periods[0].start!.slice(0, 4)).toBe('1990');
+    expect(t.sadeSati.status).toMatchObject({ phase: 'setting', saturn: { sign: 12, houseFromMoon: 2 } });
+    expect(t.sadeSati.status.current!.start!.slice(0, 10)).toBe('2020-01-24');
+    expect(t.sadeSati.status.next!.start!.slice(0, 4)).toBe('2049');
+    expect(t.sadeSati.span).toEqual({ start: '1992-08-14T01:15:00Z', end: '2112-08-14T01:15:00Z' });
+    // No English names (D-063) and nothing display-related
+    expect(JSON.stringify(t)).not.toMatch(/Aries|Capricorn|Saturn|Ashwini|IST|\+05:30/);
+  });
+
+  it('same request + same asOf → byte-identical response body (NFR-DET-01); positions follow asOf', async () => {
+    const a = await withAsOf(BASE);
+    const b = await withAsOf(BASE);
+    expect(b.text).toBe(a.text);
+    const other = await withAsOf(BASE, '2030-01-01T00:00:00.000Z');
+    expect(other.json.transits.sadeSati.periods).toEqual(a.json.transits.sadeSati.periods);
+    expect(other.json.transits.positions.Mo.lon).not.toBe(a.json.transits.positions.Mo.lon);
+  });
+
+  it('the earliest and latest births work (1800 and 2100)', async () => {
+    const early = await withAsOf({ date: '1800-01-02', time: '12:00', manual: { lat: 28.6, lng: 77.2, utcOffsetSeconds: 19800 } });
+    expect(early.res.status).toBe(200);
+    const late = await withAsOf({ date: '2100-12-31', time: '23:59', manual: { lat: 28.6, lng: 77.2, utcOffsetSeconds: 19800 } });
+    expect(late.res.status).toBe(200);
+    expect(late.json.transits.sadeSati.span.end.slice(0, 4)).toBe('2220');
   });
 });

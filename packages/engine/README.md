@@ -15,7 +15,7 @@ From a birth instant (UTC) and a place (latitude/longitude):
 
 Plus **local time → UTC** (FR-CALC-01): an IANA time zone *or* a manual UTC offset in seconds.
 
-And (step 0.3.1) **Vimshottari dashas**, see below.
+And (step 0.3.1) **Vimshottari dashas**, and (step 0.3.2) **transits, sign changes and Sade Sati**; see below.
 
 Everything uses stable IDs (D-063): signs 1–12, nakshatras 1–27, houses 1–12, body codes `La Su Mo Ma Me Ju Ve Sa Ra Ke`. There are no English names. Every result carries `meta` with the engine version, the settings used, the ephemeris version and data files, and the input.
 
@@ -66,6 +66,29 @@ now.next.pratyantardasha; // the next START at that level (each level on its own
 - `vimshottariNow` takes `asOf` as an input; **the engine never reads the system clock** (NFR-DET-01, a test checks this with a fake clock). A period is current when start ≤ asOf < end.
 - Lower-level building block: `vimshottariTimeline({ moonLon, birthUtc, dashaYear })`.
 
+## Transits, sign changes and Sade Sati (step 0.3.2, `src/transits.ts`)
+
+FR-TRAN-01…04, D-099. No JHora answer key exists for this; correctness rests on Swiss Ephemeris, the self-checks in `test/transits.test.ts` and `tests/reference/transits.test.ts`, and the founder's JHora spot-check (0.3.3, `notes/0.3.3-jhora-checklist.md`).
+
+```ts
+const t = transitsForChart(chart, { asOf: '2026-11-22T10:00:00.000Z' }); // the same asOf as the dashas
+t.positions.Sa;        // { lon, sign, degInSign, nakshatra, pada, nakshatraLord, navamsaSign, speed, retrograde, houseFromMoon, houseFromLagna }
+t.signChanges.Sa;      // [{ planet: 'Sa', utc: '2025-03-29T16:15:10Z', fromSign: 11, toSign: 12, kind: 'enters' }, …]
+t.sadeSati.periods[1]; // { start, end, startedBeforeBirth, startOutsideData, endOutsideData, phases: { rising, peak, setting }, crossings: [ … ] }
+t.sadeSati.status;     // { asOf, phase: 'setting', current: { index, start, end, phases }, next: { … }, saturn: { sign: 12, houseFromMoon: 2 } }
+```
+
+- **Positions now:** the 9 grahas at `asOf`, through the same function as the natal planets (`siderealGrahas` in `chart.ts`: same adapter, Lahiri, apparent, mean node, Ketu = Rahu + 180°). No transit Lagna. Houses are whole-sign from the natal Moon's sign and from the natal Lagna's sign. A test checks that asOf = birth gives exactly the natal positions.
+- **Sign changes (a search over Swiss Ephemeris output, not new astronomy, D-007):** sample longitude and speed every **5 days**; where the speed changes sign, find the station by bisection (to 1 s); in each one-direction piece the planet moves under 30°, so it crosses at most one boundary, exactly when the end signs differ; bisect that to the whole second. The reported `utc` is the **first whole UTC second in the new sign**. **Why 5 days is safe:** a crossing could only be missed if the planet stationed twice between two samples. Saturn's stations are never less than 133.5 days apart and Jupiter's never less than 117.5 days (measured 1800–2399; the test asserts > 100), and the mean node never stations (speed always −0.0530 ± 0.0001 °/day). A dense 1-hour scan finds exactly the same crossings (tests: Saturn 1960–2040, Jupiter 1990–2040, Rahu 2000–2030). Precision: 1 s of search; physically, Saturn's 0.14″ Lahiri difference to JHora is about 20 s at normal speed.
+- **Kinds**, relative to the normal direction (forward for Saturn/Jupiter, backward for the nodes): `enters` (further than the planet has been), `moves-back` (against the normal direction), `enters-again` (into a sign it had stepped back out of). Each search starts 1 year before the first crossing it reports, so a dip in progress (always under ~5 months) is known. The mean node only ever `enters`. Ketu's crossings are Rahu's moments into the opposite signs.
+- **Window (FR-TRAN-03):** from the planet's most recent `enters` at or before asOf, up to asOf, plus every crossing in the 10 calendar years after asOf.
+- **Sade Sati:** Moon sign M = natal Moon's sign; Saturn in M−1 = rising, M = peak, M+1 = setting. **Merging rule:** the stretches Saturn spends in those three signs are one period when the gap between them is shorter than **10 years of 365.25 days** (real gaps are retrograde dips under a year or ~22 years to the next return, so the threshold has no effect between 1 and 20 years). Period = first entry into M−1 → final exit from M+1. Phases start at Saturn's **first** entry into M−1 / M / M+1 inside the period; each ends where the next starts. Every Saturn crossing inside the period is listed with houses from the Moon (`fromHouse`/`toHouse`: 12, 1, 2, or 11/3 during a dip out). Periods last 6.4–8.9 years.
+- **Span:** every period overlapping birth → birth + 120 calendar years. A period running at birth keeps its true start (`startedBeforeBirth`). **Before the data:** the ephemeris begins 1800-01-01 01:08:07 UTC (`EPHEMERIS_DATA_START`, D-091). If Saturn is already in one of the three signs there, `start` is `null` (`startOutsideData: true`), and so is the start of Saturn's phase at that moment and of any earlier phase. (On 1800-01-01 Saturn was at ~17°44′ Cancer, 13° from Leo, so no later phase can have begun before the data.) The end side works the same way (`endOutsideData`); the search stops at 2399-12-01 (`EPHEMERIS_DATA_END`), far beyond the ~2231 the API can need.
+- **Status at asOf:** `none` / `rising` / `peak` / `setting` by the phase rules (a retrograde dip does not change the phase; `saturn` gives Saturn's real sign and house from the Moon), the running period and the next one to start.
+- **Reuse and cost:** Saturn is searched once per chart over one range covering both the Sade Sati span and the sign-change window; about 70 ms per chart on a Mac.
+- Lower-level pieces (exported for tests): `crossingTimeline`, `rawCrossings`, `sadeSatiPeriods`, and `calculateSadeSati({ moonSign, birthUtc, asOf })` for any Moon sign.
+- Not here (D-099 item 7, FR-TRAN-05): Ashtama/Kantaka Shani, a list of retrograde stations, life-area windows (0.3.4).
+
 ## Layout
 
 | Path | What |
@@ -74,6 +97,7 @@ now.next.pratyantardasha; // the next START at that level (each level on its own
 | `src/ephemeris/sweph.ts` | The `sweph` (Node) adapter. **The only file allowed to import `sweph`** (a test checks this). It sets Lahiri before every call and throws `EphemerisError` (`EPHEMERIS_FALLBACK`) if Swiss Ephemeris ever falls back to its Moshier model. |
 | `src/chart.ts` | `calculateChart()`: puts everything together. |
 | `src/dasha.ts` | Vimshottari timeline, current period and coming up (step 0.3.1). |
+| `src/transits.ts` | Positions now, sign-change search (Saturn, Jupiter, Rahu/Ketu) and Sade Sati (step 0.3.2). |
 | `src/time.ts` | `localToUtc()`. Uses the Temporal API (`@js-temporal/polyfill`) with the runtime's built-in IANA tz database. |
 | `src/zodiac.ts` | Sign / nakshatra / pada / D-9 arithmetic, done in arcseconds. |
 | `src/dignity.ts`, `src/aspects.ts`, `src/combustion.ts` | The rule tables from D-076, D-012, D-077. |

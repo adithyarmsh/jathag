@@ -45,7 +45,7 @@ Response (shortened):
 ```json
 {
   "apiVersion": 1,
-  "engineVersion": "0.2.0",
+  "engineVersion": "0.3.0",
   "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign", "dashaYear": "365.25" },
   "place": { "kind": "search", "geonameId": 1261481, "lat": 28.6139, "lng": 77.209, "timeZone": "Asia/Kolkata", "countryCode": "IN", "admin1Code": "07", "admin2Code": "094" },
   "clock": { "source": "clockRule", "id": "ist", "chosen": true, "utcOffsetSeconds": 19800, "timeZone": null, "tzdataVersion": null },
@@ -61,12 +61,33 @@ Response (shortened):
                                        "antardashas": [ { "lord": "Ma", …, "pratyantardashas": [ { "lord": "Ma", … }, … ] }, … ] }, … ] },
     "current": { "mahadasha": { "path": [2], "lord": "Ju", "start": "…", "end": "…" }, "antardasha": { "path": [2, 8], … }, "pratyantardasha": { "path": [2, 8, 4], … } },
     "next":    { "mahadasha": { "path": [3], "lord": "Sa", … }, "antardasha": { … }, "pratyantardasha": { … } }
+  },
+  "transits": {
+    "asOf": "2026-11-22T10:00:00.000Z",
+    "natal": { "moonSign": 11, "lagnaSign": 5 },
+    "positions": { "Su": { … }, …, "Sa": { "lon": 344.005, "sign": 12, "nakshatra": 26, "pada": 4, "speed": -0.0328, "retrograde": true,
+                                       "houseFromMoon": 2, "houseFromLagna": 8, … }, … },
+    "signChanges": { "Sa": [ { "planet": "Sa", "utc": "2025-03-29T16:15:10Z", "fromSign": 11, "toSign": 12, "kind": "enters" }, … ],
+                     "Ju": [ … ], "Ra": [ … ], "Ke": [ … ] },
+    "sadeSati": {
+      "moonSign": 11, "signs": { "rising": 10, "peak": 11, "setting": 12 },
+      "span": { "start": "1992-08-14T01:15:00Z", "end": "2112-08-14T01:15:00Z" },
+      "periods": [ { "start": "2020-01-24T04:26:33Z", "end": "2028-02-23T13:53:57Z", "startedBeforeBirth": false,
+                     "startOutsideData": false, "endOutsideData": false,
+                     "phases": { "rising": { "start": "2020-01-24T04:26:33Z", "end": "2022-04-29T02:23:42Z" }, "peak": { … }, "setting": { … } },
+                     "crossings": [ { "planet": "Sa", "utc": "2022-07-12T09:18:01Z", "fromSign": 11, "toSign": 10, "kind": "moves-back",
+                                      "fromHouse": 1, "toHouse": 12 }, … ] }, … ],
+      "status": { "asOf": "…", "phase": "setting", "current": { "index": 1, "start": "…", "end": "…", "phases": { … } },
+                  "next": { "index": 2, … }, "saturn": { "sign": 12, "houseFromMoon": 2 } }
+    }
   }
 }
 ```
 `clock.source` is `timeZone` (the place's IANA zone; `tzdataVersion` set), `clockRule` (a "Which clock?" option; `chosen` = sent by the client, otherwise the default) or `manual`. `chart` is exactly the engine's output (`packages/engine/README.md`).
 
-`dashas` (step 0.3.1, D-096): the full Vimshottari timeline from the engine (`vimshottariForChart`), plus `current` (the period running at `asOf` at each level, `null` before birth or after the 120 years) and `next` (the next start at each level, `null` when none is left). `asOf` is the moment of calculation: the endpoint reads the time when the request arrives (the web route passes it; `handleChartRequest(request, { asOf })` lets tests fix it) and `calculateChartResponse(req, { asOf })` requires it, so the same request + `asOf` gives a byte-identical response. All times are UTC; showing them on the birth place's clock (D-097) is done by the screens from `clock` (0.3.7). The response is about 106 KB raw, about 12 KB compressed, almost all of it the 729 pratyantardashas (D-096 item 5).
+`dashas` (step 0.3.1, D-096): the full Vimshottari timeline from the engine (`vimshottariForChart`), plus `current` (the period running at `asOf` at each level, `null` before birth or after the 120 years) and `next` (the next start at each level, `null` when none is left). `asOf` is the moment of calculation: the endpoint reads the time when the request arrives (the web route passes it; `handleChartRequest(request, { asOf })` lets tests fix it) and `calculateChartResponse(req, { asOf })` requires it, so the same request + `asOf` gives a byte-identical response. All times are UTC; showing them on the birth place's clock (D-097) is done by the screens from `clock` (0.3.7). The response is about 120 KB raw, about 14 KB gzip-compressed (10 KB Brotli), most of it the 729 pratyantardashas (D-096 item 5).
+
+`transits` (step 0.3.2, D-099): the engine's `transitsForChart` for the same `asOf` as `dashas` — the 9 grahas at asOf with whole-sign houses from the natal Moon and Lagna signs, the sign changes of Saturn, Jupiter, Rahu and Ketu (from the latest `enters` at or before asOf, then 10 years ahead; kinds `enters` / `moves-back` / `enters-again`), and every Sade Sati from birth to 120 years after birth with phases, the crossings inside each period and the status at asOf. Rules and search method: `packages/engine/README.md`. Exact UTC only; shown on the clock at birth by the screens (0.3.7, D-099 item 6). About 14 KB raw / 2.3 KB compressed; the `Server-Timing` header has a `transits` entry with the time it took.
 
 ### Errors
 

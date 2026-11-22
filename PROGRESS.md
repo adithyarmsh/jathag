@@ -11,7 +11,7 @@
 | **Current step** | 0.3.2 — Transits + Sade Sati (v0.3 Timing engine) |
 | **Next step** | 0.3.3 — JHora spot-check |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Nothing (waiting for the 0.3.2 handoff) |
+| **Blocked on** | Project review of the 0.3.2 report (PR #16) |
 | **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice, footer v0.3.1; the chart API also returns the dasha timeline, not shown yet; hidden from search engines) |
 | **Last updated** | 2026-11-22 |
 
@@ -78,7 +78,9 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.2.15 Founder test fixes (D-094, D-095): smarter place search (last word(s) as state/country, aliases UK/USA/UAE), 12-hour time with AM/PM buttons, day/month dropdowns with live checks, earlier old-clock "i", place details with UTC offset, fixed header, footer version, "Coming soon" tags + calculation line, honest hero intro, cards rendered once (PR #14)
 
 ### v0.3 — Timing engine
-- ✅ 0.3.1 Dashas (3 levels): Vimshottari timeline + current period + coming up in the engine and chart API; all JHora dasha tests pass; dates on the clock at birth (D-098) (PR #15) · ⏳ 0.3.2 Transits + Sade Sati · ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
+- ✅ 0.3.1 Dashas (3 levels): Vimshottari timeline + current period + coming up in the engine and chart API; all JHora dasha tests pass; dates on the clock at birth (D-098) (PR #15)
+- 🔄 0.3.2 Transits + Sade Sati: built and tested in the engine and chart API (positions now with houses from Moon and Lagna, Saturn/Jupiter/Rahu-Ketu sign changes incl. retrograde back-and-forth, Sade Sati periods from birth to +120 years with phases and status); JHora checklist for 0.3.3 in `notes/0.3.3-jhora-checklist.md`. Left: Project review (PR #16)
+- ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
 
 ### v0.4 — Design system + app shell
 - ⏳ 0.4.1 References · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
@@ -124,6 +126,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-22 | 0.3.2 | #16 | Transits + Sade Sati built: 9 grahas at the dashas' moment with houses from Moon and Lagna; sign-change search on Swiss Ephemeris output (5-day steps, stations found, to the second) for Saturn, Jupiter, Rahu/Ketu marked enters / moves back / enters again; Sade Sati periods from birth to +120 years with phases, dips and status; chart API `transits` section; engine 0.3.0. Project's Saturn example matches on every date. Natal positions and dashas unchanged; all tests green. JHora checklist for 0.3.3 written. D-099 / requirements v1.9 committed unchanged. Waiting for Project review. |
 | 2026-11-22 | 0.3.1 | #15 | Approved by the Project (D-098: dasha dates on the clock at birth, like JHora; display of births after the calculation moment decided in 0.3.7). D-098 committed unchanged. Squash-merged. |
 | 2026-11-22 | 0.3.1 | #15 | Vimshottari dashas built: engine timeline (9/81/729 periods from the true start before birth, whole-second UTC), current period + coming up for a moment passed in, dasha year setting (365.25/360/365.2422), chart API `dashas` section; JHora dasha tests on and passing for all 29 births (max 30.7 min from 1900, 4.6 h for 1853); JHora's dates use the fixed offset at birth (D-097 research); build loader replaced by a small engine change; engine 0.2.0; 1,107 tests green. Preview: chart 1.01 s cold / ≈0.3 s warm, 106 KB raw / 13 KB sent, logs clean; page unchanged. D-096/D-097 docs committed unchanged. Waiting for Project review. |
 | 2026-11-22 | 0.2.15 | #14 | Approved by the Project (D-095) with two additions: hero intro now "…and soon explains it in short, honest, modern language."; country aliases UK/USA/UAE in place search ("london uk", "dallas usa", "dubai uae") with tests. D-095 docs committed unchanged. Squash-merged; v0.2 complete. Next: 0.3.1 Dashas. |

@@ -10,6 +10,36 @@ export type { Settings, DashaYearSetting } from './settings.ts';
 export { DASHA_YEAR_DAYS } from './settings.ts';
 export { vimshottariTimeline, vimshottariForChart, vimshottariNow, VIMSHOTTARI_YEARS, VIMSHOTTARI_ORDER, DashaInputError } from './dasha.ts';
 export type { VimshottariTimeline, Mahadasha, Antardasha, DashaPeriod, DashaNow, DashaRef, DashaLevels } from './dasha.ts';
+export {
+  transitsForChart,
+  calculateSadeSati,
+  crossingTimeline,
+  rawCrossings,
+  sadeSatiPeriods,
+  TransitInputError,
+  STEP_DAYS,
+  SADE_SATI_JOIN_GAP_YEARS,
+  SADE_SATI_SPAN_YEARS,
+  SIGN_CHANGE_YEARS_AHEAD,
+  EPHEMERIS_DATA_START,
+  EPHEMERIS_DATA_END,
+} from './transits.ts';
+export type {
+  Transits,
+  TransitPosition,
+  SignCrossing,
+  SignChangePlanet,
+  SearchBody,
+  CrossingKind,
+  CrossingTimeline,
+  SadeSati,
+  SadeSatiPeriod,
+  SadeSatiPhase,
+  SadeSatiCrossing,
+  SadeSatiRef,
+  SadeSatiStatus,
+  PhaseDates,
+} from './transits.ts';
 export { ENGINE_VERSION } from './version.ts';
 export * from './ids.ts';
 export { placement, angularDistance, houseOf, nthSignFrom } from './zodiac.ts';

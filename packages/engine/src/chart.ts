@@ -68,12 +68,32 @@ export class ChartInputError extends Error {
 
 let defaultAdapter: EphemerisAdapter | null = null;
 
+/** The adapter used when none is passed (one per process). Also used by the transit calculation. */
+export function getDefaultAdapter(): EphemerisAdapter {
+  return (defaultAdapter ??= createSwephAdapter());
+}
+
+/**
+ * The 9 grahas at one instant: sidereal, apparent, with nutation (D-071), mean node (D-009).
+ * Ketu = Rahu + 180°, same speed. Used for the birth chart and for transits "now" (step 0.3.2),
+ * so both are calculated exactly the same way.
+ */
+export function siderealGrahas(eph: EphemerisAdapter, jd: number): Record<GrahaCode, { lon: number; speed: number }> {
+  const raw = {} as Record<GrahaCode, { lon: number; speed: number }>;
+  for (const g of GRAHAS) {
+    if (g === 'Ke') continue;
+    raw[g] = eph.siderealBody(jd, g);
+  }
+  raw.Ke = { lon: normalizeDegrees(raw.Ra.lon + 180), speed: raw.Ra.speed };
+  return raw;
+}
+
 export function calculateChart(
   input: ChartInput,
   options: { settings?: Partial<Record<keyof Settings, unknown>>; ephemeris?: EphemerisAdapter } = {},
 ): Chart {
   const settings = resolveSettings(options.settings);
-  const eph = options.ephemeris ?? (defaultAdapter ??= createSwephAdapter());
+  const eph = options.ephemeris ?? getDefaultAdapter();
   const { lat, lng } = input;
   if (!Number.isFinite(lat) || lat < -90 || lat > 90) throw new ChartInputError(`Latitude must be between −90 and 90, got ${lat}.`);
   if (!Number.isFinite(lng) || lng < -180 || lng > 180) throw new ChartInputError(`Longitude must be between −180 and 180, got ${lng}.`);
@@ -81,13 +101,7 @@ export function calculateChart(
   const t = utcParts(input.utc);
   const jd = eph.julianDayUt(t.year, t.month, t.day, t.hours);
 
-  // Planets: sidereal, apparent, with nutation (D-071). Ketu = Rahu + 180°, same speed.
-  const raw = {} as Record<GrahaCode, { lon: number; speed: number }>;
-  for (const g of GRAHAS) {
-    if (g === 'Ke') continue;
-    raw[g] = eph.siderealBody(jd, g);
-  }
-  raw.Ke = { lon: normalizeDegrees(raw.Ra.lon + 180), speed: raw.Ra.speed };
+  const raw = siderealGrahas(eph, jd);
 
   // Lagna (D-073): tropical ascendant minus the Lahiri ayanamsa WITHOUT nutation.
   const lagnaLon = normalizeDegrees(eph.tropicalAscendant(jd, lat, lng) - eph.ayanamsaWithoutNutation(jd));
