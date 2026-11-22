@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.7 · 2026-11-21 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.8 · 2026-11-22 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -75,8 +75,8 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | FR-TIME-01 | Vimshottari Mahadasha sequence from birth for 120 years, with dasha balance at birth based on the Moon's position in its nakshatra. Year length 365.25 days (configurable). | Must |
 | FR-TIME-02 | Antardasha (Bhukti) within every Mahadasha. | Must |
 | FR-TIME-03 | Pratyantardasha within every Antardasha. | Must |
-| FR-TIME-04 | Exact start and end date for every period (date precision in UI; full timestamp in data). | Must |
-| FR-TIME-05 | "Current period" calculation for today's date at all three levels; list of the next upcoming transitions. | Must |
+| FR-TIME-04 | Exact start and end date for every period (date precision in UI, on the birth place's clock with a short note saying so, D-097; full timestamp in data). The timeline starts at the true start of the mahadasha running at birth; periods that ended before birth are marked (D-096). | Must |
+| FR-TIME-05 | "Current period" at all three levels for the moment of calculation (passed to the engine as an input, D-096); "coming up" = the next start at each level. | Must |
 | FR-TIME-06 | Timing-window definitions: Short-term = Pratyantardasha, Medium-term = Antardasha, Long-term = Mahadasha. | Must |
 | FR-TIME-07 | Life-area windows (simple rule): a period is flagged for a life area when its ruling planet rules or occupies that area's house(s). Each flag explains itself via the "i" button. | Must |
 | FR-TIME-08 | Transit-combined life-area windows (e.g. dasha + Jupiter transit). | Later |

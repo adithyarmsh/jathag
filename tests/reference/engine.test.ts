@@ -8,7 +8,7 @@
 //   2. Flip the matching flag in `ENABLED` to true:
 //        positions   → 0.2.8  (longitudes, sign, nakshatra, pada, retrograde, D-9)
 //        divisional  → 1.0.1  (all other divisional charts, D-2 … D-60)
-//        dashas      → 0.3.1  (Vimshottari mahadasha, antardasha, pratyantardasha)
+//        dashas      → 0.3.1  (Vimshottari mahadasha, antardasha, pratyantardasha)  ← ON since 0.3.1
 //        panchanga   → 0.9.1  (tithi, nakshatra, weekday, yoga, karana, hora)
 //   3. Run `pnpm test`. All enabled groups must pass before the step is merged (CLAUDE.md rule 4).
 //
@@ -36,7 +36,7 @@ import { BODIES } from './scripts/ids.mjs';
 const ENABLED = {
   positions: true, // 0.2.8
   divisional: false, // 1.0.1
-  dashas: false, // 0.3.1
+  dashas: true, // 0.3.1
   panchanga: false, // 0.9.1
 };
 
@@ -86,8 +86,10 @@ export type EngineResult = {
 };
 
 async function runEngine(input: EngineInput): Promise<EngineResult> {
-  const { calculateChart } = await import('@jathag/engine');
+  const { calculateChart, vimshottariForChart } = await import('@jathag/engine');
   const chart = calculateChart(input);
+  const timeline = vimshottariForChart(chart);
+  const period = (p: { lord: string; start: string; end: string }) => ({ lord: p.lord as BodyCode, startUtc: p.start, endUtc: p.end });
   const bodies = Object.fromEntries((BODIES as BodyCode[]).map((code) => {
     const b = chart.bodies[code];
     return [code, {
@@ -105,7 +107,10 @@ async function runEngine(input: EngineInput): Promise<EngineResult> {
       if (n === 9) return Object.fromEntries((BODIES as BodyCode[]).map((c) => [c, chart.bodies[c].navamsaSign])) as Record<BodyCode, number>;
       throw new Error(`D-${n} not built yet (step 1.0.1)`);
     },
-    get vimshottari(): never { throw new Error('Dashas not built yet (step 0.3.1)'); },
+    vimshottari: timeline.mahadashas.map((m) => ({
+      ...period(m),
+      antardashas: m.antardashas.map((a) => ({ ...period(a), pratyantardashas: a.pratyantardashas.map(period) })),
+    })),
     get panchanga(): never { throw new Error('Panchanga not built yet (step 0.9.1)'); },
   };
 }
@@ -236,6 +241,44 @@ describe.skipIf(!ENABLED.dashas)('engine: Vimshottari dashas (0.3.1)', () => {
         expect(Math.abs(Date.parse(got.endUtc) - Date.parse(p.end.utc)), `${p.lord} end`).toBeLessThanOrEqual(tolerancesFor(b).dashaMs);
       });
     }
+  });
+  // Structure of the whole timeline, for every birth (no JHora values needed).
+  it.each(cases)('%s: structure: first mahadasha contains birth; 9/81/729; contiguous; children fill parents; 120 dasha years', async (_id, b) => {
+    const { calculateChart, vimshottariForChart } = await import('@jathag/engine');
+    const input = inputFor(b);
+    const t = vimshottariForChart(calculateChart(input));
+    const birth = Date.parse(input.utc);
+    const ms = (iso: string) => Date.parse(iso);
+    const md = t.mahadashas;
+    const ad = md.flatMap((m) => m.antardashas);
+    const pd = ad.flatMap((a) => a.pratyantardashas);
+    expect([md.length, ad.length, pd.length]).toEqual([9, 81, 729]);
+    expect(ms(md[0].start)).toBeLessThanOrEqual(birth);
+    expect(ms(md[0].end)).toBeGreaterThan(birth);
+    expect(md[0].containsBirth).toBe(true);
+    for (const level of [md, ad, pd]) {
+      expect(level[0].start).toBe(t.start);
+      expect(level.at(-1)!.end).toBe(t.end);
+      for (let i = 1; i < level.length; i++) expect(level[i].start, `gap at ${i}`).toBe(level[i - 1].end);
+      for (const p of level) expect(ms(p.end)).toBeGreaterThan(ms(p.start));
+      expect(level.filter((p) => p.containsBirth)).toHaveLength(1);
+      for (const p of level) {
+        expect(p.containsBirth).toBe(ms(p.start) <= birth && birth < ms(p.end));
+        expect(p.endedBeforeBirth).toBe(ms(p.end) <= birth);
+      }
+    }
+    for (const m of md) {
+      expect(m.antardashas[0].start).toBe(m.start);
+      expect(m.antardashas.at(-1)!.end).toBe(m.end);
+      expect(m.antardashas[0].lord).toBe(m.lord);
+      for (const a of m.antardashas) {
+        expect(a.pratyantardashas[0].start).toBe(a.start);
+        expect(a.pratyantardashas.at(-1)!.end).toBe(a.end);
+        expect(a.pratyantardashas[0].lord).toBe(a.lord);
+      }
+    }
+    // 120 dasha years of 365.25 days, to the rounding second.
+    expect(Math.abs(ms(t.end) - ms(t.start) - 120 * 365.25 * 86400000)).toBeLessThanOrEqual(1000);
   });
 });
 

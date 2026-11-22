@@ -48,8 +48,8 @@ describe('chart: a normal birth', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
     expect(res.headers.get('server-timing')).toMatch(/calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
     expect(json.apiVersion).toBe(1);
-    expect(json.engineVersion).toBe('0.1.0');
-    expect(json.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign' });
+    expect(json.engineVersion).toBe('0.2.0');
+    expect(json.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(json.place).toEqual({ kind: 'search', ...CHENNAI });
     expect(json.clock).toEqual({ source: 'timeZone', id: null, chosen: false, utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata', tzdataVersion: process.versions.tz });
     expect(json.utc).toBe('1992-08-14T01:15:00Z');
@@ -162,6 +162,74 @@ describe('chart: errors are codes only and never echo the request', () => {
   it('settings errors name the setting (a key, not birth data)', async () => {
     expect((await chart({ ...BASE, settings: { node: 'true' } })).json).toEqual({ error: { code: 'SETTING_NOT_SUPPORTED', setting: 'node' } });
     expect((await chart({ ...BASE, settings: { colour: 'red' } })).json).toEqual({ error: { code: 'UNKNOWN_SETTING', setting: 'colour' } });
+  });
+});
+
+describe('chart: dashas (step 0.3.1)', () => {
+  const AS_OF = '2026-11-22T10:00:00.000Z';
+  const withAsOf = async (body: unknown, asOf = AS_OF) => {
+    const res = await handleChartRequest(post(body), { asOf: () => asOf });
+    return { res, text: await res.clone().text(), json: await res.json() as ChartResponse & { error?: { code: string; setting?: string } } };
+  };
+
+  it('full timeline, current period and coming up for the given moment', async () => {
+    const { res, json } = await withAsOf(BASE);
+    expect(res.status).toBe(200);
+    const d = json.dashas;
+    expect(Object.keys(d)).toEqual(['asOf', 'vimshottari', 'current', 'next']);
+    expect(d.asOf).toBe(AS_OF);
+    expect(d.vimshottari.mahadashas).toHaveLength(9);
+    expect(d.vimshottari.mahadashas.flatMap((m) => m.antardashas)).toHaveLength(81);
+    expect(d.vimshottari.mahadashas.flatMap((m) => m.antardashas.flatMap((a) => a.pratyantardashas))).toHaveLength(729);
+    expect(d.vimshottari.birthUtc).toBe(json.utc);
+    expect(d.vimshottari.dashaYear).toBe('365.25');
+    // R01: Mars mahadasha from 1986 (JHora), Rahu from 1993, Jupiter from 2011 → Jupiter is running in 2026.
+    expect(d.vimshottari.mahadashas[0]).toMatchObject({ lord: 'Ma', containsBirth: true, endedBeforeBirth: false });
+    expect(d.current.mahadasha?.lord).toBe('Ju');
+    expect(d.current.antardasha?.path.slice(0, 1)).toEqual(d.current.mahadasha?.path);
+    for (const level of ['mahadasha', 'antardasha', 'pratyantardasha'] as const) {
+      expect(Date.parse(d.current[level]!.start)).toBeLessThanOrEqual(Date.parse(AS_OF));
+      expect(Date.parse(d.current[level]!.end)).toBeGreaterThan(Date.parse(AS_OF));
+      expect(d.next[level]!.start).toBe(d.current[level]!.end);
+    }
+    // Positions are unchanged by the new section.
+    expect(json.chart.bodies.Mo.nakshatra).toBe(d.vimshottari.moonNakshatra);
+  });
+
+  it('same request + same asOf → byte-identical response body (NFR-DET-01)', async () => {
+    const a = await withAsOf(BASE);
+    const b = await withAsOf(BASE);
+    expect(b.text).toBe(a.text);
+    const other = await withAsOf(BASE, '2040-01-01T00:00:00.000Z');
+    expect(other.json.dashas.vimshottari).toEqual(a.json.dashas.vimshottari);
+    expect(other.json.dashas.current).not.toEqual(a.json.dashas.current);
+  });
+
+  it('without an asOf option the endpoint uses the time the request arrived', async () => {
+    const before = Date.now();
+    const { json } = await chart(BASE);
+    const t = Date.parse(json.dashas.asOf);
+    expect(t).toBeGreaterThanOrEqual(before);
+    expect(t).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('dasha year setting: 360 and 365.2422 accepted and echoed; anything else refused with the setting name', async () => {
+    for (const dashaYear of ['365.25', '360', '365.2422']) {
+      const { res, json } = await withAsOf({ ...BASE, settings: { dashaYear } });
+      expect(res.status).toBe(200);
+      expect(json.settings.dashaYear).toBe(dashaYear);
+      expect(json.chart.meta.settings.dashaYear).toBe(dashaYear);
+      expect(json.dashas.vimshottari.dashaYear).toBe(dashaYear);
+    }
+    for (const bad of [360, '365', 'true-sidereal']) {
+      expect((await withAsOf({ ...BASE, settings: { dashaYear: bad } })).json).toEqual({ error: { code: 'SETTING_NOT_SUPPORTED', setting: 'dashaYear' } });
+    }
+  });
+
+  it('keeps the clock information 0.3.7 needs to show dates on the birth place\'s clock (D-097)', async () => {
+    const { json } = await withAsOf({ date: '1943-07-15', time: '11:30', place: { ...CHENNAI } });
+    expect(json.clock).toMatchObject({ source: 'clockRule', id: 'war', utcOffsetSeconds: 23400 });
+    expect((await withAsOf(BASE)).json.clock).toMatchObject({ utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata' });
   });
 });
 

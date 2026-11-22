@@ -111,7 +111,7 @@ describe('tableRows: IDs → words from en.json', () => {
 
 describe('settings and clock lines', () => {
   it('settings words (FR-SET-03)', () => {
-    expect(settingsLine({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign' }, en.chart))
+    expect(settingsLine({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' }, en.chart))
       .toBe('Settings: Lahiri ayanamsa · mean node · whole-sign houses');
   });
   it('clock used', () => {

@@ -22,7 +22,7 @@ describe('metadata', () => {
   const chart = calculateChart(R01);
   it('includes the engine version, the settings used and the ephemeris', () => {
     expect(chart.meta.engineVersion).toBe(ENGINE_VERSION);
-    expect(chart.meta.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign' });
+    expect(chart.meta.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(chart.meta.ephemeris.swissEphemerisVersion).toBe('2.10.03');
     expect(chart.meta.ephemeris.dataFiles).toEqual(['sepl_18.se1', 'semo_18.se1']);
     expect(chart.meta.input).toEqual(R01);
@@ -34,8 +34,8 @@ describe('metadata', () => {
 });
 
 describe('settings', () => {
-  it('defaults are Lahiri, mean node, whole sign; passing them explicitly is fine', () => {
-    expect(DEFAULT_SETTINGS).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign' });
+  it('defaults are Lahiri, mean node, whole sign, 365.25-day dasha year; passing them explicitly is fine', () => {
+    expect(DEFAULT_SETTINGS).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(() => calculateChart(R01, { settings: { ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign' } })).not.toThrow();
   });
   it.each([

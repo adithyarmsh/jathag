@@ -14,10 +14,14 @@ import {
   resolveSettings,
   SettingsError,
   TimeError,
+  vimshottariForChart,
+  vimshottariNow,
   type BirthZone,
   type Chart,
+  type DashaNow,
   type EphemerisAdapter,
   type Settings,
+  type VimshottariTimeline,
 } from '@jathag/engine';
 import { CLOCK_IDS, ClockChoiceError, resolveClock, type ClockId, type ClockQuestion, clockQuestion } from './clock.ts';
 import { ApiError, type ApiErrorCode } from './errors.ts';
@@ -89,6 +93,18 @@ export interface ChartResponse {
   /** The "Which clock?" question for this birth, so the form can show its note (0.2.13) or question (0.4.6). */
   clockQuestion: ClockQuestion;
   chart: Chart;
+  /**
+   * Vimshottari dashas (step 0.3.1, D-096): the full 3-level timeline (exact UTC times, whole
+   * seconds), the period running at `asOf` at each level and the next start at each level.
+   * `asOf` = the moment of calculation (ISO 8601 UTC). Shown on the birth place's clock from 0.3.7
+   * (D-097), using `clock` above; nothing display-related is in here.
+   */
+  dashas: {
+    asOf: string;
+    vimshottari: VimshottariTimeline;
+    current: DashaNow['current'];
+    next: DashaNow['next'];
+  };
 }
 
 // ---------------------------------------------------------------- validation helpers
@@ -206,10 +222,16 @@ const EPHEMERIS_EDGE_BEFORE = '1800-01-02T00:00:00Z';
 export interface ChartOptions {
   /** Ephemeris adapter (the web app passes one with the deployed data-file path). */
   ephemeris?: EphemerisAdapter;
+  /**
+   * The instant "current period" and "coming up" are worked out for (ISO 8601 UTC). Always passed
+   * in, so the same request + asOf gives the same response (NFR-DET-01); the endpoint passes the
+   * request time.
+   */
+  asOf: string;
 }
 
 /** Validated request → full response. Throws ApiError (expected problems) or anything else (bugs). */
-export function calculateChartResponse(req: ChartRequest, options: ChartOptions = {}): ChartResponse {
+export function calculateChartResponse(req: ChartRequest, options: ChartOptions): ChartResponse {
   let settings: Settings;
   try {
     settings = resolveSettings(req.settings as Partial<Record<keyof Settings, unknown>> | undefined);
@@ -272,6 +294,9 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions 
     throw e;
   }
 
+  const vimshottari = vimshottariForChart(chart);
+  const now = vimshottariNow(vimshottari, options.asOf);
+
   return {
     apiVersion: API_VERSION,
     engineVersion: ENGINE_VERSION,
@@ -281,5 +306,6 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions 
     utc,
     clockQuestion: question,
     chart,
+    dashas: { asOf: now.asOf, vimshottari, current: now.current, next: now.next },
   };
 }
