@@ -12,7 +12,7 @@
 | **Next step** | 0.3.3 — JHora spot-check |
 | **Then** | v0.4 — Design system + app shell |
 | **Blocked on** | Nothing (waiting for the 0.3.2 handoff) |
-| **Live site** | https://jathag.vercel.app (birth form + planet table with the 0.2.15 fixes, Beta notice; hidden from search engines) |
+| **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice, footer v0.3.1; the chart API also returns the dasha timeline, not shown yet; hidden from search engines) |
 | **Last updated** | 2026-11-22 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
