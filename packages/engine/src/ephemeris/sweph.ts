@@ -9,6 +9,7 @@
 //   - Every returned flag is checked. If Swiss Ephemeris fell back to its Moshier model (data
 //     files missing), we throw. Fallback results are never returned.
 
+import { dirname, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sweph from 'sweph';
 import type { EphemerisAdapter, EphemerisBody, EphemerisInfo } from './types.ts';
@@ -16,8 +17,17 @@ import { EphemerisError } from './types.ts';
 
 const C = sweph.constants;
 
-/** Folder holding the committed Swiss Ephemeris data files. */
-export const DEFAULT_EPHE_PATH = fileURLToPath(new URL('../../ephe/', import.meta.url));
+/**
+ * Folder holding the committed Swiss Ephemeris data files (packages/engine/ephe/), found from this
+ * file's own location. Only used when no `ephePath` is passed. Worked out on first use, never when the
+ * module loads, and without `new URL(…, import.meta.url)`: bundlers (Turbopack) treat that pattern as a
+ * file to bundle. A bundled copy of the engine (the web app) must pass `ephePath`; if it does not, this
+ * path does not exist there, Swiss Ephemeris finds no files and the adapter throws EPHEMERIS_FALLBACK
+ * (never a silent Moshier answer). (Step 0.3.1, D-096 item 7; replaces the 0.2.12 build loader.)
+ */
+export function defaultEphePath(): string {
+  return join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'ephe') + sep;
+}
 export const DATA_FILES = ['sepl_18.se1', 'semo_18.se1'];
 
 const SWEPH_BINDING_VERSION = '2.10.3-8';
@@ -53,7 +63,7 @@ function check(what: string, flag: number, error: string): void {
 }
 
 export function createSwephAdapter(options: { ephePath?: string } = {}): EphemerisAdapter {
-  const ephePath = options.ephePath ?? DEFAULT_EPHE_PATH;
+  const ephePath = options.ephePath ?? defaultEphePath();
 
   const prepare = () => {
     if (activeEphePath !== ephePath) {

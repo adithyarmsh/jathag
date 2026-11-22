@@ -32,30 +32,41 @@ Limits: query up to 100 characters, body up to 1 KB.
              "countryCode": "IN", "admin1Code": "07", "admin2Code": "094" },
   "clock": "ist",
   "repeatedTime": "earlier",
-  "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign" }
+  "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign", "dashaYear": "365.25" }
 }
 ```
 - `date` `YYYY-MM-DD` (1800-01-01 – 2100-12-31, FR-IN-02) and `time` `HH:MM` or `HH:MM:SS`: local, at the birth place.
 - **Either** `place` (the fields a search result returns; `label` and `featureCode` may be sent too and are ignored) **or** `manual`: `{ "lat", "lng", "utcOffsetSeconds" }` (FR-IN-07). The chart function trusts these fields and does not look the place up again.
 - `clock` (optional): the "Which clock?" answer, one of `ist`, `war`, `bombay`, `calcutta`, `lmt`. Only allowed when this birth's question offers it. Without it, a birth in a window gets the default.
 - `repeatedTime` (optional): `earlier` / `later`, only needed for a clock time that happened twice (daylight saving ended).
-- `settings` (optional): defaults per FR-SET-01; other values are refused until built.
+- `settings` (optional): defaults per FR-SET-01; other values are refused until built. `dashaYear` (step 0.3.1) accepts `"365.25"` (default), `"360"` and `"365.2422"` — strings, not numbers; only 365.25 is checked against JHora.
 
 Response (shortened):
 ```json
 {
   "apiVersion": 1,
-  "engineVersion": "0.1.0",
-  "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign" },
+  "engineVersion": "0.2.0",
+  "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign", "dashaYear": "365.25" },
   "place": { "kind": "search", "geonameId": 1261481, "lat": 28.6139, "lng": 77.209, "timeZone": "Asia/Kolkata", "countryCode": "IN", "admin1Code": "07", "admin2Code": "094" },
   "clock": { "source": "clockRule", "id": "ist", "chosen": true, "utcOffsetSeconds": 19800, "timeZone": null, "tzdataVersion": null },
   "utc": "1943-07-15T06:00:00Z",
   "clockQuestion": { "applies": true, "windows": ["war-1942-1945"], "defaultClock": "war",
                      "options": [{ "id": "war", "utcOffsetSeconds": 23400 }, { "id": "ist", "utcOffsetSeconds": 19800 }] },
-  "chart": { "meta": { … }, "bodies": { "La": { … }, "Su": { … }, … }, "houses": [ … ], "aspects": { … } }
+  "chart": { "meta": { … }, "bodies": { "La": { … }, "Su": { … }, … }, "houses": [ … ], "aspects": { … } },
+  "dashas": {
+    "asOf": "2026-11-22T10:00:00.000Z",
+    "vimshottari": { "system": "vimshottari", "dashaYear": "365.25", "birthUtc": "…", "moonLon": 304.46, "moonNakshatra": 23,
+                     "fractionTravelled": 0.83, "balanceYears": 1.16, "start": "1986-10-10T23:38:46Z", "end": "2106-10-11T23:38:46Z",
+                     "mahadashas": [ { "lord": "Ma", "start": "…", "end": "…", "endedBeforeBirth": false, "containsBirth": true,
+                                       "antardashas": [ { "lord": "Ma", …, "pratyantardashas": [ { "lord": "Ma", … }, … ] }, … ] }, … ] },
+    "current": { "mahadasha": { "path": [2], "lord": "Ju", "start": "…", "end": "…" }, "antardasha": { "path": [2, 8], … }, "pratyantardasha": { "path": [2, 8, 4], … } },
+    "next":    { "mahadasha": { "path": [3], "lord": "Sa", … }, "antardasha": { … }, "pratyantardasha": { … } }
+  }
 }
 ```
 `clock.source` is `timeZone` (the place's IANA zone; `tzdataVersion` set), `clockRule` (a "Which clock?" option; `chosen` = sent by the client, otherwise the default) or `manual`. `chart` is exactly the engine's output (`packages/engine/README.md`).
+
+`dashas` (step 0.3.1, D-096): the full Vimshottari timeline from the engine (`vimshottariForChart`), plus `current` (the period running at `asOf` at each level, `null` before birth or after the 120 years) and `next` (the next start at each level, `null` when none is left). `asOf` is the moment of calculation: the endpoint reads the time when the request arrives (the web route passes it; `handleChartRequest(request, { asOf })` lets tests fix it) and `calculateChartResponse(req, { asOf })` requires it, so the same request + `asOf` gives a byte-identical response. All times are UTC; showing them on the birth place's clock (D-097) is done by the screens from `clock` (0.3.7). The response is about 106 KB raw, about 12 KB compressed, almost all of it the 729 pratyantardashas (D-096 item 5).
 
 ### Errors
 

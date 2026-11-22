@@ -11,7 +11,9 @@ export const maxDuration = 10;
 let adapter: EphemerisAdapter | null = null;
 
 export function POST(request: Request): Promise<Response> {
+  const asOf = new Date().toISOString(); // the request time = "current period" moment (D-096 item 2)
   return handleChartRequest(request, {
+    asOf: () => asOf,
     ephemeris: () => (adapter ??= createSwephAdapter({ ephePath: ephemerisPath() })),
   });
 }

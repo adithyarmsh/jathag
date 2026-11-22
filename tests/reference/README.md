@@ -13,7 +13,7 @@ Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8
 | `expected/` | Clean data made from `raw/` by the converter: `R01.json` … `R29.json`. |
 | `scripts/` | `convert.mjs` (the converter), `parse.mjs` (how the PDFs and text files are read), `ids.mjs` (the stable IDs). |
 | `checks.test.ts` | Self-checks on the answer key. Always on, must always pass. |
-| `engine.test.ts` | Tests that compare the engine to `expected/`. Positions are on (0.2.8); see the top of the file for how each later step switches its group on. |
+| `engine.test.ts` | Tests that compare the engine to `expected/`. Positions are on (0.2.8), Vimshottari dashas are on (0.3.1); see the top of the file for how each later step switches its group on. |
 | `api.test.ts` | End-to-end through the chart endpoint's logic (`packages/api`, step 0.2.12): R27–R29 entered as a user would (a searched place + their "Which clock?" answer) give JHora's instant and positions; R01 and R06 as controls. |
 
 ## What `expected/RNN.json` contains
@@ -70,7 +70,8 @@ Why two levels: JHora and Swiss Ephemeris estimate Earth's past rotation (ΔT) a
 - **R22 (Madras Mean Time, UTC+5:21:10).** JHora's time zone has no seconds box, so R22 was typed in as 07:29:50 at UTC+5:21 — the same instant as the true 07:30:00 at UTC+5:21:10 in `births.json` (D-072). The PDF therefore shows 07:29:50; the tests compare the instant.
 - **Lagna (D-073).** JHora's Lagna = tropical ascendant minus the Lahiri ayanamsa *without nutation*. Swiss Ephemeris' default sidereal ascendant includes nutation and is off by about 18.7″ (R01). Planets do include nutation.
 - **0.14″ Lahiri offset.** JHora's "Traditional Lahiri" starts about 0.14″ away from Swiss Ephemeris' `SE_SIDM_LAHIRI`. It is constant, below the 1″ tolerance and ignored. Because dashas magnify Moon differences, it moves dasha times by 10–26 minutes — inside the 1-hour tolerance (D-074).
-- **Dasha times are on the birth place's clock** — the fixed UTC offset typed into JHora (no daylight-saving changes later in life). `expected/` stores the printed time and the UTC instant; tests compare UTC.
+- **Dasha times are on the birth place's clock** — the fixed UTC offset typed into JHora (no daylight-saving changes later in life). `expected/` stores the printed time and the UTC instant; tests compare UTC. Step 0.3.1 confirmed this for every date: with times rebuilt from JHora's own Moon, the fixed offset at birth gives all 81 antardasha dates for each of R06, R16–R20, R22, R26–R29, and JHora sides with it on every date where the place's later clock would give another day (`notes/0.3.1-dashas.md`).
+- **Dasha tests (step 0.3.1).** Mahadasha and antardasha start dates for all 29 births (JHora prints dates only: the engine's time, on JHora's clock, ± the tolerance must land on the printed date), pratyantardasha start and end times for R01, R09, R10, R15, R22, and structure checks for every birth (9/81/729 periods, back to back, children fill their parent, the first mahadasha contains birth, 120 dasha years).
 - **Before sunrise = previous weekday.** R24 (Pune, 05:54) and R19 (Oslo in December, 08:30) are before sunrise, so JHora's Vedic weekday is the day before the calendar date.
 - **Rahu and Ketu** are never marked "(R)" by JHora, so retrograde is only tested for Sun–Saturn.
 - **Place labels** printed in the PDFs (e.g. "Madras" for R12, "(, India)" for London) are just JHora's text box; only the coordinates matter, and they are correct.

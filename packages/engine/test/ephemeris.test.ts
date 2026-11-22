@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { calculateChart, createSwephAdapter, DEFAULT_EPHE_PATH, EphemerisError } from '../src/index.ts';
+import { calculateChart, createSwephAdapter, defaultEphePath, EphemerisError } from '../src/index.ts';
 
 // Astrodienst's official files (github.com/aloistr/swisseph, ephe/), downloaded in step 0.2.8.
 // The same values are in ephe/SHA256SUMS (for `shasum -a 256 -c SHA256SUMS`).
@@ -18,19 +18,19 @@ const R01 = { utc: '1992-08-14T01:15:00Z', lat: 13.083333, lng: 80.283333 };
 
 describe('ephemeris data files', () => {
   it.each(Object.keys(PINNED))('%s is present and unchanged', (name) => {
-    const buf = readFileSync(join(DEFAULT_EPHE_PATH, name));
+    const buf = readFileSync(join(defaultEphePath(), name));
     expect(buf.length).toBe(PINNED[name].bytes);
     expect(createHash('sha256').update(buf).digest('hex')).toBe(PINNED[name].sha256);
   });
 
   it('SHA256SUMS lists exactly the pinned files with the same checksums', () => {
-    const lines = readFileSync(join(DEFAULT_EPHE_PATH, 'SHA256SUMS'), 'utf8').trim().split('\n');
+    const lines = readFileSync(join(defaultEphePath(), 'SHA256SUMS'), 'utf8').trim().split('\n');
     const listed = Object.fromEntries(lines.map((l) => l.split(/\s+/)).map(([h, f]) => [f, h]));
     expect(listed).toEqual(Object.fromEntries(Object.entries(PINNED).map(([f, v]) => [f, v.sha256])));
   });
 
   it('the folder holds no other ephemeris files', () => {
-    const se1 = readdirSync(DEFAULT_EPHE_PATH).filter((f) => f.endsWith('.se1')).sort();
+    const se1 = readdirSync(defaultEphePath()).filter((f) => f.endsWith('.se1')).sort();
     expect(se1).toEqual(Object.keys(PINNED).sort());
   });
 });
@@ -55,7 +55,7 @@ describe('Moshier fallback is refused', () => {
 });
 
 describe('only the adapter talks to Swiss Ephemeris', () => {
-  const srcDir = join(DEFAULT_EPHE_PATH, '..', 'src');
+  const srcDir = join(defaultEphePath(), '..', 'src');
   const files = readdirSync(srcDir, { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.ts'));
 
   it('no engine file except src/ephemeris/sweph.ts imports sweph', () => {

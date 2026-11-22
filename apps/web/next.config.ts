@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
         loaders: ["@tailwindcss/turbopack"],
         as: "*.css",
       },
-      // See bundler/engine-ephe-path-loader.cjs (the engine's data-folder line, bundle only).
-      "**/packages/engine/src/ephemeris/sweph.ts": {
-        loaders: [path.join(__dirname, "bundler", "engine-ephe-path-loader.cjs")],
-        as: "*.ts",
-      },
     },
   },
   // Workspace packages are TypeScript source (step 0.2.12).
