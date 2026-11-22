@@ -24,7 +24,7 @@ export function handleChartRequest(request: Request, options: ChartHandlerOption
     const req = parseChartRequest(body);
     const t = performance.now();
     const ephemeris = options.ephemeris?.();
-    const result = calculateChartResponse(req, { asOf, ...(ephemeris ? { ephemeris } : {}) });
+    const result = calculateChartResponse(req, { asOf, timing, ...(ephemeris ? { ephemeris } : {}) });
     timing.calc = performance.now() - t;
     return result;
   });

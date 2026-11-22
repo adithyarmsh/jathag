@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.8 · 2026-11-22 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.9 · 2026-11-22 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -87,8 +87,8 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 |---|---|---|
 | FR-TRAN-01 | Current sidereal positions of all 9 grahas (for "now"). | Must |
 | FR-TRAN-02 | Each current planet's house counted from natal Moon (gochara) and from natal lagna. | Must |
-| FR-TRAN-03 | Sign-change (ingress) dates for Saturn, Jupiter and Rahu/Ketu: the most recent one and the next ones for the coming 10 years. | Must |
-| FR-TRAN-04 | Sade Sati: all past, current and future periods for the person's life (Saturn transiting the 12th, 1st and 2nd from natal Moon), with phase (rising/peak/setting) and dates. | Must |
+| FR-TRAN-03 | Sign-change (ingress) dates for Saturn, Jupiter and Rahu/Ketu: the most recent one and the next ones for the coming 10 years. Every crossing is listed, including back-and-forth crossings while a planet is retrograde, each marked as enters / moves back / enters again (D-099). | Must |
+| FR-TRAN-04 | Sade Sati: all past, current and future periods from birth to 120 years after birth (Saturn transiting the 12th, 1st and 2nd from the natal Moon sign), with phase (rising/peak/setting) and dates. Each period is continuous from Saturn's first entry into the 12th to its final exit from the 2nd; each phase starts at Saturn's first entry into its sign; retrograde dips are listed inside the period; a period already running at birth is marked (D-099). | Must |
 | FR-TRAN-05 | Retrograde stations of transiting planets. | Later |
 
 ### 5.4 Approximate birth time
