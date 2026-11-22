@@ -18,6 +18,7 @@ export {
   sadeSatiPeriods,
   TransitInputError,
   STEP_DAYS,
+  MAX_SPEED,
   SADE_SATI_JOIN_GAP_YEARS,
   SADE_SATI_SPAN_YEARS,
   SIGN_CHANGE_YEARS_AHEAD,

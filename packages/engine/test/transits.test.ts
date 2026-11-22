@@ -13,6 +13,7 @@ import {
   placement,
   rawCrossings,
   STEP_DAYS,
+  MAX_SPEED,
   transitsForChart,
   TransitInputError,
   type Chart,
@@ -199,7 +200,7 @@ describe('completeness: an independent dense scan finds exactly the same crossin
   });
 });
 
-describe('why a 5-day step is safe', () => {
+describe('why a 20-day step is safe', () => {
   /** Stations (speed changes sign) found with a 1-day scan over the whole data range. */
   const stations = (body: SearchBody) => {
     const out: number[] = [];
@@ -213,19 +214,26 @@ describe('why a 5-day step is safe', () => {
     }
     return out;
   };
-  it.each(['Sa', 'Ju'] as const)('%s: stations are always far more than 5 days apart (1800–2400)', (body) => {
+  it.each(['Sa', 'Ju'] as const)('%s: stations are always far more than one step apart, and it moves well under 30° per step (1800–2400)', (body) => {
     const st = stations(body);
     expect(st.length).toBeGreaterThan(1000);
     let minGap = Infinity;
     for (let i = 1; i < st.length; i++) minGap = Math.min(minGap, st[i] - st[i - 1]);
     expect(minGap / DAY).toBeGreaterThan(100);
-    expect(STEP_DAYS).toBe(5);
+    expect(STEP_DAYS).toBe(20);
+    expect(minGap / DAY).toBeGreaterThan(5 * STEP_DAYS);
+    // MAX_SPEED really is an upper bound (it decides when a station can be skipped)
+    let top = 0;
+    for (let t = ms(EPHEMERIS_DATA_START); t <= ms(EPHEMERIS_DATA_END); t += DAY) top = Math.max(top, Math.abs(eph.siderealBody(jd(t), body).speed));
+    expect(top).toBeLessThan(MAX_SPEED[body] * 0.9);
+    expect(MAX_SPEED[body] * STEP_DAYS).toBeLessThan(30);
   });
   it('the mean node never stations: its speed is always negative (1800–2400, every 10 days)', () => {
     for (let t = ms(EPHEMERIS_DATA_START); t <= ms(EPHEMERIS_DATA_END); t += 10 * DAY) {
       const s = eph.siderealBody(jd(t), 'Ra').speed;
       expect(s).toBeLessThan(-0.05);
       expect(s).toBeGreaterThan(-0.056);
+      expect(-s).toBeLessThan(MAX_SPEED.Ra);
     }
   });
   it('the data range constants are right: the data starts at 1800-01-01 01:08:07 UTC; the end limit is inside the data', () => {

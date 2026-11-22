@@ -10,20 +10,24 @@
 // 2. Sign changes (crossings of a multiple of 30°) for Saturn, Jupiter and Rahu (Ketu = Rahu + 180°,
 //    so its crossings are the same moments into the opposite signs).
 //    HOW THE SEARCH WORKS:
-//      - Sample the planet's longitude and speed every STEP_DAYS (5 days) on whole UTC seconds.
-//      - Where the speed changes sign between two samples, the planet stationed in between: find that
-//        moment by bisection on the speed (to 1 second). This splits the time into pieces in which the
-//        planet moves in one direction only.
-//      - Inside a one-direction piece the planet moves less than 30° (at most ~1.3° in 5 days), so it
-//        crosses at most one boundary, and it does so exactly when the sign at the two ends differs.
-//        That crossing is narrowed down by bisection to the whole second: the reported moment is the
-//        FIRST whole UTC second at which Swiss Ephemeris puts the planet in the new sign.
+//      - Sample the planet's longitude and speed every STEP_DAYS (20 days) on whole UTC seconds.
+//      - Same direction of motion at both ends of a step: the planet moved one way only, by at most
+//        ~6° (Jupiter's top speed × 20 days), so it crossed at most one boundary, exactly when the signs
+//        at the two ends differ.
+//      - Speed changed sign: the planet stationed once inside the step. If it could have reached a
+//        boundary (the end signs differ, or an end is within MAX_SPEED × 20 days of a boundary), the
+//        station is found to the second and each one-direction side is checked as above; otherwise no
+//        boundary was within reach and nothing can have been crossed.
+//      - Every crossing (and station) is narrowed down to the second (interpolation with a halving
+//        fallback). The reported moment is the FIRST whole UTC second at which Swiss Ephemeris puts the
+//        planet in the new sign.
 //    WHY NO CROSSING CAN BE MISSED: a crossing could only hide if the planet went over a boundary and
-//    back between two samples, i.e. stationed twice inside 5 days. Saturn's and Jupiter's stations are
-//    always more than 100 days apart (retrograde lasts ~4–5 months, direct ~8–9 months; the test checks
-//    the shortest gap over 1800–2399), and the mean node never stations (its speed is always about
-//    −0.053°/day). Two crossings of one boundary close to a station are both caught, because the station
-//    itself is found and each side is checked.
+//    back unseen, which needs two stations inside one step, or more than 30° of motion in one step.
+//    Saturn's stations are never less than 133 days apart and Jupiter's never less than 117 days
+//    (retrograde lasts ~4–5 months, direct ~8–9; the test measures 1800–2399), far more than 20 days;
+//    and the mean node never stations (its speed is always about −0.053°/day). Two crossings of one
+//    boundary close to a station are both caught, because that station is found and each side checked.
+//    A dense 1-hour scan over decades finds exactly the same crossings (tests).
 //    KINDS (relative to the planet's normal direction: forward for Saturn and Jupiter, backward for the
 //    nodes): "enters" = a normal-direction step into a sign further on than the planet has been;
 //    "moves-back" = a step against the normal direction; "enters-again" = a normal-direction step into a
@@ -67,7 +71,9 @@ const DAY_MS = 86_400_000;
 const YEAR_MS = 365.25 * DAY_MS;
 
 /** Sampling step of the crossing search (see the header for why it is safe). */
-export const STEP_DAYS = 5;
+export const STEP_DAYS = 20;
+/** Upper bounds of |speed| in degrees/day (real maxima ≈ 0.134 Saturn, 0.243 Jupiter, 0.053 node; tested). */
+export const MAX_SPEED: Readonly<Record<SearchBody, number>> = Object.freeze({ Sa: 0.2, Ju: 0.3, Ra: 0.1 });
 const STEP_MS = STEP_DAYS * DAY_MS;
 /** Extra search before the first reported crossing, so "enters" / "enters-again" labels are right. */
 const LABEL_PAD_DAYS = 366;
@@ -246,18 +252,21 @@ export function rawCrossings(eph: EphemerisAdapter, body: SearchBody, startMs: n
   const a0 = ceilSec(Math.max(startMs, DATA_START_MS));
   const b0 = floorSec(Math.min(endMs, DATA_END_MS));
   const at = (ms: number) => eph.siderealBody(jdAt(eph, ms), body);
+  const margin = MAX_SPEED[body] * STEP_DAYS; // the most the planet can move within one step, degrees
   const out: RawCrossing[] = [];
 
   /** One-direction piece [a, b] (whole seconds): at most one crossing, iff the end signs differ. */
-  const piece = (a: number, sa: Sign, b: number, sb: Sign) => {
+  const piece = (a: number, la: number, b: number, lb: number) => {
+    const sa = signOf(la);
+    const sb = signOf(lb);
     if (sa === sb) return;
-    let lo = a;
-    let hi = b;
-    while (hi - lo > SEC) {
-      const mid = floorSec((lo + hi) / 2);
-      if (signOf(at(mid).lon) === sa) lo = mid;
-      else hi = mid;
-    }
+    // The boundary between the two signs, and the signed distance from it (degrees).
+    const boundary = (sb === (sa % 12) + 1 ? sa : sa - 1) * 30;
+    const g = (lon: number) => ((((lon - boundary) % 360) + 540) % 360) - 180;
+    const hi = narrow(a, b, g(la), g(lb), (ms) => {
+      const lon = at(ms).lon;
+      return { g: g(lon), loSide: signOf(lon) === sa };
+    });
     out.push({ ms: hi, from: sa, to: sb });
   };
 
@@ -266,28 +275,58 @@ export function rawCrossings(eph: EphemerisAdapter, body: SearchBody, startMs: n
   while (t < b0) {
     const u = Math.min(t + STEP_MS, b0);
     const q = at(u);
-    const st = signOf(p.lon);
-    const su = signOf(q.lon);
     if (Math.sign(p.speed) === Math.sign(q.speed)) {
-      piece(t, st, u, su);
-    } else {
-      // A station between t and u: find it (to the second) by bisection on the speed's sign.
+      piece(t, p.lon, u, q.lon);
+    } else if (signOf(p.lon) !== signOf(q.lon) || distToBoundary(p.lon) <= margin || distToBoundary(q.lon) <= margin) {
+      // A station between t and u, close enough to a boundary to matter: find it (to the second) on the
+      // speed's sign, then check each one-direction side.
       const s0 = Math.sign(p.speed);
-      let lo = t;
-      let hi = u;
-      while (hi - lo > SEC) {
-        const mid = floorSec((lo + hi) / 2);
-        if (Math.sign(at(mid).speed) === s0) lo = mid;
-        else hi = mid;
-      }
-      const ss = signOf(at(lo).lon);
-      piece(t, st, lo, ss);
-      piece(lo, ss, u, su);
+      const hi = narrow(t, u, p.speed, q.speed, (ms) => {
+        const v = at(ms).speed;
+        return { g: v, loSide: Math.sign(v) === s0 };
+      });
+      const lo = hi - SEC;
+      const ls = at(lo).lon;
+      piece(t, p.lon, lo, ls);
+      piece(lo, ls, u, q.lon);
     }
+    // else: a station far from every boundary; the planet cannot reach one within this step.
     t = u;
     p = q;
   }
   return out;
+}
+
+/** Distance from a longitude to the nearest sign boundary, degrees. */
+function distToBoundary(lon: number): number {
+  const x = normalizeDegrees(lon) % 30;
+  return Math.min(x, 30 - x);
+}
+
+/**
+ * Narrow a bracket [lo, hi] (whole seconds; lo on one side, hi on the other) down to 1 second and return
+ * hi, the first second on the far side. Uses interpolation on g (a smooth value that changes sign across
+ * the bracket) and falls back to halving whenever a step does not at least halve the bracket, so it
+ * never takes more than about twice the steps of plain bisection.
+ */
+function narrow(lo: number, hi: number, gLo: number, gHi: number, probe: (ms: number) => { g: number; loSide: boolean }): number {
+  let halveNext = false;
+  while (hi - lo > SEC) {
+    const width = hi - lo;
+    let mid = !halveNext && gLo !== gHi ? lo + (width * gLo) / (gLo - gHi) : lo + width / 2;
+    if (!Number.isFinite(mid)) mid = lo + width / 2;
+    mid = Math.min(Math.max(floorSec(mid), lo + SEC), hi - SEC);
+    const r = probe(mid);
+    if (r.loSide) {
+      lo = mid;
+      gLo = r.g;
+    } else {
+      hi = mid;
+      gHi = r.g;
+    }
+    halveNext = hi - lo > width / 2;
+  }
+  return hi;
 }
 
 /** Label crossings (enters / moves-back / enters-again) relative to the normal direction. */
