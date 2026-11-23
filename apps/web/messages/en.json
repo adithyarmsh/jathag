@@ -165,6 +165,29 @@
       "calcutta": "Calcutta time",
       "lmt": "local time"
     },
+    "abbreviations": {
+      "La": "La",
+      "Su": "Su",
+      "Mo": "Mo",
+      "Ma": "Ma",
+      "Me": "Me",
+      "Ju": "Ju",
+      "Ve": "Ve",
+      "Sa": "Sa",
+      "Ra": "Ra",
+      "Ke": "Ke"
+    },
+    "southChart": {
+      "heading": "Your Rasi chart",
+      "centreTitle": "Rasi chart (D-1)",
+      "svgTitle": "South Indian Rasi chart",
+      "svgDescription": "Lagna in {sign}. The planet table below lists every position in words.",
+      "planetLabel": "{abbr} {deg}°",
+      "retrogradeMark": "(R)",
+      "houseLabel": "{n} house",
+      "ordinals": ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th"],
+      "key": "Su Sun · Mo Moon · Ma Mars · Me Mercury · Ju Jupiter · Ve Venus · Sa Saturn · Ra Rahu · Ke Ketu · La Lagna (Ascendant) · (R) retrograde · House numbers count from the Lagna (1st house)."
+    },
     "bodies": {
       "La": "Lagna",
       "Su": "Sun",

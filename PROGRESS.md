@@ -8,12 +8,12 @@
 | | |
 |---|---|
 | **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.3 — JHora spot-check (founder, using `notes/0.3.3-jhora-checklist.md`) |
+| **Current step** | 0.3.3 — JHora spot-check (founder, using `notes/0.3.3-jhora-checklist.md`), in parallel with 0.3.2.1 — Basic South Indian chart (built, waiting for Project review) |
 | **Next step** | 0.3.4 — Life-area windows |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Nothing (founder's JHora spot-check) |
-| **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice, footer v0.3.2; the chart API also returns the dasha timeline, transits and Sade Sati, not shown yet; hidden from search engines) |
-| **Last updated** | 2026-11-22 |
+| **Blocked on** | Nothing (founder's JHora spot-check; Project review of 0.3.2.1, PR #17) |
+| **Live site** | https://jathag.vercel.app (birth form + planet table, Beta notice, footer v0.3.2; the South Indian chart from 0.3.2.1 is on the PR preview only until merged; the chart API also returns the dasha timeline, transits and Sade Sati, not shown yet; hidden from search engines) |
+| **Last updated** | 2026-11-23 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
 
@@ -80,6 +80,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 ### v0.3 — Timing engine
 - ✅ 0.3.1 Dashas (3 levels): Vimshottari timeline + current period + coming up in the engine and chart API; all JHora dasha tests pass; dates on the clock at birth (D-098) (PR #15)
 - ✅ 0.3.2 Transits + Sade Sati: positions now with houses from Moon and Lagna, Saturn/Jupiter/Rahu-Ketu sign changes incl. retrograde back-and-forth, Sade Sati periods from birth to +120 years with phases and status, in the engine and chart API; all tests pass; approved as built (D-100) (PR #16)
+- 🔄 0.3.2.1 Basic South Indian chart (D-101): Rasi (D-1) chart drawn as SVG between the form and the planet table, house numbers from the Lagna, whole degrees and (R), Lagna corner mark, birth details in the centre, one-line key; matches the table for all 29 reference births. Waiting for Project review (PR #17); then the founder checks it against his JHora chart on the live site
 - ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
 
 ### v0.4 — Design system + app shell
@@ -126,6 +127,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-23 | 0.3.2.1 | #17 | Basic South Indian Rasi chart built on the home page (between the form and the table): fixed-sign layout, sign name + "Nth house" from the Lagna in each box, planets as "Sa 20° (R)" (whole degree cut off, like the table; never (R) on Rahu/Ketu), Lagna corner line + "La", date/time/place in the centre, key line underneath; text shrinks only when a box is crowded (even all 10 fit). Page now scrolls to the chart after calculating. Data in `apps/web/lib/south-chart.ts`, drawing in `apps/web/app/south-chart.tsx`; no engine/API/places/reference-data change. 1,205 tests green. D-101 / roadmap v2.7 / requirements v1.10 committed unchanged. Waiting for Project review. |
 | 2026-11-22 | 0.3.2 | #16 | Approved by the Project (D-100: built as reported, incl. the six small choices). D-100 committed unchanged. Squash-merged. |
 | 2026-11-22 | 0.3.2 | #16 | Transits + Sade Sati built: 9 grahas at the dashas' moment with houses from Moon and Lagna; sign-change search on Swiss Ephemeris output (20-day steps, stations found where they matter, to the second) for Saturn, Jupiter, Rahu/Ketu marked enters / moves back / enters again; Sade Sati periods from birth to +120 years with phases, dips and status; chart API `transits` section; engine 0.3.0. Project's Saturn example matches on every date. Natal positions and dashas unchanged; all tests green. Preview: chart 1.15 s cold / 0.50–0.58 s warm (transits add 65–90 ms of work), 120 KB raw / 15.5 KB sent, logs clean, page unchanged. 1,162 tests green. Report in `notes/0.3.2-transits.md`; JHora checklist for 0.3.3 in `notes/0.3.3-jhora-checklist.md`. D-099 / requirements v1.9 committed unchanged. Waiting for Project review. |
 | 2026-11-22 | 0.3.1 | #15 | Approved by the Project (D-098: dasha dates on the clock at birth, like JHora; display of births after the calculation moment decided in 0.3.7). D-098 committed unchanged. Squash-merged. |

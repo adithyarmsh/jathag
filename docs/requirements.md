@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.9 · 2026-11-22 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.10 · 2026-11-23 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -159,7 +159,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-CH-01 | Rasi (D1) and Navamsa (D9), switchable; North and South Indian styles, switchable. | Must |
+| FR-CH-01 | Rasi (D1) and Navamsa (D9), switchable; North and South Indian styles, switchable. (From step 0.3.2.1 a basic South Indian Rasi chart is already shown on the home page, D-101; replaced in 0.5.2.) | Must |
 | FR-CH-02 | Drawn as SVG by code; crisp at any size; themed for dark/light. | Must |
 | FR-CH-03 | Planet abbreviations with degree; retrograde marked (R); lagna marked. | Must |
 | FR-CH-04 | Tap/click a planet in the chart → its planet detail page. | Should |
