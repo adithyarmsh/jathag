@@ -414,3 +414,25 @@ html {
   outline-offset: -3px;
   border-radius: 0.6rem;
 }
+
+/* The basic South Indian chart (0.3.2.1, D-101). Lines use the field-border colour (3:1 against the
+   card in both themes, like form fields), drawn 1px at any size; the Lagna's corner mark in gold. */
+.south-chart {
+  font-variant-numeric: tabular-nums;
+}
+.south-chart-line {
+  fill: none;
+  stroke: var(--field-border);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+.south-chart-lagna {
+  stroke: var(--accent-text);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+/* Lining figures: in the serif font an old-style "1" looks like "I" ("D-1"). */
+.south-chart-title {
+  font-variant-numeric: lining-nums;
+}

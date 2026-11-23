@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.6 · 2026-11-21 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.7 · 2026-11-23 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -110,6 +110,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 |---|---|---|---|
 | 0.3.1 | CODE | Vimshottari Mahadasha / Antardasha / Pratyantardasha + current period + coming up | Dasha tests pass (±1 day) |
 | 0.3.2 | CODE | Transits: today's positions, houses from Moon and lagna, Saturn/Jupiter/Rahu-Ketu sign changes (10 years), Sade Sati periods | Tests pass |
+| 0.3.2.1 | CODE | Basic South Indian Rasi (D-1) chart on the home page, between the form and the planet table: sign + house number from the Lagna in every box, planets with whole degrees and (R), Lagna marked, birth details in the centre; provisional styling (founder's request, D-101) | Live; founder checks it against his JHora chart |
 | 0.3.3 | YOU | Spot-check 2–3 transit / Sade Sati dates in JHora | Match |
 | 0.3.4 | CODE | Life-area window rule (period lord rules/occupies the area's houses), with reasons | Tests pass |
 | 0.3.5 | PROJECT | Design 3–5 approximate-time test cases | Delivered |
@@ -133,7 +134,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | Step | Who | What | Done when |
 |---|---|---|---|
 | 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below. Until then (v0.2–v0.4) the table appears under the form on the home page | You compare with JHora |
-| 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle | Visual match with JHora |
+| 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle (replaces the basic chart from 0.3.2.1) | Visual match with JHora |
 | 0.5.3 | CODE | Planets table + planet detail pages (numbers; text placeholders until v0.7) | Merged |
 
 ## v0.6 — Timing screens

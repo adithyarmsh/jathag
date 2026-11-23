@@ -14,7 +14,7 @@ describe('footer version', () => {
     expect(versionLabel('0.2.15', '', en.footer)).toBe('v0.2.15');
   });
   it('STEP is a roadmap step ID that exists in docs/roadmap.md', () => {
-    expect(STEP).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(STEP).toMatch(/^\d+\.\d+\.\d+(\.\d+)?$/); // e.g. 0.3.2 or an inserted step like 0.3.2.1
     const roadmap = readFileSync(join(import.meta.dirname, '../../../docs/roadmap.md'), 'utf8');
     expect(roadmap).toContain(`| ${STEP} |`);
   });

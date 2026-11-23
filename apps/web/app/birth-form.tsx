@@ -23,6 +23,7 @@ import type { Messages } from "@/lib/i18n";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
 import { PlanetTable } from "./planet-table";
+import { SouthChart, type BirthShown } from "./south-chart";
 
 type Errors = Partial<Record<FormField, string>>;
 type Repeated = "earlier" | "later";
@@ -87,8 +88,9 @@ export function BirthForm({ t }: { t: Messages }) {
   /** Which groups may show their live check (left once with something in them, or after "See my chart"). */
   const [shown, setShown] = useState<Record<Group, boolean>>({ date: false, time: false, place: false });
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ data: ChartResponse; summary: string } | null>(null);
-  const tableHeading = useRef<HTMLHeadingElement>(null);
+  const [result, setResult] = useState<{ data: ChartResponse; summary: string; birth: BirthShown } | null>(null);
+  /** Heading of the chart (the first result card): the page scrolls there after calculating. */
+  const resultHeading = useRef<HTMLHeadingElement>(null);
 
   const fullDate = birthDate(day, month, year);
   const date = fullDate && isUsableDate(fullDate) ? fullDate : null;
@@ -122,13 +124,14 @@ export function BirthForm({ t }: { t: Messages }) {
     [place, date, time],
   );
 
-  // After a successful calculation: scroll smoothly down to the table (instantly with reduced motion).
+  // After a successful calculation: scroll smoothly down to the chart, the first result card
+  // (instantly with reduced motion); the card is scrolled to and its heading gets the focus.
   useEffect(() => {
-    const heading = tableHeading.current;
+    const heading = resultHeading.current;
     if (!result || !heading) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     heading.focus({ preventScroll: true });
-    heading.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    (heading.closest("section") ?? heading).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }, [result]);
 
   /** Any change to the birth clears that field's API message and the "which one?" question. */
@@ -197,7 +200,11 @@ export function BirthForm({ t }: { t: Messages }) {
           ? ` (${repeatedTime === "earlier" ? f.repeatedTime.summaryEarlier : f.repeatedTime.summaryLater})`
           : "";
         const shownTime = fill(t.chart.summaryTime, { time12: to12hText(time, f.time.am, f.time.pm), time24: time });
-        setResult({ data: data as ChartResponse, summary: fill(t.chart.summary, { date: when, time: shownTime + which, place: place.label }) });
+        setResult({
+          data: data as ChartResponse,
+          summary: fill(t.chart.summary, { date: when, time: shownTime + which, place: place.label }),
+          birth: { date: when, time: to12hText(time, f.time.am, f.time.pm), place: place.label },
+        });
         setAmbiguous(false);
       } else {
         problem = errorFor(data?.error?.code, t.errors);
@@ -523,7 +530,8 @@ export function BirthForm({ t }: { t: Messages }) {
         </p>
       </section>
 
-      {result && <PlanetTable ref={tableHeading} result={result.data} summary={result.summary} t={t.chart} />}
+      {result && <SouthChart ref={resultHeading} result={result.data} birth={result.birth} summary={result.summary} t={t.chart} />}
+      {result && <PlanetTable result={result.data} summary={result.summary} t={t.chart} />}
     </>
   );
 }
