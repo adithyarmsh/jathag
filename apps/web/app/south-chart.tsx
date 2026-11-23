@@ -21,8 +21,11 @@ export interface BirthShown {
 
 const MARK = 13; // length of the Lagna's corner line along each edge (clear of the sign name)
 
-export const SouthChart = forwardRef<HTMLHeadingElement, { result: ChartResponse; birth: BirthShown; t: Messages["chart"] }>(
-  function SouthChart({ result, birth, t }, headingRef) {
+export const SouthChart = forwardRef<
+  HTMLHeadingElement,
+  { result: ChartResponse; birth: BirthShown; summary: string; t: Messages["chart"] }
+>(
+  function SouthChart({ result, birth, summary, t }, headingRef) {
     const s = t.southChart;
     const boxes = southChartBoxes(result.chart, t);
     const lagna = boxes.find((b) => b.isLagna)!;
@@ -43,10 +46,12 @@ export const SouthChart = forwardRef<HTMLHeadingElement, { result: ChartResponse
         aria-labelledby="south-chart-title"
         className="card-outer rounded-[24px] bg-card p-4 shadow-soft sm:p-8 lg:col-span-2"
       >
-        <h2 id="south-chart-title" ref={headingRef} tabIndex={-1} className="sr-only">
+        {/* Visible header, same style as the planet table's (D-102) */}
+        <h2 id="south-chart-title" ref={headingRef} tabIndex={-1} className="font-serif text-[28px] leading-tight font-medium">
           {s.heading}
         </h2>
-        <div className="mx-auto w-full max-w-[560px]">
+        <p className="mt-1 text-sm text-muted">{summary}</p>
+        <div className="mx-auto mt-5 w-full max-w-[560px]">
           <svg
             viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
             role="img"

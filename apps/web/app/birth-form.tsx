@@ -125,8 +125,7 @@ export function BirthForm({ t }: { t: Messages }) {
   );
 
   // After a successful calculation: scroll smoothly down to the chart, the first result card
-  // (instantly with reduced motion). Its heading is for screen readers only, so the card is scrolled
-  // to and the heading gets the focus.
+  // (instantly with reduced motion); the card is scrolled to and its heading gets the focus.
   useEffect(() => {
     const heading = resultHeading.current;
     if (!result || !heading) return;
@@ -531,7 +530,7 @@ export function BirthForm({ t }: { t: Messages }) {
         </p>
       </section>
 
-      {result && <SouthChart ref={resultHeading} result={result.data} birth={result.birth} t={t.chart} />}
+      {result && <SouthChart ref={resultHeading} result={result.data} birth={result.birth} summary={result.summary} t={t.chart} />}
       {result && <PlanetTable result={result.data} summary={result.summary} t={t.chart} />}
     </>
   );
