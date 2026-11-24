@@ -10,6 +10,7 @@
 //     starts at birth and shows the next starts. Pure functions, tested in dasha-view.test.ts.
 
 import { fill } from "./chart-format";
+import { periodProgress, type Progress } from "./progress";
 import {
   activatesText,
   grahaName,
@@ -104,9 +105,15 @@ export interface CurrentLine {
   level: DashaLevel;
   /** "Mahadasha (long-term)" */
   label: string;
+  /** "Long-term · Mahadasha": the tier label of the Right now card (0.3.7.1, D-115 item 4) */
+  tierLabel: string;
   row: PeriodRow;
   /** "Activates: Career & work, Money & family" / "Activates: No life area linked" */
   activates: string;
+  /** How far through the period the calculation moment is (null if it cannot be worked out). */
+  progress: Progress | null;
+  /** "About 63% through" (the bar's text alternative), or null */
+  progressText: string | null;
 }
 
 export interface NextLine {
@@ -148,7 +155,16 @@ export function dashaNow(ctx: ListContext): DashaNowView {
     const p = periodsAt(ctx, level).find((x) => samePath(ref.path, x.path));
     if (!p) continue;
     const r = row(p.p, p.path, level, ctx);
-    current.push({ level, label: levelLabel(level, ctx.t), row: r, activates: activatesText(r.lord, ctx) });
+    const progress = periodProgress(r.startUtc, r.endUtc, dashas.asOf);
+    current.push({
+      level,
+      label: levelLabel(level, ctx.t),
+      tierLabel: fill(ctx.t.lists.tierLabel, { term: ctx.t.lists.termsTitle[level], level: ctx.t.lists.levels[level] }),
+      row: r,
+      activates: activatesText(r.lord, ctx),
+      progress,
+      progressText: progress ? fill(ctx.t.lists.progressText, { percent: progress.percent }) : null,
+    });
   }
 
   const next: NextLine[] = [];

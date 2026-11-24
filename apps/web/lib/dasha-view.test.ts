@@ -92,6 +92,13 @@ describe("Right now (dashaNow)", () => {
       "Pratyantardasha (short-term)",
     ]);
     expect(now.current[0]!.row.lord).toBe("Ra");
+    // Tier labels and progress (0.3.7.1, D-115 item 4)
+    expect(now.current.map((c) => c.tierLabel)).toEqual(["Long-term · Mahadasha", "Medium-term · Antardasha", "Short-term · Pratyantardasha"]);
+    for (const c of now.current) {
+      expect(c.progress!.fraction).toBeGreaterThanOrEqual(0);
+      expect(c.progress!.fraction).toBeLessThan(1);
+      expect(c.progressText).toBe(`About ${c.progress!.percent}% through`);
+    }
     expect(now.current[0]!.activates).toBe("Activates: Home, mother & inner peace, Career & work");
     const other = now.current.find((c) => c.row.lord !== "Ra");
     if (other) expect(other.activates).toBe("Activates: No life area linked");

@@ -17,6 +17,16 @@ export const CHART_SIZE = 320;
 export const CELL = CHART_SIZE / 4;
 
 /**
+ * Sign name (top of each box) and house label (bottom), SVG units. 0.3.7.1 (D-115 item 2): about 30%
+ * smaller than before (9.5 and 9). The planet labels keep their sizes (D-110) and their area.
+ */
+export const SIGN_FONT = 6.7;
+export const HOUSE_FONT = 6.3;
+/** Baselines of the sign name and the house label inside a box. */
+export const SIGN_BASELINE = 9;
+export const HOUSE_BASELINE = CELL - 3.5;
+
+/**
  * Classic South Indian layout: the signs never move. [column, row] of each sign's box, 0-based from
  * the top left, by sign number (1 = Aries … 12 = Pisces).
  * Top row left → right: Pisces, Aries, Taurus, Gemini; right column down: Cancer, Leo;
@@ -228,8 +238,7 @@ export function southChartBoxes(chart: ChartResponse["chart"], t: Messages["char
 
 /** Widest line in the centre, in SVG units, and the font size of the place lines. */
 export const CENTRE_LINE_WIDTH = 2 * CELL - 10;
-export const PLACE_FONT = 9.5;
-
+export const PLACE_FONT = 9;
 /**
  * The place for the centre, on at most two lines that fit CENTRE_LINE_WIDTH. Long labels are
  * shortened by leaving out middle parts (keeping the town and the country), e.g.
@@ -262,4 +271,66 @@ function toLines(parts: string[], fits: (s: string) => boolean): string[] {
     else lines.push(piece);
   }
   return lines;
+}
+
+// ---- The centre text (0.3.7.1, D-115 item 3) -----------------------------------------------------
+
+/** Free space kept between the centre text and the centre's frame, top and bottom (SVG units). */
+export const CENTRE_PADDING = 8;
+export const CENTRE_TITLE_FONT = 13.5;
+export const CENTRE_BIRTH_FONT = 9.5;
+/** The Moon lines use the largest of these sizes at which all three fit the centre's width. */
+export const MOON_FONTS = [9, 8.5, 8, 7.5] as const;
+const CENTRE_LINE_HEIGHT = 1.15;
+
+export interface CentreLine {
+  text: string;
+  size: number;
+  /** Text baseline, absolute in the chart's 320 × 320 units. */
+  y: number;
+  kind: "title" | "birth" | "moon" | "place";
+}
+
+export interface CentreBirth {
+  date: string;
+  time: string;
+  place: string;
+}
+
+/** The Moon's sign, nakshatra and pada in words, straight from the chart response (no calculation). */
+export function moonFacts(chart: ChartResponse["chart"], t: Messages["chart"]) {
+  const mo = chart.bodies.Mo;
+  return { sign: t.signs[mo.sign - 1]!, nakshatra: t.nakshatras[mo.nakshatra - 1]!, pada: String(mo.pada) };
+}
+
+/**
+ * The centre, top to bottom: title, date, time, "Moon sign (Rasi): …", "Nakshatra: …", "Pada: …",
+ * then the place (placeLines, at most two lines). Lines are stacked around the middle of the chart;
+ * every line fits CENTRE_LINE_WIDTH and the block stays CENTRE_PADDING inside the centre's frame (tested
+ * with the longest names).
+ */
+export function centreLines(chart: ChartResponse["chart"], birth: CentreBirth, t: Messages["chart"]): CentreLine[] {
+  const s = t.southChart;
+  const moon = moonFacts(chart, t);
+  const moonTexts = [
+    fill(s.centreFact, { label: s.moonSign, value: moon.sign }),
+    fill(s.centreFact, { label: s.nakshatra, value: moon.nakshatra }),
+    fill(s.centreFact, { label: s.pada, value: moon.pada }),
+  ];
+  const fits = (text: string, size: number) => textWidthEm(text) * size <= CENTRE_LINE_WIDTH;
+  const moonSize = MOON_FONTS.find((size) => moonTexts.every((x) => fits(x, size))) ?? MOON_FONTS[MOON_FONTS.length - 1];
+
+  const items: { text: string; size: number; gap: number; kind: CentreLine["kind"] }[] = [
+    { text: s.centreTitle, size: CENTRE_TITLE_FONT, gap: 0, kind: "title" },
+    { text: birth.date, size: CENTRE_BIRTH_FONT, gap: 7, kind: "birth" },
+    { text: birth.time, size: CENTRE_BIRTH_FONT, gap: 2.5, kind: "birth" },
+    ...moonTexts.map((text, i) => ({ text, size: moonSize, gap: i === 0 ? 7 : 2, kind: "moon" as const })),
+    ...placeLines(birth.place).map((text, i) => ({ text, size: PLACE_FONT, gap: i === 0 ? 7 : 2, kind: "place" as const })),
+  ];
+  const heights = items.map((l) => l.gap + l.size * CENTRE_LINE_HEIGHT);
+  let y = CHART_SIZE / 2 - heights.reduce((a, b) => a + b, 0) / 2;
+  return items.map((l, i) => {
+    y += heights[i]!;
+    return { text: l.text, size: l.size, kind: l.kind, y: y - l.size * 0.25 };
+  });
 }

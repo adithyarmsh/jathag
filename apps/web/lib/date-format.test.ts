@@ -56,3 +56,14 @@ describe("dates on the clock at birth", () => {
     expect(() => dateOnBirthClock("2020-01-01T00:00:00Z", Number.NaN)).toThrow();
   });
 });
+
+describe("date notes (0.3.7.1, D-115 item 5)", () => {
+  it("no longer mention Jagannatha Hora, and keep the offset", () => {
+    expect(en.lists.clockNote).toBe("Dates are shown on the clock used at birth ({offset} for this chart).");
+    expect(en.lists.clockPointer).toBe("Dates use the clock at birth ({offset}).");
+    for (const s of [en.lists.clockNote, en.lists.clockPointer]) expect(s).not.toMatch(/Jagannatha|JHora/i);
+  });
+  it("the calculation line above the planet table is unchanged (founder decides separately)", () => {
+    expect(en.chart.methodLine).toBe("Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · checked against Jagannatha Hora");
+  });
+});
