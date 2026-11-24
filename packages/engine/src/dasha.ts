@@ -201,6 +201,23 @@ export interface DashaNow {
   next: DashaLevels<DashaRef | null>;
 }
 
+export type DashaLevel = keyof DashaLevels<unknown>;
+export const DASHA_LEVELS: readonly DashaLevel[] = ['mahadasha', 'antardasha', 'pratyantardasha'];
+
+/** Every period at one level (9 / 81 / 729), in time order, as references with their path in the timeline. */
+export function dashaRefs(timeline: VimshottariTimeline, level: DashaLevel): DashaRef[] {
+  if (!DASHA_LEVELS.includes(level)) throw new DashaInputError('Unknown dasha level.');
+  const out: DashaRef[] = [];
+  timeline.mahadashas.forEach((m, i) => {
+    if (level === 'mahadasha') return void out.push({ path: [i], lord: m.lord, start: m.start, end: m.end });
+    m.antardashas.forEach((a, j) => {
+      if (level === 'antardasha') return void out.push({ path: [i, j], lord: a.lord, start: a.start, end: a.end });
+      a.pratyantardashas.forEach((p, k) => out.push({ path: [i, j, k], lord: p.lord, start: p.start, end: p.end }));
+    });
+  });
+  return out;
+}
+
 /**
  * Current period and coming up for a given instant. `asOf` is always passed in: the engine never
  * reads the system clock (NFR-DET-01). A period is current when start ≤ asOf < end.
@@ -209,16 +226,11 @@ export function vimshottariNow(timeline: VimshottariTimeline, asOf: string): Das
   const t = parseUtc('asOf', asOf);
   const birthMs = Date.parse(timeline.birthUtc);
 
-  const levels: DashaLevels<DashaRef[]> = { mahadasha: [], antardasha: [], pratyantardasha: [] };
-  timeline.mahadashas.forEach((m, i) => {
-    levels.mahadasha.push({ path: [i], lord: m.lord, start: m.start, end: m.end });
-    m.antardashas.forEach((a, j) => {
-      levels.antardasha.push({ path: [i, j], lord: a.lord, start: a.start, end: a.end });
-      a.pratyantardashas.forEach((p, k) => {
-        levels.pratyantardasha.push({ path: [i, j, k], lord: p.lord, start: p.start, end: p.end });
-      });
-    });
-  });
+  const levels: DashaLevels<DashaRef[]> = {
+    mahadasha: dashaRefs(timeline, 'mahadasha'),
+    antardasha: dashaRefs(timeline, 'antardasha'),
+    pratyantardasha: dashaRefs(timeline, 'pratyantardasha'),
+  };
 
   const live = t >= birthMs;
   const pick = (list: DashaRef[]) => ({
