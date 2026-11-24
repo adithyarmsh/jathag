@@ -8,11 +8,11 @@
 | | |
 |---|---|
 | **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.7 — Lists on the live site |
-| **Next step** | 0.3.7, then the v0.4 design work |
+| **Current step** | 0.3.6 — Approximate-time scanner ✅ done (D-112) |
+| **Next step** | 0.3.7 — Show lists on live site (then the v0.4 design work) |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Project review of PR #20 (0.3.6) |
-| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.5.1 (v0.3.6 once PR #20 is merged); the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, and `POST /api/chart/range` the approximate-time scan, neither shown yet; hidden from search engines) |
+| **Blocked on** | Nothing (0.3.7 handoff from the Project) |
+| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.6; the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, and `POST /api/chart/range` the approximate-time scan, neither shown yet; hidden from search engines) |
 | **Last updated** | 2026-11-24 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -132,6 +132,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-24 | 0.3.6 | #20 | Approved by the Project as built (D-112), including keeping AMBIGUOUS_LOCAL_TIME for a range end in a repeated clock hour unless first/second is sent (D-112 item 1, no code change). D-112 committed unchanged. Squash-merged; live on jathag.vercel.app. |
 | 2026-11-24 | 0.3.6 | #20 | Approximate-time scanner built: engine `scanTimeRange` (engine 0.5.0) finds every second where the Lagna sign/nakshatra/navamsa or Moon sign/nakshatra/pada changes, with segments, certain values and dasha date ranges; `POST /api/chart/range` with the D-111 range rules and local times (first/second in a repeated hour). All five Project cases match `cases.json` exactly (0 s difference); 47 place-days identical to a second-by-second check; whole day ≈12 ms in the engine locally, on the Vercel preview the whole-day request takes 1.2 s cold and 0.44–0.91 s warm seen from India (66–165 ms inside the function; target under 5 s), 77 KB raw / 11.6 KB sent, gives exactly case A4, no runtime log lines. D-111 and roadmap v2.10 and the case files committed unchanged; 0.3.5 and 0.3.5.1 marked ✅ (D-111). Waiting for Project review. |
 | 2026-11-24 | 0.3.5.1 | #19 | Approved by the Project (D-110). D-109 / D-110 committed unchanged. Squash-merged; stays 🔄 until the founder checks it live. |
 | 2026-11-24 | 0.3.5.1 | #19 | Chart card heading now "South Indian Birth Chart"; degrees removed from the chart boxes (label = abbreviation + (R) when retrograde, never on Rahu/Ketu); planet labels now use the largest size that fits, from 14 down to 9.5 (all 29 reference births: 13–14 in every box, was 10–12); key line and screen-reader text unchanged (no degrees in them). Chart matches the table on sign, house and (R) for all 29 births. Only `apps/web`, PROGRESS.md, CLAUDE.md and the three docs (committed unchanged) changed. Waiting for Project review. |
