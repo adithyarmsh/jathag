@@ -36,7 +36,7 @@ export const PlanetTable = forwardRef<HTMLHeadingElement, { result: ChartRespons
         </h2>
         <p className="mt-1 text-sm text-muted">{summary}</p>
         <p className="mt-3 text-xs text-muted sm:hidden">{t.scrollHint}</p>
-        <div className="mt-3 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="planet-table-title">
+        <div className="relative mt-3 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="planet-table-title">
           <table className="planet-table w-full min-w-[720px] border-collapse text-left text-[15px]">
             <caption className="sr-only">
               {t.title}: {summary}

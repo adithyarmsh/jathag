@@ -47,7 +47,7 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
       </h3>
       <p className="text-sm text-muted">{fill(tr.positionsCaption, { date: ctx.date(ctx.result.transits.asOf) })}</p>
       <p className="mt-2 text-xs text-muted sm:hidden">{ctx.t.chart.scrollHint}</p>
-      <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="transit-positions-title">
+      <div className="relative mt-2 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="transit-positions-title">
         <table className="planet-table list-table w-full min-w-[440px] border-collapse text-left text-[15px]">
           <caption className="sr-only">{fill(tr.positionsCaption, { date: ctx.date(ctx.result.transits.asOf) })}</caption>
           <thead>
