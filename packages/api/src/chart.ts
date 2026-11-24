@@ -141,7 +141,7 @@ function num(v: unknown, code: ApiErrorCode): number {
 }
 
 /** Same as the engine's own check, done first so that the range check below sees a real date. */
-function checkDate(date: unknown): string {
+export function checkDate(date: unknown): string {
   const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str(date, 'INVALID_DATE', 10));
   if (!d) return fail('INVALID_DATE');
   const [y, m, day] = [Number(d[1]), Number(d[2]), Number(d[3])];
@@ -153,7 +153,7 @@ function checkDate(date: unknown): string {
   return s;
 }
 
-function checkTime(time: unknown): string {
+export function checkTime(time: unknown): string {
   const t = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(str(time, 'INVALID_TIME', 8));
   if (!t || Number(t[1]) > 23 || Number(t[2]) > 59 || Number(t[3] ?? 0) > 59) fail('INVALID_TIME');
   return time as string;
@@ -166,7 +166,7 @@ function checkLatLng(o: Record<string, unknown>, code: ApiErrorCode): { lat: num
   return { lat, lng };
 }
 
-function checkPlace(v: unknown): PlaceInput {
+export function checkPlace(v: unknown): PlaceInput {
   if (!isObject(v)) return fail('INVALID_PLACE');
   const geonameId = num(v.geonameId, 'INVALID_PLACE');
   if (!Number.isSafeInteger(geonameId) || geonameId <= 0) fail('INVALID_PLACE');
@@ -180,7 +180,7 @@ function checkPlace(v: unknown): PlaceInput {
   return { geonameId, lat, lng, timeZone, countryCode, admin1Code, admin2Code };
 }
 
-function checkManual(v: unknown): ManualInput {
+export function checkManual(v: unknown): ManualInput {
   if (!isObject(v)) return fail('INVALID_PLACE');
   const { lat, lng } = checkLatLng(v, 'INVALID_PLACE');
   const off = num(v.utcOffsetSeconds, 'INVALID_UTC_OFFSET');
@@ -188,18 +188,17 @@ function checkManual(v: unknown): ManualInput {
   return { lat, lng, utcOffsetSeconds: off };
 }
 
-/** Validates the request body. Throws ApiError with a code; never includes any input. */
-export function parseChartRequest(body: unknown): ChartRequest {
-  if (!isObject(body)) return fail('INVALID_REQUEST');
-  const date = checkDate(body.date);
-  const time = checkTime(body.time);
+/** The fields every calculation request shares: place or manual entry and the clock answer. */
+export type PlaceRequest = Pick<ChartRequest, 'place' | 'manual' | 'clock'>;
 
+/** Validates the place and clock fields (shared with the range endpoint). */
+export function parsePlaceFields(body: Record<string, unknown>): PlaceRequest {
   const hasPlace = body.place !== undefined && body.place !== null;
   const hasManual = body.manual !== undefined && body.manual !== null;
   if (!hasPlace && !hasManual) fail('MISSING_PLACE');
   if (hasPlace && hasManual) fail('INVALID_PLACE');
 
-  const req: ChartRequest = { date, time };
+  const req: PlaceRequest = {};
   if (hasPlace) req.place = checkPlace(body.place);
   else req.manual = checkManual(body.manual);
 
@@ -207,20 +206,46 @@ export function parseChartRequest(body: unknown): ChartRequest {
     if (typeof body.clock !== 'string' || !(CLOCK_IDS as readonly string[]).includes(body.clock)) fail('INVALID_CLOCK_CHOICE');
     req.clock = body.clock as ClockId;
   }
-  if (body.repeatedTime !== undefined && body.repeatedTime !== null) {
-    if (body.repeatedTime !== 'earlier' && body.repeatedTime !== 'later') fail('INVALID_REPEATED_TIME');
-    req.repeatedTime = body.repeatedTime as 'earlier' | 'later';
-  }
-  if (body.settings !== undefined && body.settings !== null) {
-    if (!isObject(body.settings)) fail('INVALID_REQUEST');
-    req.settings = body.settings as Partial<Settings>;
-  }
+  return req;
+}
+
+/** The optional settings object (its values are checked by resolveApiSettings). */
+export function checkSettingsField(v: unknown): Partial<Settings> | undefined {
+  if (v === undefined || v === null) return undefined;
+  if (!isObject(v)) fail('INVALID_REQUEST');
+  return v as Partial<Settings>;
+}
+
+/** "earlier" | "later" for a clock time that happened twice; undefined when not sent. */
+export function checkRepeatedTime(v: unknown): 'earlier' | 'later' | undefined {
+  if (v === undefined || v === null) return undefined;
+  if (v !== 'earlier' && v !== 'later') fail('INVALID_REPEATED_TIME');
+  return v as 'earlier' | 'later';
+}
+
+export const isJsonObject = isObject;
+
+/** Validates the request body. Throws ApiError with a code; never includes any input. */
+export function parseChartRequest(body: unknown): ChartRequest {
+  if (!isObject(body)) return fail('INVALID_REQUEST');
+  const date = checkDate(body.date);
+  const time = checkTime(body.time);
+  // Checked in the same order as before 0.3.6: place, clock, repeatedTime, settings.
+  const { place, manual, clock } = parsePlaceFields(body);
+  const repeatedTime = checkRepeatedTime(body.repeatedTime);
+  const settings = checkSettingsField(body.settings);
+  const req: ChartRequest = { date, time };
+  if (place) req.place = place;
+  if (manual) req.manual = manual;
+  if (clock) req.clock = clock;
+  if (repeatedTime) req.repeatedTime = repeatedTime;
+  if (settings) req.settings = settings;
   return req;
 }
 
 // ---------------------------------------------------------------- the calculation
 
-const TIME_ERRORS: Record<TimeError['code'], ApiErrorCode> = {
+export const TIME_ERRORS: Record<TimeError['code'], ApiErrorCode> = {
   INVALID_DATE: 'INVALID_DATE',
   INVALID_TIME: 'INVALID_TIME',
   INVALID_TIME_ZONE: 'INVALID_TIME_ZONE',
@@ -235,7 +260,7 @@ const TIME_ERRORS: Record<TimeError['code'], ApiErrorCode> = {
  * hours get DATE_OUT_OF_RANGE instead of an internal error. Any other ephemeris failure stays an
  * internal error (it would mean the data files are missing).
  */
-const EPHEMERIS_EDGE_BEFORE = '1800-01-02T00:00:00Z';
+export const EPHEMERIS_EDGE_BEFORE = '1800-01-02T00:00:00Z';
 
 export interface ChartOptions {
   /** Ephemeris adapter (the web app passes one with the deployed data-file path). */
@@ -250,16 +275,28 @@ export interface ChartOptions {
   timing?: Record<string, number>;
 }
 
-/** Validated request → full response. Throws ApiError (expected problems) or anything else (bugs). */
-export function calculateChartResponse(req: ChartRequest, options: ChartOptions): ChartResponse {
-  let settings: Settings;
+/** Settings with defaults filled in; unsupported or unknown settings become ApiErrors. */
+export function resolveApiSettings(settings: Partial<Settings> | undefined): Settings {
   try {
-    settings = resolveSettings(req.settings as Partial<Record<keyof Settings, unknown>> | undefined);
+    return resolveSettings(settings as Partial<Record<keyof Settings, unknown>> | undefined);
   } catch (e) {
     if (e instanceof SettingsError) throw new ApiError(e.code, 400, e.setting);
     throw e;
   }
+}
 
+/** The place, its "Which clock?" question and the clock used, for a local date (shared with the range endpoint). */
+export interface PlaceClock {
+  place: ChartResponse['place'];
+  /** What the engine's localToUtc gets. */
+  zone: BirthZone;
+  /** utcOffsetSeconds and tzdataVersion are filled in once a local time is converted. */
+  clock: ChartResponse['clock'];
+  question: ClockQuestion;
+}
+
+/** Applies the "Which clock?" rule (D-082/D-086/D-090) for a place (or manual entry) on a local date. */
+export function resolvePlaceClock(req: Pick<ChartRequest, 'date' | 'place' | 'manual' | 'clock'>): PlaceClock {
   let zone: BirthZone;
   let clock: ChartResponse['clock'];
   let question: ClockQuestion;
@@ -293,6 +330,13 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
     zone = { utcOffsetSeconds: manual.utcOffsetSeconds };
     clock = { source: 'manual', id: null, chosen: false, utcOffsetSeconds: manual.utcOffsetSeconds, timeZone: null, tzdataVersion: null };
   }
+  return { place, zone, clock, question };
+}
+
+/** Validated request → full response. Throws ApiError (expected problems) or anything else (bugs). */
+export function calculateChartResponse(req: ChartRequest, options: ChartOptions): ChartResponse {
+  const settings = resolveApiSettings(req.settings);
+  const { place, zone, clock, question } = resolvePlaceClock(req);
 
   let utc: string;
   try {

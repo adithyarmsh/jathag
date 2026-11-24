@@ -146,3 +146,49 @@ export function utcParts(utc: string): { year: number; month: number; day: numbe
   const seconds = z.second + z.millisecond / 1e3 + z.microsecond / 1e6 + z.nanosecond / 1e9;
   return { year: z.year, month: z.month, day: z.day, hours: z.hour + z.minute / 60 + seconds / 3600 };
 }
+
+export interface LocalClockTime {
+  /** "YYYY-MM-DD HH:MM:SS" on the birth place's clock (whole seconds). */
+  local: string;
+  /** The UTC offset in force, seconds east of Greenwich. */
+  utcOffsetSeconds: number;
+  /**
+   * Only for a clock time that happened twice (clocks went back): 'first' for the earlier pass,
+   * 'second' for the later one. Null otherwise (always null for a fixed offset).
+   */
+  repeated: 'first' | 'second' | null;
+}
+
+/**
+ * The reverse of localToUtc (step 0.3.6): a UTC instant (whole seconds) on a zone's clock. With an
+ * IANA zone, a time inside an hour that happened twice is marked 'first' or 'second'.
+ */
+export function utcToLocal(utc: string, zone: BirthZone): LocalClockTime {
+  let instant: Temporal.Instant;
+  try {
+    instant = Temporal.Instant.from(utc);
+  } catch {
+    throw new TimeError('INVALID_TIME', `"${utc}" is not a valid UTC instant (ISO 8601, e.g. 1992-08-14T01:15:00Z).`);
+  }
+  const fmt = (p: Temporal.PlainDateTime) => p.toString({ smallestUnit: 'second' }).replace('T', ' ');
+  if ('utcOffsetSeconds' in zone) {
+    const off = zone.utcOffsetSeconds;
+    if (!Number.isInteger(off) || Math.abs(off) > MAX_OFFSET_SECONDS) {
+      throw new TimeError('INVALID_UTC_OFFSET', `UTC offset must be a whole number of seconds within ±18 h, got ${off}.`);
+    }
+    return { local: fmt(instant.add({ seconds: off }).toZonedDateTimeISO('UTC').toPlainDateTime()), utcOffsetSeconds: off, repeated: null };
+  }
+  let zdt: Temporal.ZonedDateTime;
+  try {
+    zdt = instant.toZonedDateTimeISO(zone.iana);
+  } catch {
+    throw new TimeError('INVALID_TIME_ZONE', `Unknown time zone "${zone.iana}".`);
+  }
+  const wall = zdt.toPlainDateTime();
+  const earlier = wall.toZonedDateTime(zone.iana, { disambiguation: 'earlier' });
+  const later = wall.toZonedDateTime(zone.iana, { disambiguation: 'later' });
+  const repeated = earlier.epochNanoseconds === later.epochNanoseconds
+    ? null
+    : zdt.epochNanoseconds === earlier.epochNanoseconds ? 'first' : 'second';
+  return { local: fmt(wall), utcOffsetSeconds: Math.round(zdt.offsetNanoseconds / 1e9), repeated };
+}

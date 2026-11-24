@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.9 · 2026-11-24 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.10 · 2026-11-24 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -115,7 +115,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.3.4 | CODE | Life-area window rule (period lord rules/occupies the area's houses), with reasons | Tests pass |
 | 0.3.5 | PROJECT | Design 3–5 approximate-time test cases | Delivered |
 | 0.3.5.1 | CODE | Basic South Indian chart: heading "South Indian Birth Chart" and no degrees in the boxes (founder's request, D-108) | Live; founder checks |
-| 0.3.6 | CODE | Approximate-time scanner (certain vs uncertain values with time sub-ranges) | Tests pass |
+| 0.3.6 | CODE | Approximate-time scanner (segments, certain vs uncertain values, dasha date ranges) in the engine, plus `POST /api/chart/range` for a local from–to range, no screen (D-111) | Tests pass (the five 0.3.5 cases); whole-day scan timed on Vercel |
 | 0.3.7 | CODE | Show all of the above as plain lists on the live site | Live |
 
 ## v0.4 — Design system + app shell

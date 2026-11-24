@@ -15,7 +15,7 @@ From a birth instant (UTC) and a place (latitude/longitude):
 
 Plus **local time → UTC** (FR-CALC-01): an IANA time zone *or* a manual UTC offset in seconds.
 
-And (step 0.3.1) **Vimshottari dashas**, (step 0.3.2) **transits, sign changes and Sade Sati**, and (step 0.3.4) **life-area links**; see below.
+And (step 0.3.1) **Vimshottari dashas**, (step 0.3.2) **transits, sign changes and Sade Sati**, (step 0.3.4) **life-area links** and (step 0.3.6) the **approximate-time scanner**; see below.
 
 Everything uses stable IDs (D-063): signs 1–12, nakshatras 1–27, houses 1–12, body codes `La Su Mo Ma Me Ju Ve Sa Ra Ke`. There are no English names. Every result carries `meta` with the engine version, the settings used, the ephemeris version and data files, and the input.
 
@@ -99,6 +99,33 @@ The rule behind "Periods that especially activate this area" (FR-TIME-07, FR-LA-
 - `periodsForLifeArea(timeline, links, area, level)` → the periods at one level (`mahadasha` / `antardasha` / `pratyantardasha`) whose lord is linked to `area`, in time order, each `{ path, lord, start, end, reasons }` (`path` = position in the timeline, like `vimshottariNow`). Built on `dashaRefs(timeline, level)` in `dasha.ts` (all 9 / 81 / 729 periods at a level), which `vimshottariNow` now also uses. Includes periods that ended before birth; screens decide what to show (0.3.7, 0.7.5).
 - Pure: no clock, no ephemeris. Measured on the 29 reference births: a graha is linked to 1–4 areas (average 2.5), and each area to 1–6 grahas (average 2.2).
 
+## Approximate-time scanner (step 0.3.6, `src/approx-time.ts`)
+
+FR-APX-01…03, D-107, D-111. For a place and a range of possible birth moments, every moment one of six values changes, the stretches in between, which values are certain, and the dasha date ranges.
+
+```ts
+import { scanTimeRange } from '@jathag/engine';
+
+const r = scanTimeRange({ fromUtc: '1992-08-14T00:30:00Z', toUtc: '1992-08-14T06:30:00Z', lat: 13.083333, lng: 80.283333 });
+r.events[0];   // { utc: '1992-08-14T00:39:30Z', changes: [{ value: 'ls', from: 4, to: 5 }, { value: 'ln', from: 9, to: 10 }, { value: 'ld9', from: 12, to: 1 }] }
+r.segments[0]; // { from: '1992-08-14T00:30:00Z', to: '1992-08-14T00:39:29Z', ls: 4, ln: 9, ld9: 12, ms: 11, mn: 23, mp: 4 }
+r.certain;     // ['ms']
+r.dasha[1];    // { from, to, moonNakshatra: 24, lordAtBirth: 'Ra', mahadashas: [9 × { lord, startMin, startMax, endMin, endMax }], antardashas: [81 × { maha, lord, … }] }
+r.meta;        // { engineVersion, settings, ephemeris, input, seconds }
+```
+
+- **Values** (`TIME_VALUES`): `ls` Lagna sign, `ln` Lagna nakshatra, `ld9` Lagna sign in the navamsa, `ms` Moon sign, `mn` Moon nakshatra (the dasha lord changes with it), `mp` Moon pada. IDs only.
+- **Input:** both ends ISO 8601 UTC with whole seconds (`…T00:30:00Z`), both included; the end may equal the start. Settings as for `calculateChart` (only `dashaYear` affects the result).
+- **Output:** `events` (a change moment = the **first whole second of the new value**; several values can change in the same second, listed in `TIME_VALUES` order), `segments` (maximal stretches with all six values constant; `to` = the second before the next change, the last ends at the range end), `certain` (values that never change), `dasha` (one entry per stretch of one Moon nakshatra: earliest/latest start and end of all 9 mahadashas and 81 antardashas, from the Vimshottari timeline at the first and last second of the stretch; no pratyantardashas).
+- **Same Lagna and Moon as the chart:** `lagnaLongitude` (shared with `calculateChart`), the adapter's Moon, `placement`, at the same Julian day for each whole second; a test checks a chart at both ends of every segment.
+- **Method (no new astronomy):** all six values are read off two *pada indexes* (which 3°20′ piece, 0–107) of the Lagna and the Moon. Both only move forward (the Moon is never retrograde; the Lagna moves forward everywhere outside the polar circles), so the number of boundaries crossed between two seconds is exactly the difference of the indexes (mod 108) whenever less than a full circle passes in between. The range is sampled every 30 minutes (`SAMPLE_SECONDS`) and every gap that crossed something is halved down to single seconds. So no change can be missed, however close two are: checked against a test of **every single second** for a whole day at all 29 reference places and at 60°N, 60°S, Reykjavik, Ushuaia and ±66.5° on three dates (47 days, identical), and in `test/approx-time.test.ts` for Oslo and 66.5°N.
+- **Shortest gaps measured** (two changes of the same value; 12 days of 2001 per place): reference places `ld9` 3 min 4 s, `ln` 12 min 21 s, `ls` 28 min 34 s, `mp` 5 h 17 min; Reykjavik `ld9` 77 s; 66.5° `ld9` 2 s (1 s once in 1850). Moon signs and nakshatras change at most once a day.
+- **Polar latitudes:** beyond **66.5°** north or south (`MAX_SCAN_LATITUDE`; the polar circles lie at 66.53°–66.57° in 1800–2100) the ecliptic can lie along the horizon, the Lagna jumps and runs backwards (measured at 67° and 70°N), and the rising sign is not well defined: `TimeRangeError` `POLAR_LATITUDE`, never an answer.
+- **Errors** (`TimeRangeError.code`): `INVALID_RANGE_TIME` (not ISO UTC with whole seconds, or not a real moment), `RANGE_END_BEFORE_START`, `RANGE_TOO_LONG` (over 7 days, `MAX_SCAN_SECONDS`, a safety cap; the API allows one day), `POLAR_LATITUDE`. Bad latitude/longitude: `ChartInputError` as for the chart.
+- **Speed:** a whole day takes about 12 ms on a Mac (about 1,300 ephemeris look-ups). The engine never reads the clock; same input, same output (NFR-DET-01, tested).
+- Not here (D-107 item 2): houses, life areas, Sade Sati or transits per segment; those come in 0.8.1 by running the chart once per segment.
+- `utcToLocal(utc, zone)` in `src/time.ts` (the reverse of `localToUtc`) gives the birth-place clock time of an instant, with `repeated: 'first' | 'second'` inside an hour that happened twice; the range endpoint uses it.
+
 ## Layout
 
 | Path | What |
@@ -109,7 +136,8 @@ The rule behind "Periods that especially activate this area" (FR-TIME-07, FR-LA-
 | `src/dasha.ts` | Vimshottari timeline, current period and coming up (step 0.3.1). |
 | `src/transits.ts` | Positions now, sign-change search (Saturn, Jupiter, Rahu/Ketu) and Sade Sati (step 0.3.2). |
 | `src/life-areas.ts` | Life-area table, graha → life-area links with reasons, periods for one area (step 0.3.4). |
-| `src/time.ts` | `localToUtc()`. Uses the Temporal API (`@js-temporal/polyfill`) with the runtime's built-in IANA tz database. |
+| `src/approx-time.ts` | Approximate-time scanner: change moments, segments, certain values, dasha date ranges (step 0.3.6). |
+| `src/time.ts` | `localToUtc()` and its reverse `utcToLocal()`. Uses the Temporal API (`@js-temporal/polyfill`) with the runtime's built-in IANA tz database. |
 | `src/zodiac.ts` | Sign / nakshatra / pada / D-9 arithmetic, done in arcseconds. |
 | `src/dignity.ts`, `src/aspects.ts`, `src/combustion.ts` | The rule tables from D-076, D-012, D-077. |
 | `src/settings.ts`, `src/ids.ts`, `src/version.ts` | Settings, stable IDs and sign lords, and the engine version. |

@@ -88,6 +88,20 @@ export function siderealGrahas(eph: EphemerisAdapter, jd: number): Record<GrahaC
   return raw;
 }
 
+/**
+ * Lagna (D-073): tropical ascendant minus the Lahiri ayanamsa WITHOUT nutation, degrees [0, 360).
+ * Shared by the chart and the approximate-time scanner (step 0.3.6), so both give the same Lagna.
+ */
+export function lagnaLongitude(eph: EphemerisAdapter, jd: number, lat: number, lng: number): number {
+  return normalizeDegrees(eph.tropicalAscendant(jd, lat, lng) - eph.ayanamsaWithoutNutation(jd));
+}
+
+/** Checks a latitude/longitude pair the same way for every calculation (ChartInputError). */
+export function checkLocation(lat: number, lng: number): void {
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) throw new ChartInputError(`Latitude must be between −90 and 90, got ${lat}.`);
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) throw new ChartInputError(`Longitude must be between −180 and 180, got ${lng}.`);
+}
+
 export function calculateChart(
   input: ChartInput,
   options: { settings?: Partial<Record<keyof Settings, unknown>>; ephemeris?: EphemerisAdapter } = {},
@@ -95,16 +109,14 @@ export function calculateChart(
   const settings = resolveSettings(options.settings);
   const eph = options.ephemeris ?? getDefaultAdapter();
   const { lat, lng } = input;
-  if (!Number.isFinite(lat) || lat < -90 || lat > 90) throw new ChartInputError(`Latitude must be between −90 and 90, got ${lat}.`);
-  if (!Number.isFinite(lng) || lng < -180 || lng > 180) throw new ChartInputError(`Longitude must be between −180 and 180, got ${lng}.`);
+  checkLocation(lat, lng);
 
   const t = utcParts(input.utc);
   const jd = eph.julianDayUt(t.year, t.month, t.day, t.hours);
 
   const raw = siderealGrahas(eph, jd);
 
-  // Lagna (D-073): tropical ascendant minus the Lahiri ayanamsa WITHOUT nutation.
-  const lagnaLon = normalizeDegrees(eph.tropicalAscendant(jd, lat, lng) - eph.ayanamsaWithoutNutation(jd));
+  const lagnaLon = lagnaLongitude(eph, jd, lat, lng);
   const lagna = placement(lagnaLon);
 
   const bodies = {} as Record<BodyCode, BodyResult>;
