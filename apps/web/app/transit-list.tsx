@@ -1,8 +1,8 @@
 "use client";
 
 // "Transits and Sade Sati" (step 0.3.7, D-113 item 4, FR-TR-01…03; 0.3.7.1, D-115 item 6: the sign
-// changes and the list of all Sade Sati periods are collapsed by default, each behind an opener with a
-// one-line summary, rows drawn only when opened; looser spacing): today's positions of the 9 grahas,
+// changes are collapsed by default, one opener per planet, rows drawn only when opened; looser spacing;
+// 0.3.7.2, D-117 items 1–2: every Sade Sati period is its own opener, phases and dips inside, indented): today's positions of the 9 grahas,
 // the sign changes of Saturn, Jupiter, Rahu and Ketu exactly as the chart API returns them, the Sade
 // Sati status and every Sade Sati period with its phases; each period opens to show Saturn's sign
 // changes inside it (drawn only when opened). Dates on the clock at birth (D-098, D-099 item 6).
@@ -10,7 +10,7 @@
 import { useState } from "react";
 import { fill } from "@/lib/chart-format";
 import type { ListContext } from "@/lib/list-context";
-import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, sadeSatiSummary, signChangeGroups, signChangeSummary } from "@/lib/transit-view";
+import { positionRows, sadeSatiPeriodViews, sadeSatiIntro, sadeSatiStatus, signChangeGroups, signChangeSummary } from "@/lib/transit-view";
 import { Chevron, ListCard, Marker, Sep } from "./list-bits";
 import { Cell } from "./planet-table";
 import { SadeSatiStatusBlock } from "./right-now";
@@ -35,7 +35,7 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
       else n.add(p);
       return n;
     });
-  const [allOpen, setAllOpen] = useState(false);
+  const periods = sadeSatiPeriodViews(ctx);
 
   return (
     <ListCard id="transit-list-title" title={tr.title}>
@@ -132,85 +132,70 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
       <h4 id="sade-sati-all-title" className="mt-6 font-semibold">
         {t.sadeSati.allTitle}
       </h4>
-      <p className="text-sm text-muted">{t.sadeSati.allIntro}</p>
-      {ctx.result.transits.sadeSati.periods.length === 0 ? (
-        <p className="mt-2">{t.sadeSati.none}</p>
-      ) : (
-        <>
-          <button
-            type="button"
-            className="dasha-opener list-section-opener mt-2"
-            aria-expanded={allOpen}
-            aria-controls={allOpen ? "sade-sati-all-list" : undefined}
-            onClick={() => setAllOpen((o) => !o)}
-          >
-            <Chevron open={allOpen} />
-            <span>{sadeSatiSummary(ctx)}</span>
-            <span className="sr-only"> ({t.sadeSati.allShow})</span>
-          </button>
-          {allOpen && (
-            <ol id="sade-sati-all-list" aria-labelledby="sade-sati-all-title" className="mt-2">
-              {sadeSatiPeriodViews(ctx).map((p) => {
-                const isOpen = open.has(p.index);
-                const subId = `sade-sati-crossings-${p.index}`;
-                return (
-                  <li key={p.key} className="sade-sati-period">
-                    <button
-                      type="button"
-                      className="dasha-opener"
-                      aria-expanded={isOpen}
-                      aria-controls={isOpen ? subId : undefined}
-                      onClick={() => toggle(p.index)}
-                    >
-                      <Chevron open={isOpen} />
-                      <span className="dasha-row-text">
-                        <span className="tabular-nums font-semibold">{p.range}</span>
-                        {(p.current || p.beganBeforeBirth) && (
-                          <span className="flex flex-wrap gap-1.5">
-                            {p.current && (
-                              <>
-                                <Sep />
-                                <Marker strong>{t.youAreHere}</Marker>
-                              </>
-                            )}
-                            {p.beganBeforeBirth && (
-                              <>
-                                <Sep />
-                                <Marker>{t.beganBeforeBirth}</Marker>
-                              </>
-                            )}
-                          </span>
+      <p className="text-sm text-muted">{sadeSatiIntro(ctx)}</p>
+      {/* One opener per period, always listed (0.3.7.2, D-117 item 1): closed = the date range and its
+          markers; open = Rising/Peak/Setting, then Saturn's sign changes under their own sub-heading. */}
+      {periods.length > 0 && (
+        <ol aria-labelledby="sade-sati-all-title" className="mt-2">
+          {periods.map((p) => {
+            const isOpen = open.has(p.index);
+            const subId = `sade-sati-period-${p.index}`;
+            return (
+              <li key={p.key} className="sade-sati-period">
+                <button
+                  type="button"
+                  className="dasha-opener"
+                  aria-expanded={isOpen}
+                  aria-controls={isOpen ? subId : undefined}
+                  onClick={() => toggle(p.index)}
+                >
+                  <Chevron open={isOpen} />
+                  <span className="dasha-row-text">
+                    <span className="tabular-nums font-semibold">{p.range}</span>
+                    {(p.current || p.beganBeforeBirth) && (
+                      <span className="flex flex-wrap gap-1.5">
+                        {p.current && (
+                          <>
+                            <Sep />
+                            <Marker strong>{t.youAreHere}</Marker>
+                          </>
+                        )}
+                        {p.beganBeforeBirth && (
+                          <>
+                            <Sep />
+                            <Marker>{t.beganBeforeBirth}</Marker>
+                          </>
                         )}
                       </span>
-                      <span className="sr-only"> ({fill(t.sadeSati.opensLabel, { period: p.range })})</span>
-                    </button>
-                    <ul className="airy-list ml-7 text-sm">
+                    )}
+                  </span>
+                  <span className="sr-only"> ({fill(t.sadeSati.opensLabel, { period: p.range })})</span>
+                </button>
+                {isOpen && (
+                  <div id={subId} className="sade-sati-body">
+                    <ul className="airy-list text-[15px]">
                       {p.phases.map((ph) => (
                         <li key={ph.phase}>{ph.text}</li>
                       ))}
                     </ul>
-                    {isOpen && (
-                      <div id={subId} className="dasha-sub">
-                        <p id={`${subId}-label`} className="text-sm font-semibold text-muted">
-                          {fill(t.sadeSati.crossingsLabel, { period: p.range })}
-                        </p>
-                        <ol aria-labelledby={`${subId}-label`} className="airy-list mt-1 text-[15px]">
-                          {p.crossings.map((r) => (
-                            <li key={r.key} className="list-dated-row">
-                              <span className="list-date tabular-nums">{r.date}</span>
-                              <Sep />
-                              <span>{r.text}</span>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </>
+                    <h5 id={`${subId}-dips`} className="sade-sati-subheading">
+                      {t.sadeSati.crossingsHeading}
+                    </h5>
+                    <ol aria-labelledby={`${subId}-dips`} className="airy-list text-[15px]">
+                      {p.crossings.map((r) => (
+                        <li key={r.key} className="list-dated-row">
+                          <span className="list-date tabular-nums">{r.date}</span>
+                          <Sep />
+                          <span>{r.text}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
       )}
     </ListCard>
   );

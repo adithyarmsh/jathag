@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.11 · 2026-11-24 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.12 · 2026-11-24 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -118,6 +118,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.3.6 | CODE | Approximate-time scanner (segments, certain vs uncertain values, dasha date ranges) in the engine, plus `POST /api/chart/range` for a local from–to range, no screen (D-111) | Tests pass (the five 0.3.5 cases); whole-day scan timed on Vercel |
 | 0.3.7 | CODE | Show all of the above as plain lists on the live site | Live |
 | 0.3.7.1 | CODE | Founder feedback on the live lists and chart (D-115): "Coming soon" tags to the bottom in red, smaller sign and house labels in the chart, Moon sign / nakshatra / pada in the chart centre, roomier "Right now" card with clear Mahadasha / Antardasha / Pratyantardasha tiers, collapsible sign changes and Sade Sati periods, JHora wording removed from the date notes | Live; founder checks |
+| 0.3.7.2 | CODE | Founder polish round 2 (D-117): Sade Sati periods as four openers (Rising/Peak/Setting inside), clearer and indented dip list, level colours in the Dasha periods card, background dots become random four-point stars (twice as many, bigger = brighter, new positions on every load) | Live; founder checks |
 
 ## v0.4 — Design system + app shell
 

@@ -20,7 +20,8 @@
   --accent-border: rgba(122, 92, 30, 0.3);
   --sun-soft: #fbefcf;
   --shadow: 0 1px 2px rgba(27, 22, 36, 0.04), 0 6px 20px rgba(27, 22, 36, 0.05);
-  --dust: rgba(122, 92, 30, 0.3);
+  --star: #7a5c1e;
+  --star-strength: 0.3;
   color-scheme: light;
 }
 
@@ -38,7 +39,8 @@
     --accent-border: rgba(212, 178, 106, 0.35);
     --sun-soft: #3a3324;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
-    --dust: rgba(212, 178, 106, 0.38);
+    --star: #d4b26a;
+    --star-strength: 0.38;
     color-scheme: dark;
   }
 }
@@ -55,28 +57,9 @@
   --accent-border: rgba(212, 178, 106, 0.35);
   --sun-soft: #3a3324;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 48px -24px rgba(0, 0, 0, 0.7);
-  --dust: rgba(212, 178, 106, 0.38);
+  --star: #d4b26a;
+  --star-strength: 0.38;
   color-scheme: dark;
-}
-
-/* "Star dust" in both modes (D-065): 14 tiny gold dots, repeated every 320px,
-   on the page background only (cards cover it). Pure CSS, no images. */
-:root {
-  --stardust:
-    radial-gradient(circle at 18px 34px, var(--dust) 0.9px, transparent 1.5px),
-    radial-gradient(circle at 96px 12px, var(--dust) 0.6px, transparent 1.2px),
-    radial-gradient(circle at 168px 58px, var(--dust) 1.2px, transparent 1.8px),
-    radial-gradient(circle at 252px 24px, var(--dust) 0.7px, transparent 1.3px),
-    radial-gradient(circle at 300px 96px, var(--dust) 1px, transparent 1.6px),
-    radial-gradient(circle at 54px 118px, var(--dust) 0.7px, transparent 1.3px),
-    radial-gradient(circle at 128px 150px, var(--dust) 1.1px, transparent 1.7px),
-    radial-gradient(circle at 214px 132px, var(--dust) 0.6px, transparent 1.2px),
-    radial-gradient(circle at 276px 190px, var(--dust) 0.8px, transparent 1.4px),
-    radial-gradient(circle at 22px 214px, var(--dust) 1px, transparent 1.6px),
-    radial-gradient(circle at 104px 246px, var(--dust) 0.6px, transparent 1.2px),
-    radial-gradient(circle at 190px 226px, var(--dust) 0.9px, transparent 1.5px),
-    radial-gradient(circle at 236px 290px, var(--dust) 1.2px, transparent 1.8px),
-    radial-gradient(circle at 70px 302px, var(--dust) 0.8px, transparent 1.4px);
 }
 
 @theme inline {
@@ -96,10 +79,33 @@
 }
 
 body {
+  position: relative; /* the star layer (app/star-field.tsx) covers the body */
   background-color: var(--bg);
-  background-image: var(--stardust);
-  background-size: 320px 320px;
   color: var(--ink);
+}
+
+/* Background stars (0.3.7.2, D-117 item 4; amends D-065): random four-point stars drawn by
+   app/star-field.tsx, in the gold of each theme at the old dots' strength (--star-strength); each star
+   adds its own 0.5–1 brightness. Behind everything, scrolls with the page, never takes clicks. */
+.star-field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.star-field-svg {
+  display: block;
+  fill: var(--star);
+  opacity: var(--star-strength);
+  animation: star-fade-in 600ms ease-out;
+}
+@keyframes star-fade-in {
+  from { opacity: 0; }
+  to { opacity: var(--star-strength); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-field-svg { animation: none; }
 }
 
 /*
@@ -120,7 +126,7 @@ body {
   border-color: var(--accent);
 }
 
-/* Text that sits on the page background: a solid backing so no star-dust dot
+/* Text that sits on the page background: a solid backing so no background star
    is ever behind letters (keeps WCAG contrast exact). Invisible otherwise. */
 .text-on-dust {
   background-color: var(--bg);
@@ -684,4 +690,38 @@ html {
 }
 .planet-opener .list-chevron {
   margin-top: 0.3rem;
+}
+
+/* ---------------------------------------------------------------- 0.3.7.2: founder polish round 2 (D-117) */
+
+/* Dasha periods rows (item 3): a left rule in the level's colour, the same tokens as the Right now tiers.
+   The level is also told apart by the sub-list labels and the indentation. No text sits on the colour. */
+.dasha-row {
+  border-left: 3px solid transparent;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.dasha-row-1 { border-left-color: var(--tier-1); }
+.dasha-row-2 { border-left-color: var(--tier-2); }
+.dasha-row-3 { border-left-color: var(--tier-3); }
+.dasha-opener.dasha-row {
+  padding-left: 0.5rem;
+}
+.dasha-leaf.dasha-row {
+  padding-left: 2rem;
+}
+
+/* Inside an opened Sade Sati period (items 1–2): indented about 15 px from the date range, with the thin
+   guide line; Saturn's sign changes under their own small sub-heading. */
+.sade-sati-body {
+  margin: 0.25rem 0 0.75rem 0.75rem;
+  padding-left: 1.875rem;
+  border-left: 1px solid var(--line);
+}
+.sade-sati-subheading {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
 }

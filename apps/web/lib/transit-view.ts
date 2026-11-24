@@ -122,12 +122,16 @@ export const signChangeRowCount = (ctx: ListContext) =>
 
 // ---------------------------------------------------------------- Sade Sati
 
-/** "4 periods from birth to 120 years after birth" for the closed Sade Sati list. */
-export function sadeSatiSummary(ctx: ListContext): string {
+/**
+ * The sentence under "All Sade Sati periods" (0.3.7.2, D-117 item 1), with the number of periods merged
+ * in: "Every Sade Sati from birth to 120 years after birth: 4 periods. Open one to see …"; its own form
+ * for one period, and the "none" line when there is no period.
+ */
+export function sadeSatiIntro(ctx: ListContext): string {
   const s = ctx.t.lists.sadeSati;
   const n = ctx.result.transits.sadeSati.periods.length;
   if (n === 0) return s.none;
-  return n === 1 ? s.allSummaryOne : fill(s.allSummary, { count: n });
+  return n === 1 ? s.allIntroOne : fill(s.allIntro, { count: n });
 }
 
 /** A Sade Sati date, or words when it lies outside the ephemeris data (null in the API). */
