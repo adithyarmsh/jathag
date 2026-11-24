@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { calculateChart } from '@jathag/engine';
 import { loadBirths } from './scripts/parse.mjs';
 import { tableRows, TABLE_BODIES } from '../../apps/web/lib/chart-format.ts';
-import { LABEL_AREA, SIGN_CELLS, southChartBoxes } from '../../apps/web/lib/south-chart.ts';
+import { LABEL_AREA, moonFacts, SIGN_CELLS, southChartBoxes } from '../../apps/web/lib/south-chart.ts';
 import en from '../../apps/web/messages/en.json';
 
 type Birth = { id: string; date: string; time: string; utc_offset: number; lat: number; lng: number };
@@ -33,6 +33,10 @@ describe('South Indian chart matches the planet table for every reference birth'
     const rows = tableRows(chart, t);
     const boxes = southChartBoxes(chart, t);
     expect(boxes).toHaveLength(12);
+
+    // Centre (0.3.7.1, D-115 item 3): the Moon's sign, nakshatra and pada equal the table's Moon row
+    const moonRow = rows.find((r) => r.code === 'Mo')!;
+    expect(moonFacts(chart, t), id).toEqual({ sign: moonRow.sign, nakshatra: moonRow.nakshatra, pada: moonRow.pada });
 
     // Every body exactly once, in the box of the sign the table shows
     const seen = boxes.flatMap((box) => box.bodies.map((body) => ({ box, body })));

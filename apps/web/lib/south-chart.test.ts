@@ -4,6 +4,13 @@ import en from "../messages/en.json";
 import {
   CELL,
   CENTRE_LINE_WIDTH,
+  CENTRE_PADDING,
+  centreLines,
+  HOUSE_BASELINE,
+  HOUSE_FONT,
+  moonFacts,
+  SIGN_BASELINE,
+  SIGN_FONT,
   FONT_SIZES,
   houseFromLagna,
   LABEL_AREA,
@@ -196,5 +203,57 @@ describe("placeLines", () => {
     expect(lines.length).toBeLessThanOrEqual(2);
     lines.forEach((l) => expect(fits(l)).toBe(true));
     expect(lines[0]!.endsWith("…")).toBe(true);
+  });
+});
+
+describe("chart centre with the Moon's sign, nakshatra and pada (D-115 item 3)", () => {
+  const moonChart = (sign: number, nakshatra: number, pada: number) =>
+    ({ bodies: { Mo: { sign, nakshatra, pada } } }) as unknown as Chart;
+  const birth = { date: "28 September 1992", time: "12:45 PM", place: "Kandivli, Mumbai Suburban, Maharashtra, India" };
+
+  it("puts the lines in order: title, date, time, Moon sign, nakshatra, pada, place", () => {
+    const lines = centreLines(moonChart(9, 26, 4), birth, t);
+    expect(lines.map((l) => l.text)).toEqual([
+      "Rasi chart (D-1)",
+      "28 September 1992",
+      "12:45 PM",
+      "Moon sign (Rasi): Sagittarius",
+      "Nakshatra: Uttara Bhadrapada",
+      "Pada: 4",
+      ...placeLines(birth.place),
+    ]);
+    expect(lines.map((l) => l.kind)).toEqual(["title", "birth", "birth", "moon", "moon", "moon", "place", "place"].slice(0, lines.length));
+    expect(moonFacts(moonChart(9, 26, 4), t)).toEqual({ sign: "Sagittarius", nakshatra: "Uttara Bhadrapada", pada: "4" });
+  });
+
+  it("fits every sign × nakshatra with the longest place and date: inside the width, clear of the frame, no overlap", () => {
+    const longPlace = "Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch, Wales, United Kingdom";
+    const longDate = "30 September 2000";
+    for (let sign = 1; sign <= 12; sign++)
+      for (let nak = 1; nak <= 27; nak++) {
+        const lines = centreLines(moonChart(sign, nak, 4), { date: longDate, time: "12:59 AM", place: longPlace }, t);
+        for (const l of lines) expect(textWidthEm(l.text) * l.size, l.text).toBeLessThanOrEqual(CENTRE_LINE_WIDTH);
+        const top = lines[0]!.y - lines[0]!.size; // above the first baseline: at most one font size
+        const bottom = lines.at(-1)!.y + lines.at(-1)!.size * 0.25;
+        expect(top).toBeGreaterThanOrEqual(CELL + CENTRE_PADDING);
+        expect(bottom).toBeLessThanOrEqual(3 * CELL - CENTRE_PADDING);
+        for (let i = 1; i < lines.length; i++) expect(lines[i]!.y - lines[i - 1]!.y).toBeGreaterThanOrEqual(lines[i]!.size);
+      }
+  });
+
+  it("box labels are about 30% smaller than before (9.5 / 9), planet labels unchanged", () => {
+    expect(SIGN_FONT / 9.5).toBeCloseTo(0.7, 1);
+    expect(HOUSE_FONT / 9).toBeCloseTo(0.7, 1);
+    expect(FONT_SIZES).toEqual([14, 13, 12, 11, 10, 9.5]);
+    expect(LABEL_AREA).toEqual({ x: 3, y: 17, width: CELL - 6, height: 49 });
+    // The sign name sits above the label area, the house label below it
+    expect(SIGN_BASELINE).toBeLessThanOrEqual(LABEL_AREA.y);
+    expect(HOUSE_BASELINE - HOUSE_FONT * 0.75).toBeGreaterThanOrEqual(LABEL_AREA.y + LABEL_AREA.height);
+  });
+
+  it("the screen-reader description carries the three facts", () => {
+    expect(t.southChart.svgDescription).toContain("{moonSign}");
+    expect(t.southChart.svgDescription).toContain("{nakshatra}");
+    expect(t.southChart.svgDescription).toContain("{pada}");
   });
 });

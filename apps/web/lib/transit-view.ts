@@ -62,6 +62,8 @@ export interface CrossingRow {
 export interface SignChangeGroup {
   planet: SignChangePlanet;
   name: string;
+  /** Closed-opener line (0.3.7.1): "7 sign changes · next: enters Capricorn on 5 Dec 2026" */
+  summary: string;
   rows: CrossingRow[];
 }
 
@@ -69,18 +71,64 @@ const SIGN_CHANGE_PLANETS: readonly SignChangePlanet[] = ["Sa", "Ju", "Ra", "Ke"
 
 /** Sign changes of Saturn, Jupiter, Rahu and Ketu, each in time order exactly as returned. */
 export function signChangeGroups(ctx: ListContext): SignChangeGroup[] {
-  return SIGN_CHANGE_PLANETS.map((planet) => ({
-    planet,
-    name: grahaName(planet, ctx.t),
-    rows: ctx.result.transits.signChanges[planet].map((c, i) => ({
-      key: `${planet}-${i}`,
-      date: ctx.date(c.utc),
-      text: crossingText(c, ctx),
-    })),
-  }));
+  const tr = ctx.t.lists.transits;
+  const asOf = Date.parse(ctx.result.transits.asOf);
+  return SIGN_CHANGE_PLANETS.map((planet) => {
+    const list = ctx.result.transits.signChanges[planet];
+    const count = list.length === 1 ? tr.planetSummaryOne : fill(tr.planetSummary, { count: list.length });
+    const next = list.find((c) => Date.parse(c.utc) > asOf);
+    const summary = next
+      ? fill(tr.planetSummaryNext, {
+          count,
+          change: fill(tr.crossingShort[next.kind], { sign: signName(next.toSign, ctx.t) }),
+          date: ctx.date(next.utc),
+        })
+      : count;
+    return {
+      planet,
+      name: grahaName(planet, ctx.t),
+      summary,
+      rows: list.map((c, i) => ({
+        key: `${planet}-${i}`,
+        date: ctx.date(c.utc),
+        text: crossingText(c, ctx),
+      })),
+    };
+  });
 }
 
+/**
+ * One-line summary for the closed sign-changes opener (0.3.7.1, D-115 item 6): the next crossing after
+ * the calculation moment across the four planets, e.g. "Next: Rahu enters Capricorn and Ketu enters
+ * Cancer on 6 Dec 2026" (crossings on the same day are joined); a general line if none is left.
+ */
+export function signChangeSummary(ctx: ListContext): string {
+  const tr = ctx.t.lists.transits;
+  const asOf = Date.parse(ctx.result.transits.asOf);
+  const upcoming = SIGN_CHANGE_PLANETS.flatMap((planet) => ctx.result.transits.signChanges[planet])
+    .filter((c) => Date.parse(c.utc) > asOf)
+    .sort((a, b) => Date.parse(a.utc) - Date.parse(b.utc));
+  const first = upcoming[0];
+  if (!first) return tr.signChangesSummary;
+  const day = ctx.date(first.utc);
+  const same = upcoming.filter((c) => ctx.date(c.utc) === day);
+  const changes = same.map((c) => fill(tr.crossingInline[c.kind], { planet: grahaName(c.planet, ctx.t), sign: signName(c.toSign, ctx.t) }));
+  return fill(tr.nextChange, { changes: changes.join(tr.and), date: day });
+}
+
+/** Number of rows the open sign-changes list draws (for the opener's label and tests). */
+export const signChangeRowCount = (ctx: ListContext) =>
+  SIGN_CHANGE_PLANETS.reduce((n, p) => n + ctx.result.transits.signChanges[p].length, 0);
+
 // ---------------------------------------------------------------- Sade Sati
+
+/** "4 periods from birth to 120 years after birth" for the closed Sade Sati list. */
+export function sadeSatiSummary(ctx: ListContext): string {
+  const s = ctx.t.lists.sadeSati;
+  const n = ctx.result.transits.sadeSati.periods.length;
+  if (n === 0) return s.none;
+  return n === 1 ? s.allSummaryOne : fill(s.allSummary, { count: n });
+}
 
 /** A Sade Sati date, or words when it lies outside the ephemeris data (null in the API). */
 function sadeDate(iso: string | null, edge: "before" | "after", ctx: ListContext): string {

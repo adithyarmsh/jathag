@@ -33,27 +33,20 @@ function Features({ t }: { t: Messages }) {
         {t.hero.featuresLabel}
       </h2>
       {/* Inner cards: plain border, no hover highlight (D-066), no numbers (D-067) */}
-      <ul className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:mt-10">
+      {/* Equal-height cards (auto-rows-fr), the "Coming soon" tag pinned to the bottom (D-115 item 1) */}
+      <ul className="grid auto-rows-fr grid-cols-1 gap-3 md:grid-cols-3 lg:mt-10">
         {t.hero.features.map((f) => (
-          <li key={f.title} className="rounded-[18px] border border-line bg-bg px-5 py-6">
-            <h3 className="text-base leading-snug font-semibold">
-              {f.title}
-              {"soon" in f && f.soon && (
-                <>
-                  {" "}
-                  <ComingSoon label={t.hero.comingSoon} />
-                </>
-              )}
-            </h3>
+          <li key={f.title} className="flex flex-col rounded-[18px] border border-line bg-bg px-5 py-6">
+            <h3 className="text-base leading-snug font-semibold">{f.title}</h3>
             <p className="mt-2.5 text-sm leading-relaxed text-muted">
               {f.text}
-              {"soonText" in f && (
-                <>
-                  {" "}
-                  {f.soonText} <ComingSoon label={t.hero.comingSoon} />
-                </>
-              )}
+              {"soonText" in f && <> {f.soonText}</>}
             </p>
+            {(("soon" in f && f.soon) || "soonText" in f) && (
+              <p className="mt-auto pt-4">
+                <ComingSoon label={t.hero.comingSoon} />
+              </p>
+            )}
           </li>
         ))}
       </ul>

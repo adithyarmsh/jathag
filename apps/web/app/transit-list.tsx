@@ -1,6 +1,8 @@
 "use client";
 
-// "Transits and Sade Sati" (step 0.3.7, D-113 item 4, FR-TR-01…03): today's positions of the 9 grahas,
+// "Transits and Sade Sati" (step 0.3.7, D-113 item 4, FR-TR-01…03; 0.3.7.1, D-115 item 6: the sign
+// changes and the list of all Sade Sati periods are collapsed by default, each behind an opener with a
+// one-line summary, rows drawn only when opened; looser spacing): today's positions of the 9 grahas,
 // the sign changes of Saturn, Jupiter, Rahu and Ketu exactly as the chart API returns them, the Sade
 // Sati status and every Sade Sati period with its phases; each period opens to show Saturn's sign
 // changes inside it (drawn only when opened). Dates on the clock at birth (D-098, D-099 item 6).
@@ -8,7 +10,7 @@
 import { useState } from "react";
 import { fill } from "@/lib/chart-format";
 import type { ListContext } from "@/lib/list-context";
-import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, signChangeGroups } from "@/lib/transit-view";
+import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, sadeSatiSummary, signChangeGroups, signChangeSummary } from "@/lib/transit-view";
 import { Chevron, ListCard, Marker, Sep } from "./list-bits";
 import { Cell } from "./planet-table";
 import { SadeSatiStatusBlock } from "./right-now";
@@ -25,7 +27,15 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
       else n.add(i);
       return n;
     });
-  const periods = sadeSatiPeriodViews(ctx);
+  const [signsOpen, setSignsOpen] = useState<ReadonlySet<string>>(new Set());
+  const toggleSigns = (p: string) =>
+    setSignsOpen((s) => {
+      const n = new Set(s);
+      if (n.has(p)) n.delete(p);
+      else n.add(p);
+      return n;
+    });
+  const [allOpen, setAllOpen] = useState(false);
 
   return (
     <ListCard id="transit-list-title" title={tr.title}>
@@ -65,33 +75,55 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
         </table>
       </div>
 
-      {/* Sign changes (FR-TR-03, FR-TRAN-03) */}
-      <h3 className="list-subheading mt-8">{tr.signChangesTitle}</h3>
+      {/* Sign changes (FR-TR-03, FR-TRAN-03): collapsed by default, rows drawn only when open (D-115 item 6) */}
+      <h3 id="sign-changes-title" className="list-subheading mt-8">
+        {tr.signChangesTitle}
+      </h3>
       <p className="text-sm text-muted">{tr.signChangesIntro}</p>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2">
-        {signChangeGroups(ctx).map((g) => (
-          <div key={g.planet} className="rounded-xl border border-line p-4">
-            <h4 id={`sign-changes-${g.planet}`} className="font-semibold">
-              {g.name}
-            </h4>
-            {g.rows.length === 0 ? (
-              <p className="mt-1 text-sm text-muted">{tr.noSignChanges}</p>
-            ) : (
-              <ol aria-labelledby={`sign-changes-${g.planet}`} className="mt-1 space-y-1 text-[15px]">
-                {g.rows.map((r) => (
-                  <li key={r.key} className="list-dated-row">
-                    <span className="list-date tabular-nums">{r.date}</span>
-                    <Sep />
-                    <span>{r.text}</span>
-                  </li>
+      <p className="mt-2 text-[15px]">{signChangeSummary(ctx)}</p>
+      {/* One opener per planet (a single list is about 50 rows for a typical chart); rows drawn only when open */}
+      <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+        {signChangeGroups(ctx).map((g) => {
+          const isOpen = signsOpen.has(g.planet);
+          const subId = `sign-changes-${g.planet}`;
+          return (
+            <li key={g.planet} className="rounded-xl border border-line">
+              <button
+                type="button"
+                className="dasha-opener planet-opener"
+                aria-expanded={isOpen}
+                aria-controls={isOpen ? subId : undefined}
+                onClick={() => toggleSigns(g.planet)}
+              >
+                <Chevron open={isOpen} />
+                <span>
+                  <span className="block font-semibold">{g.name}</span>
+                  <span className="block text-sm text-muted">{g.summary}</span>
+                </span>
+                <span className="sr-only"> ({fill(tr.signChangesShow, { planet: g.name })})</span>
+              </button>
+              {isOpen &&
+                (g.rows.length === 0 ? (
+                  <p id={subId} className="px-4 pb-4 text-sm text-muted">
+                    {tr.noSignChanges}
+                  </p>
+                ) : (
+                  <ol id={subId} aria-label={g.name} className="airy-list px-4 pb-4 text-[15px]">
+                    {g.rows.map((r) => (
+                      <li key={r.key} className="list-dated-row">
+                        <span className="list-date tabular-nums">{r.date}</span>
+                        <Sep />
+                        <span>{r.text}</span>
+                      </li>
+                    ))}
+                  </ol>
                 ))}
-              </ol>
-            )}
-          </div>
-        ))}
-      </div>
+            </li>
+          );
+        })}
+      </ul>
 
-      {/* Sade Sati (FR-TR-02, FR-TRAN-04) */}
+      {/* Sade Sati (FR-TR-02, FR-TRAN-04): the status stays visible; all periods collapsed (D-115 item 6) */}
       <h3 className="list-subheading mt-8">{t.sadeSati.title}</h3>
       <div className="mt-2 rounded-xl border border-line p-4">
         <SadeSatiStatusBlock ctx={ctx} view={sadeSatiStatus(ctx)} />
@@ -101,69 +133,84 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
         {t.sadeSati.allTitle}
       </h4>
       <p className="text-sm text-muted">{t.sadeSati.allIntro}</p>
-      {periods.length === 0 ? (
+      {ctx.result.transits.sadeSati.periods.length === 0 ? (
         <p className="mt-2">{t.sadeSati.none}</p>
       ) : (
-        <ol aria-labelledby="sade-sati-all-title" className="mt-2">
-          {periods.map((p) => {
-            const isOpen = open.has(p.index);
-            const subId = `sade-sati-crossings-${p.index}`;
-            return (
-              <li key={p.key} className="sade-sati-period">
-                <button
-                  type="button"
-                  className="dasha-opener"
-                  aria-expanded={isOpen}
-                  aria-controls={isOpen ? subId : undefined}
-                  onClick={() => toggle(p.index)}
-                >
-                  <Chevron open={isOpen} />
-                  <span className="dasha-row-text">
-                    <span className="tabular-nums font-semibold">{p.range}</span>
-                    {(p.current || p.beganBeforeBirth) && (
-                      <span className="flex flex-wrap gap-1.5">
-                        {p.current && (
-                          <>
-                            <Sep />
-                            <Marker strong>{t.youAreHere}</Marker>
-                          </>
-                        )}
-                        {p.beganBeforeBirth && (
-                          <>
-                            <Sep />
-                            <Marker>{t.beganBeforeBirth}</Marker>
-                          </>
+        <>
+          <button
+            type="button"
+            className="dasha-opener list-section-opener mt-2"
+            aria-expanded={allOpen}
+            aria-controls={allOpen ? "sade-sati-all-list" : undefined}
+            onClick={() => setAllOpen((o) => !o)}
+          >
+            <Chevron open={allOpen} />
+            <span>{sadeSatiSummary(ctx)}</span>
+            <span className="sr-only"> ({t.sadeSati.allShow})</span>
+          </button>
+          {allOpen && (
+            <ol id="sade-sati-all-list" aria-labelledby="sade-sati-all-title" className="mt-2">
+              {sadeSatiPeriodViews(ctx).map((p) => {
+                const isOpen = open.has(p.index);
+                const subId = `sade-sati-crossings-${p.index}`;
+                return (
+                  <li key={p.key} className="sade-sati-period">
+                    <button
+                      type="button"
+                      className="dasha-opener"
+                      aria-expanded={isOpen}
+                      aria-controls={isOpen ? subId : undefined}
+                      onClick={() => toggle(p.index)}
+                    >
+                      <Chevron open={isOpen} />
+                      <span className="dasha-row-text">
+                        <span className="tabular-nums font-semibold">{p.range}</span>
+                        {(p.current || p.beganBeforeBirth) && (
+                          <span className="flex flex-wrap gap-1.5">
+                            {p.current && (
+                              <>
+                                <Sep />
+                                <Marker strong>{t.youAreHere}</Marker>
+                              </>
+                            )}
+                            {p.beganBeforeBirth && (
+                              <>
+                                <Sep />
+                                <Marker>{t.beganBeforeBirth}</Marker>
+                              </>
+                            )}
+                          </span>
                         )}
                       </span>
-                    )}
-                  </span>
-                  <span className="sr-only"> ({fill(t.sadeSati.opensLabel, { period: p.range })})</span>
-                </button>
-                <ul className="ml-7 space-y-0.5 text-sm">
-                  {p.phases.map((ph) => (
-                    <li key={ph.phase}>{ph.text}</li>
-                  ))}
-                </ul>
-                {isOpen && (
-                  <div id={subId} className="dasha-sub">
-                    <p id={`${subId}-label`} className="text-sm font-semibold text-muted">
-                      {fill(t.sadeSati.crossingsLabel, { period: p.range })}
-                    </p>
-                    <ol aria-labelledby={`${subId}-label`} className="mt-1 space-y-1 text-[15px]">
-                      {p.crossings.map((r) => (
-                        <li key={r.key} className="list-dated-row">
-                          <span className="list-date tabular-nums">{r.date}</span>
-                          <Sep />
-                          <span>{r.text}</span>
-                        </li>
+                      <span className="sr-only"> ({fill(t.sadeSati.opensLabel, { period: p.range })})</span>
+                    </button>
+                    <ul className="airy-list ml-7 text-sm">
+                      {p.phases.map((ph) => (
+                        <li key={ph.phase}>{ph.text}</li>
                       ))}
-                    </ol>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
+                    </ul>
+                    {isOpen && (
+                      <div id={subId} className="dasha-sub">
+                        <p id={`${subId}-label`} className="text-sm font-semibold text-muted">
+                          {fill(t.sadeSati.crossingsLabel, { period: p.range })}
+                        </p>
+                        <ol aria-labelledby={`${subId}-label`} className="airy-list mt-1 text-[15px]">
+                          {p.crossings.map((r) => (
+                            <li key={r.key} className="list-dated-row">
+                              <span className="list-date tabular-nums">{r.date}</span>
+                              <Sep />
+                              <span>{r.text}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </>
       )}
     </ListCard>
   );

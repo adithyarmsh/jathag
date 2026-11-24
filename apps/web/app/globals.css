@@ -341,18 +341,37 @@ html {
   }
 }
 
-/* "Coming soon" tag (item 9): small and calm, on promises not live yet */
+/* "Coming soon" tag (item 9; D-115 item 1): small, muted brick red (not alarm red), one shade per
+   theme; text vs tag background ≥ 4.5:1 in both themes (checked by apps/web/lib/soon-tag.test.ts). */
+:root {
+  --soon-text: #9a3324;
+  --soon-bg: #fbeeea;
+  --soon-border: #e3b4aa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --soon-text: #f0a596;
+    --soon-bg: #3a2024;
+    --soon-border: #7a3e38;
+  }
+}
+:root[data-theme="dark"] {
+  --soon-text: #f0a596;
+  --soon-bg: #3a2024;
+  --soon-border: #7a3e38;
+}
 .coming-soon {
   display: inline-block;
   vertical-align: 0.1em;
-  border: 1px solid var(--line);
+  border: 1px solid var(--soon-border);
   border-radius: 9999px;
-  padding: 0.15rem 0.5rem;
+  background-color: var(--soon-bg);
+  padding: 0.2rem 0.55rem;
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: var(--soon-text);
   white-space: nowrap;
 }
 
@@ -523,8 +542,8 @@ html {
   border-left: 1px solid var(--line);
 }
 .sade-sati-period + .sade-sati-period {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
+  margin-top: 0.7rem; /* 0.3.7.1: a third more air (was 0.5rem) */
+  padding-top: 0.7rem;
   border-top: 1px solid var(--line);
 }
 
@@ -542,4 +561,127 @@ html {
 /* The transit table reuses the planet table's look; its longer headers may wrap. */
 .list-table thead th {
   white-space: normal;
+}
+
+/* ---------------------------------------------------------------- 0.3.7.1: founder feedback (D-115) */
+
+/* Right now tiers (item 4). Each level has its own colour for the label and the left rule; the level is
+   also told apart by its label text, size and indentation (never colour alone). Text colours pass 4.5:1
+   on the card in both themes (checked by apps/web/lib/tier-colours.test.ts). */
+:root {
+  --tier-1: #7a5c1e;
+  --tier-2: #23666f;
+  --tier-3: #6b4a96;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tier-1: #d4b26a;
+    --tier-2: #7fc6cf;
+    --tier-3: #bca6e6;
+  }
+}
+:root[data-theme="dark"] {
+  --tier-1: #d4b26a;
+  --tier-2: #7fc6cf;
+  --tier-3: #bca6e6;
+}
+.right-now-heading {
+  font-size: 1.1875rem;
+  font-weight: 600;
+}
+.tier {
+  --tier: var(--tier-1);
+  border-left: 4px solid var(--tier);
+  padding: 0.15rem 0 0.15rem 1rem;
+}
+.tier-2 {
+  --tier: var(--tier-2);
+  border-left-width: 3px;
+  margin-left: 0.75rem;
+}
+.tier-3 {
+  --tier: var(--tier-3);
+  border-left-width: 2px;
+  margin-left: 1.5rem;
+}
+@media (width >= 40rem) {
+  .tier-2 { margin-left: 1.25rem; }
+  .tier-3 { margin-left: 2.5rem; }
+}
+.tier-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tier);
+}
+.tier-main {
+  margin-top: 0.2rem;
+  line-height: 1.3;
+}
+.tier-lord {
+  font-weight: 650;
+}
+.tier-1 .tier-lord { font-size: 1.625rem; }
+.tier-1 .tier-dates { font-size: 1.1875rem; }
+.tier-2 .tier-lord { font-size: 1.3125rem; }
+.tier-2 .tier-dates { font-size: 1.0625rem; }
+.tier-3 .tier-lord { font-size: 1.125rem; font-weight: 600; }
+.tier-3 .tier-dates { font-size: 1rem; }
+.tier-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.55rem;
+  max-width: 30rem;
+}
+.tier-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--line);
+  overflow: hidden;
+}
+.tier-2 .tier-bar { height: 5px; }
+.tier-3 .tier-bar { height: 4px; }
+.tier-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--tier);
+}
+.tier-percent {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tier-activates {
+  margin-top: 0.4rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Openers for a whole list (sign changes, all Sade Sati periods; item 6): a bordered row with the summary. */
+.list-section-opener {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  align-items: center;
+}
+.list-section-opener .list-chevron {
+  margin-top: 0;
+}
+
+/* More air in the sign-changes and Sade Sati lists (item 7): about a third more than before. */
+.airy-list {
+  line-height: 1.65;
+}
+.airy-list > li + li {
+  margin-top: 0.45rem;
+}
+.planet-opener {
+  padding: 0.75rem 0.85rem;
+}
+.planet-opener .list-chevron {
+  margin-top: 0.3rem;
 }

@@ -7,7 +7,7 @@
 import { forwardRef } from "react";
 import type { ChartResponse } from "@jathag/api";
 import { fill } from "@/lib/chart-format";
-import { CELL, CHART_SIZE, PLACE_FONT, placeLines, southChartBoxes } from "@/lib/south-chart";
+import { CELL, centreLines, CHART_SIZE, HOUSE_BASELINE, HOUSE_FONT, moonFacts, SIGN_BASELINE, SIGN_FONT, southChartBoxes } from "@/lib/south-chart";
 import type { Messages } from "@/lib/i18n";
 
 export interface BirthShown {
@@ -29,17 +29,10 @@ export const SouthChart = forwardRef<
     const s = t.southChart;
     const boxes = southChartBoxes(result.chart, t);
     const lagna = boxes.find((b) => b.isLagna)!;
-    const place = placeLines(birth.place);
 
-    // Centre lines (the merged middle 2 × 2), stacked around the middle of the chart.
-    const centre = [
-      { text: s.centreTitle, size: 15, gap: 0, title: true },
-      { text: birth.date, size: 10.5, gap: 10 },
-      { text: birth.time, size: 10.5, gap: 4 },
-      ...place.map((text, i) => ({ text, size: PLACE_FONT, gap: i === 0 ? 8 : 2.5 })),
-    ];
-    const heights = centre.map((l) => l.gap + l.size * 1.15);
-    let y = CHART_SIZE / 2 - heights.reduce((a, b) => a + b, 0) / 2;
+    // Centre lines (the merged middle 2 × 2), laid out in lib/south-chart.ts (D-115 item 3).
+    const centre = centreLines(result.chart, birth, t);
+    const moon = moonFacts(result.chart, t);
 
     return (
       <section
@@ -59,7 +52,9 @@ export const SouthChart = forwardRef<
             className="south-chart block h-auto w-full font-sans"
           >
             <title id="south-chart-svg-title">{s.svgTitle}</title>
-            <desc id="south-chart-svg-desc">{fill(s.svgDescription, { sign: lagna.signName })}</desc>
+            <desc id="south-chart-svg-desc">
+              {fill(s.svgDescription, { sign: lagna.signName, moonSign: moon.sign, nakshatra: moon.nakshatra, pada: moon.pada })}
+            </desc>
 
             {boxes.map((box) => {
               const x = box.col * CELL;
@@ -68,7 +63,7 @@ export const SouthChart = forwardRef<
                 <g key={box.sign} transform={`translate(${x} ${top})`}>
                   <rect x={0} y={0} width={CELL} height={CELL} className="south-chart-line" />
                   {box.isLagna && <line x1={0} y1={MARK} x2={MARK} y2={0} className="south-chart-lagna" />}
-                  <text x={CELL / 2} y={11.5} textAnchor="middle" fontSize={9.5} fontWeight={500} className="fill-muted">
+                  <text x={CELL / 2} y={SIGN_BASELINE} textAnchor="middle" fontSize={SIGN_FONT} fontWeight={500} className="fill-muted">
                     {box.signName}
                   </text>
                   {box.layout.labels.map((l) => (
@@ -83,7 +78,7 @@ export const SouthChart = forwardRef<
                       {l.text}
                     </text>
                   ))}
-                  <text x={CELL / 2} y={CELL - 4.5} textAnchor="middle" fontSize={9} className="fill-muted">
+                  <text x={CELL / 2} y={HOUSE_BASELINE} textAnchor="middle" fontSize={HOUSE_FONT} className="fill-muted">
                     {box.houseLabel}
                   </text>
                 </g>
@@ -92,22 +87,19 @@ export const SouthChart = forwardRef<
 
             {/* The merged centre: one frame round the middle 2 × 2 */}
             <rect x={CELL} y={CELL} width={2 * CELL} height={2 * CELL} className="south-chart-line" />
-            {centre.map((l, i) => {
-              y += heights[i]!;
-              return (
-                <text
-                  key={i}
-                  x={CHART_SIZE / 2}
-                  y={y - l.size * 0.25}
-                  textAnchor="middle"
-                  fontSize={l.size}
-                  fontWeight={l.title ? 500 : 400}
-                  className={l.title ? "south-chart-title fill-ink font-serif" : i <= 2 ? "fill-ink" : "fill-muted"}
-                >
-                  {l.text}
-                </text>
-              );
-            })}
+            {centre.map((l, i) => (
+              <text
+                key={i}
+                x={CHART_SIZE / 2}
+                y={l.y}
+                textAnchor="middle"
+                fontSize={l.size}
+                fontWeight={l.kind === "title" ? 500 : 400}
+                className={l.kind === "title" ? "south-chart-title fill-ink font-serif" : l.kind === "place" ? "fill-muted" : "fill-ink"}
+              >
+                {l.text}
+              </text>
+            ))}
           </svg>
         </div>
         <p className="mx-auto mt-4 max-w-[560px] text-xs leading-relaxed text-muted">{s.key}</p>

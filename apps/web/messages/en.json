@@ -152,7 +152,7 @@
     "settingsLine": "Settings: {ayanamsa} · {node} · {houses}",
     "placeLine": "Place: {lat}, {lng} · Clock used: {offset}",
     "engineLine": "Engine version {version}",
-    "methodLine": "Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · checked against Jagannatha Hora",
+    "methodLine": "Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · verified against independent reference charts",
     "settings": {
       "ayanamsa": { "lahiri": "Lahiri ayanamsa" },
       "node": { "mean": "mean node", "true": "true node" },
@@ -181,7 +181,11 @@
       "heading": "South Indian Birth Chart",
       "centreTitle": "Rasi chart (D-1)",
       "svgTitle": "South Indian Rasi chart",
-      "svgDescription": "Lagna in {sign}. The planet table below lists every position in words.",
+      "svgDescription": "Lagna in {sign}. Moon sign (Rasi): {moonSign}, nakshatra: {nakshatra}, pada: {pada}. The planet table below lists every position in words.",
+      "moonSign": "Moon sign (Rasi)",
+      "nakshatra": "Nakshatra",
+      "pada": "Pada",
+      "centreFact": "{label}: {value}",
       "retrogradeMark": "(R)",
       "houseLabel": "{n} house",
       "ordinals": ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th"],
@@ -219,8 +223,8 @@
     "monthsShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     "dateRange": "{start} – {end}",
     "asOf": "As of {date}",
-    "clockNote": "Dates are shown on the clock used at birth ({offset} for this chart), as in Jagannatha Hora.",
-    "clockPointer": "Dates use the clock at birth ({offset}), as in Jagannatha Hora.",
+    "clockNote": "Dates are shown on the clock used at birth ({offset} for this chart).",
+    "clockPointer": "Dates use the clock at birth ({offset}).",
     "youAreHere": "You are here",
     "beganBeforeBirth": "Began before birth",
     "levels": {
@@ -239,6 +243,10 @@
       "pratyantardasha": "short-term"
     },
     "levelLabel": "{level} ({term})",
+    "termsTitle": {"mahadasha": "Long-term", "antardasha": "Medium-term", "pratyantardasha": "Short-term"},
+    "tierLabel": "{term} · {level}",
+    "progressText": "About {percent}% through",
+    "progressLabel": "How far through the {level}",
     "subListLabel": "{levels} ({term}) in the {lord} {level}",
     "opensLabel": "Show the {levels} in the {lord} {level}",
     "rightNow": {
@@ -274,7 +282,16 @@
         "moves-back": "Moves back into {sign}",
         "enters-again": "Enters {sign} again"
       },
-      "noSignChanges": "No sign change in this window."
+      "noSignChanges": "No sign change in this window.",
+    "crossingInline": {"enters": "{planet} enters {sign}", "moves-back": "{planet} moves back into {sign}", "enters-again": "{planet} enters {sign} again"},
+    "nextChange": "Next: {changes} on {date}",
+    "signChangesSummary": "Sign changes of Saturn, Jupiter, Rahu and Ketu",
+    "and": " and ",
+    "signChangesShow": "Show the sign changes of {planet}",
+    "crossingShort": {"enters": "enters {sign}", "moves-back": "moves back into {sign}", "enters-again": "enters {sign} again"},
+    "planetSummary": "{count} sign changes",
+    "planetSummaryOne": "1 sign change",
+    "planetSummaryNext": "{count} · next: {change} on {date}"
     },
     "sadeSati": {
       "title": "Sade Sati",
@@ -297,6 +314,9 @@
       "saturnNow": "Saturn now: {sign}, house {house} from the Moon",
       "allTitle": "All Sade Sati periods",
       "allIntro": "Every Sade Sati from birth to 120 years after birth. Open a period to see each of Saturn's sign changes inside it.",
+    "allSummary": "{count} periods from birth to 120 years after birth",
+    "allSummaryOne": "1 period from birth to 120 years after birth",
+    "allShow": "Show all Sade Sati periods",
       "none": "No Sade Sati between birth and 120 years after birth.",
       "opensLabel": "Show Saturn's sign changes in the Sade Sati of {period}",
       "crossingsLabel": "Saturn's sign changes in the Sade Sati of {period}",

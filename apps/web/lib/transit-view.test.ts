@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fakeResponse } from "./list-fixtures";
 import { listContext } from "./list-context";
-import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, signChangeGroups } from "./transit-view";
+import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, sadeSatiSummary, signChangeGroups, signChangeRowCount, signChangeSummary } from "./transit-view";
 import en from "../messages/en.json";
 
 const AS_OF = "2026-11-22T06:00:00.000Z";
@@ -130,5 +130,42 @@ describe("transit lists", () => {
     expect(sadeSatiStatus(ctx).nextText).toBe("Next Sade Sati starts 1 Jan 2398");
     const words = JSON.stringify(sadeSatiPeriodViews(ctx));
     expect(words).not.toMatch(/null|undefined|NaN|Invalid/);
+  });
+});
+
+describe("collapsed-list summaries (0.3.7.1, D-115 item 6)", () => {
+  it("sign changes: the next change after asOf, same-day changes joined; a general line when none is left", () => {
+    const res = fakeResponse(base);
+    expect(signChangeSummary(listContext(res, en))).toBe("Sign changes of Saturn, Jupiter, Rahu and Ketu");
+    res.transits.signChanges.Ra.push({ planet: "Ra", utc: "2026-12-06T08:00:00Z", fromSign: 11, toSign: 10, kind: "enters" });
+    res.transits.signChanges.Ke.push({ planet: "Ke", utc: "2026-12-06T08:00:00Z", fromSign: 5, toSign: 4, kind: "enters" });
+    res.transits.signChanges.Sa.push({ planet: "Sa", utc: "2027-06-03T00:00:00Z", fromSign: 12, toSign: 1, kind: "enters" });
+    const ctx = listContext(res, en);
+    expect(signChangeSummary(ctx)).toBe("Next: Rahu enters Capricorn and Ketu enters Cancer on 6 Dec 2026");
+    expect(signChangeRowCount(ctx)).toBe(8);
+  });
+
+  it("Sade Sati: number of periods", () => {
+    const res = fakeResponse(base);
+    expect(sadeSatiSummary(listContext(res, en))).toBe("No Sade Sati between birth and 120 years after birth.");
+    const p = { start: "2020-01-01T00:00:00Z", end: "2027-01-01T00:00:00Z", startedBeforeBirth: false, startOutsideData: false, endOutsideData: false, phases: phases(null, null, null, null), crossings: [] };
+    res.transits.sadeSati.periods = [p] as never;
+    expect(sadeSatiSummary(listContext(res, en))).toBe("1 period from birth to 120 years after birth");
+    res.transits.sadeSati.periods = [p, p, p, p] as never;
+    expect(sadeSatiSummary(listContext(res, en))).toBe("4 periods from birth to 120 years after birth");
+  });
+});
+
+describe("per-planet sign-change summaries (0.3.7.1)", () => {
+  it("count and the next change", () => {
+    const res = fakeResponse(base);
+    res.transits.signChanges.Ra.push({ planet: "Ra", utc: "2026-12-06T08:00:00Z", fromSign: 11, toSign: 10, kind: "enters" });
+    const g = signChangeGroups(listContext(res, en));
+    expect(g.map((x) => x.summary)).toEqual([
+      "3 sign changes",
+      "0 sign changes",
+      "2 sign changes · next: enters Capricorn on 6 Dec 2026",
+      "1 sign change",
+    ]);
   });
 });
