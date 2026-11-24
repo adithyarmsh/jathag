@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.4 — Life-area windows (PR open, waiting for Project review) |
-| **Next step** | 0.3.5 — Approximate-time test cases (Project step) |
+| **Current step** | 0.3.5 — Approximate-time test cases (Project step; waiting for the Project's handoff) |
+| **Next step** | 0.3.6 — Approximate-time scanner |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Project review of the 0.3.4 PR |
+| **Blocked on** | Nothing |
 | **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.4; the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, not shown yet; hidden from search engines) |
 | **Last updated** | 2026-11-24 |
 
@@ -129,6 +129,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-24 | 0.3.4 | #18 | Approved by the Project (D-105: built as reported, incl. the small choices). D-105 committed unchanged. Squash-merged. |
 | 2026-11-24 | 0.3.4 | #18 | Life-area windows built: engine table of the 10 life areas (IDs only), each graha linked to the areas whose houses it rules or occupies with every reason (Rahu/Ketu by occupation only, no karaka, no score), `periodsForLifeArea` for all three dasha levels, chart API `lifeAreas` (once per graha, +0.3 KB compressed); engine 0.4.0. Hand-made tests + all 29 births re-derived from `expected/`; 1,265 tests green. D-103 / D-104 committed unchanged; 0.3.2.1 and 0.3.3 marked ✅ (D-103). Waiting for Project review. |
 | 2026-11-23 | 0.3.2.1 | #17 | Approved by the Project with a visible 'Birth chart' header (D-102). D-102 committed unchanged. Squash-merged. |
 | 2026-11-23 | 0.3.2.1 | #17 | Basic South Indian Rasi chart built on the home page (between the form and the table): fixed-sign layout, sign name + "Nth house" from the Lagna in each box, planets as "Sa 20° (R)" (whole degree cut off, like the table; never (R) on Rahu/Ketu), Lagna corner line + "La", date/time/place in the centre, key line underneath; text shrinks only when a box is crowded (even all 10 fit). Page now scrolls to the chart after calculating. Data in `apps/web/lib/south-chart.ts`, drawing in `apps/web/app/south-chart.tsx`; no engine/API/places/reference-data change. 1,205 tests green. D-101 / roadmap v2.7 / requirements v1.10 committed unchanged. Waiting for Project review. |
