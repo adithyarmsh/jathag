@@ -8,12 +8,12 @@
 | | |
 |---|---|
 | **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.3 — JHora spot-check (founder, using `notes/0.3.3-jhora-checklist.md`), in parallel with 0.3.2.1 — Basic South Indian chart (live; founder to compare with his JHora chart, D-102) |
-| **Next step** | 0.3.4 — Life-area windows |
+| **Current step** | 0.3.5 — Approximate-time test cases (Project step; waiting for the Project's handoff) |
+| **Next step** | 0.3.6 — Approximate-time scanner |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Nothing (founder's JHora spot-check and chart comparison) |
-| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.2.1; the chart API also returns the dasha timeline, transits and Sade Sati, not shown yet; hidden from search engines) |
-| **Last updated** | 2026-11-23 |
+| **Blocked on** | Nothing |
+| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.4; the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, not shown yet; hidden from search engines) |
+| **Last updated** | 2026-11-24 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
 
@@ -80,8 +80,10 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 ### v0.3 — Timing engine
 - ✅ 0.3.1 Dashas (3 levels): Vimshottari timeline + current period + coming up in the engine and chart API; all JHora dasha tests pass; dates on the clock at birth (D-098) (PR #15)
 - ✅ 0.3.2 Transits + Sade Sati: positions now with houses from Moon and Lagna, Saturn/Jupiter/Rahu-Ketu sign changes incl. retrograde back-and-forth, Sade Sati periods from birth to +120 years with phases and status, in the engine and chart API; all tests pass; approved as built (D-100) (PR #16)
-- 🔄 0.3.2.1 Basic South Indian chart (D-101): Rasi (D-1) chart drawn as SVG between the form and the planet table, house numbers from the Lagna, whole degrees and (R), Lagna corner mark, birth details in the centre, one-line key; matches the table for all 29 reference births; visible "Birth chart" header (PR #17). Live; founder to compare with his JHora chart (D-102)
-- ⏳ 0.3.3 JHora spot-check · ⏳ 0.3.4 Life-area windows · ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
+- ✅ 0.3.2.1 Basic South Indian chart (D-101): Rasi (D-1) chart drawn as SVG between the form and the planet table, house numbers from the Lagna, whole degrees and (R), Lagna corner mark, birth details in the centre, one-line key; matches the table for all 29 reference births; visible "Birth chart" header (PR #17). Founder's comparison with JHora passed (D-103)
+- ✅ 0.3.3 JHora spot-check: all 8 transit / Sade Sati checks match JHora (D-103)
+- ✅ 0.3.4 Life-area windows: graha → life-area links (rules or occupies one of the area's houses, Requirements §6.6; Rahu/Ketu by occupation only; no karaka; every reason listed) in the engine, period helper for all three dasha levels, chart API `lifeAreas`; all tests pass (PR #18)
+- ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
 
 ### v0.4 — Design system + app shell
 - ⏳ 0.4.1 References · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
@@ -127,6 +129,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-24 | 0.3.4 | #18 | Approved by the Project (D-105: built as reported, incl. the small choices). D-105 committed unchanged. Squash-merged. |
+| 2026-11-24 | 0.3.4 | #18 | Life-area windows built: engine table of the 10 life areas (IDs only), each graha linked to the areas whose houses it rules or occupies with every reason (Rahu/Ketu by occupation only, no karaka, no score), `periodsForLifeArea` for all three dasha levels, chart API `lifeAreas` (once per graha, +0.3 KB compressed); engine 0.4.0. Hand-made tests + all 29 births re-derived from `expected/`; 1,265 tests green. D-103 / D-104 committed unchanged; 0.3.2.1 and 0.3.3 marked ✅ (D-103). Waiting for Project review. |
 | 2026-11-23 | 0.3.2.1 | #17 | Approved by the Project with a visible 'Birth chart' header (D-102). D-102 committed unchanged. Squash-merged. |
 | 2026-11-23 | 0.3.2.1 | #17 | Basic South Indian Rasi chart built on the home page (between the form and the table): fixed-sign layout, sign name + "Nth house" from the Lagna in each box, planets as "Sa 20° (R)" (whole degree cut off, like the table; never (R) on Rahu/Ketu), Lagna corner line + "La", date/time/place in the centre, key line underneath; text shrinks only when a box is crowded (even all 10 fit). Page now scrolls to the chart after calculating. Data in `apps/web/lib/south-chart.ts`, drawing in `apps/web/app/south-chart.tsx`; no engine/API/places/reference-data change. 1,205 tests green. D-101 / roadmap v2.7 / requirements v1.10 committed unchanged. Waiting for Project review. |
 | 2026-11-22 | 0.3.2 | #16 | Approved by the Project (D-100: built as reported, incl. the six small choices). D-100 committed unchanged. Squash-merged. |

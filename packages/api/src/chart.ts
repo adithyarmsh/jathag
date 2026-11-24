@@ -10,6 +10,7 @@ import {
   ChartInputError,
   EphemerisError,
   ENGINE_VERSION,
+  lifeAreasForChart,
   localToUtc,
   resolveSettings,
   SettingsError,
@@ -21,6 +22,7 @@ import {
   type Chart,
   type DashaNow,
   type EphemerisAdapter,
+  type LifeAreaLinks,
   type Settings,
   type Transits,
   type VimshottariTimeline,
@@ -115,6 +117,12 @@ export interface ChartResponse {
    * clock at birth from 0.3.7 (D-099 item 6, D-098).
    */
   transits: Transits;
+  /**
+   * Life-area links (step 0.3.4, D-104): for each of the 9 grahas, the life areas it rules or occupies a
+   * house of, with every reason. Sent once per graha, not per period: a period's life areas are its
+   * lord's (`dashas…lord`), so a screen looks them up here (engine helper `periodsForLifeArea`).
+   */
+  lifeAreas: LifeAreaLinks;
 }
 
 // ---------------------------------------------------------------- validation helpers
@@ -323,5 +331,6 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
     chart,
     dashas: { asOf: now.asOf, vimshottari, current: now.current, next: now.next },
     transits,
+    lifeAreas: lifeAreasForChart(chart),
   };
 }

@@ -45,7 +45,7 @@ Response (shortened):
 ```json
 {
   "apiVersion": 1,
-  "engineVersion": "0.3.0",
+  "engineVersion": "0.4.0",
   "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign", "dashaYear": "365.25" },
   "place": { "kind": "search", "geonameId": 1261481, "lat": 28.6139, "lng": 77.209, "timeZone": "Asia/Kolkata", "countryCode": "IN", "admin1Code": "07", "admin2Code": "094" },
   "clock": { "source": "clockRule", "id": "ist", "chosen": true, "utcOffsetSeconds": 19800, "timeZone": null, "tzdataVersion": null },
@@ -80,7 +80,8 @@ Response (shortened):
       "status": { "asOf": "…", "phase": "setting", "current": { "index": 1, "start": "…", "end": "…", "phases": { … } },
                   "next": { "index": 2, … }, "saturn": { "sign": 12, "houseFromMoon": 2 } }
     }
-  }
+  },
+  "lifeAreas": { "Su": [ { "area": "self", "reasons": [ { "kind": "rules", "house": 1, "sign": 5 } ] }, … ], …, "Ke": [ { "area": "money", "reasons": [ { "kind": "occupies", "house": 11 } ] } ] }
 }
 ```
 `clock.source` is `timeZone` (the place's IANA zone; `tzdataVersion` set), `clockRule` (a "Which clock?" option; `chosen` = sent by the client, otherwise the default) or `manual`. `chart` is exactly the engine's output (`packages/engine/README.md`).
@@ -88,6 +89,8 @@ Response (shortened):
 `dashas` (step 0.3.1, D-096): the full Vimshottari timeline from the engine (`vimshottariForChart`), plus `current` (the period running at `asOf` at each level, `null` before birth or after the 120 years) and `next` (the next start at each level, `null` when none is left). `asOf` is the moment of calculation: the endpoint reads the time when the request arrives (the web route passes it; `handleChartRequest(request, { asOf })` lets tests fix it) and `calculateChartResponse(req, { asOf })` requires it, so the same request + `asOf` gives a byte-identical response. All times are UTC; showing them on the birth place's clock (D-097) is done by the screens from `clock` (0.3.7). The response is about 120 KB raw, about 14 KB gzip-compressed (10 KB Brotli), most of it the 729 pratyantardashas (D-096 item 5).
 
 `transits` (step 0.3.2, D-099): the engine's `transitsForChart` for the same `asOf` as `dashas` — the 9 grahas at asOf with whole-sign houses from the natal Moon and Lagna signs, the sign changes of Saturn, Jupiter, Rahu and Ketu (from the latest `enters` at or before asOf, then 10 years ahead; kinds `enters` / `moves-back` / `enters-again`), and every Sade Sati from birth to 120 years after birth with phases, the crossings inside each period and the status at asOf. Rules and search method: `packages/engine/README.md`. Exact UTC only; shown on the clock at birth by the screens (0.3.7, D-099 item 6). About 14 KB raw / 2.3 KB compressed; the `Server-Timing` header has a `transits` entry with the time it took.
+
+`lifeAreas` (step 0.3.4, D-104): the engine's `lifeAreasForChart` — for each of the 9 grahas, the life areas it rules or occupies a house of, each with every reason (`{ "kind": "rules", "house": 7, "sign": 11 }` / `{ "kind": "occupies", "house": 7 }`). It is sent **once per graha, not per period**: every dasha period already carries its `lord`, and a period's life areas are its lord's, so a screen looks them up here (or uses the engine's `periodsForLifeArea`). About 1.7 KB raw / 0.3 KB compressed. Example (R01, Leo Lagna): `"Sa": [ { "area": "health", "reasons": [ { "kind": "rules", "house": 6, "sign": 10 }, { "kind": "occupies", "house": 6 } ] }, { "area": "relationships", "reasons": [ { "kind": "rules", "house": 7, "sign": 11 } ] }, { "area": "career", "reasons": [ … same as health … ] } ]`.
 
 ### Errors
 

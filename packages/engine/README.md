@@ -15,7 +15,7 @@ From a birth instant (UTC) and a place (latitude/longitude):
 
 Plus **local time → UTC** (FR-CALC-01): an IANA time zone *or* a manual UTC offset in seconds.
 
-And (step 0.3.1) **Vimshottari dashas**, and (step 0.3.2) **transits, sign changes and Sade Sati**; see below.
+And (step 0.3.1) **Vimshottari dashas**, (step 0.3.2) **transits, sign changes and Sade Sati**, and (step 0.3.4) **life-area links**; see below.
 
 Everything uses stable IDs (D-063): signs 1–12, nakshatras 1–27, houses 1–12, body codes `La Su Mo Ma Me Ju Ve Sa Ra Ke`. There are no English names. Every result carries `meta` with the engine version, the settings used, the ephemeris version and data files, and the input.
 
@@ -87,7 +87,17 @@ t.sadeSati.status;     // { asOf, phase: 'setting', current: { index, start, end
 - **Status at asOf:** `none` / `rising` / `peak` / `setting` by the phase rules (a retrograde dip does not change the phase; `saturn` gives Saturn's real sign and house from the Moon), the running period and the next one to start.
 - **Reuse and cost:** Saturn is searched once per chart over one range covering both the Sade Sati span and the sign-change window; about 25 ms per chart on a Mac. (A first version with 5-day steps and plain bisection gave byte-identical results for all 29 births but took 3× longer.)
 - Lower-level pieces (exported for tests): `crossingTimeline`, `rawCrossings`, `sadeSatiPeriods`, and `calculateSadeSati({ moonSign, birthUtc, asOf })` for any Moon sign.
-- Not here (D-099 item 7, FR-TRAN-05): Ashtama/Kantaka Shani, a list of retrograde stations, life-area windows (0.3.4).
+- Not here (D-099 item 7, FR-TRAN-05): Ashtama/Kantaka Shani, a list of retrograde stations, life-area windows (0.3.4, below).
+
+## Life-area links (step 0.3.4, `src/life-areas.ts`)
+
+The rule behind "Periods that especially activate this area" (FR-TIME-07, FR-LA-03, D-028, D-104): a graha is **linked to a life area when it rules or occupies one of that area's houses** (whole-sign houses from the Lagna). Every Vimshottari period, at all three levels, is flagged by **its own lord** (D-104 item 1), so a period's life areas are its lord's links.
+
+- **Areas (IDs, Requirements §6.6):** `self` 1 · `money` 2, 11 · `communication` 3 · `home` 4 · `learning` 5 · `health` 1, 6 · `relationships` 7 · `career` 6, 10 · `luck` 9 · `spirituality` 8, 12 (`LIFE_AREAS`, `LIFE_AREA_HOUSES`). The words for them are not in the engine (D-063).
+- **Lords:** the Parashari sign lords already used for dignity (`SIGN_LORD` in `ids.ts`). **Rahu and Ketu rule nothing**: occupation only (D-104 item 2). The karaka column of §6.6 is **not** used (D-104 item 3). No score (item 4).
+- `lifeAreasForChart(chart)` (or `lifeAreaLinks({ lagnaSign, signs })` for any Lagna and signs) → `{ Su: [...], …, Ke: [...] }`, each graha's list in `LIFE_AREAS` order, one entry per area: `{ area: 'relationships', reasons: [{ kind: 'rules', house: 7, sign: 11 }, { kind: 'occupies', house: 7 }] }`. Reasons are sorted by house; for the same house "rules" comes first. `sign` (rules only) is the ruled sign in that house, needed because a dual lord rules two.
+- `periodsForLifeArea(timeline, links, area, level)` → the periods at one level (`mahadasha` / `antardasha` / `pratyantardasha`) whose lord is linked to `area`, in time order, each `{ path, lord, start, end, reasons }` (`path` = position in the timeline, like `vimshottariNow`). Built on `dashaRefs(timeline, level)` in `dasha.ts` (all 9 / 81 / 729 periods at a level), which `vimshottariNow` now also uses. Includes periods that ended before birth; screens decide what to show (0.3.7, 0.7.5).
+- Pure: no clock, no ephemeris. Measured on the 29 reference births: a graha is linked to 1–4 areas (average 2.5), and each area to 1–6 grahas (average 2.2).
 
 ## Layout
 
@@ -98,6 +108,7 @@ t.sadeSati.status;     // { asOf, phase: 'setting', current: { index, start, end
 | `src/chart.ts` | `calculateChart()`: puts everything together. |
 | `src/dasha.ts` | Vimshottari timeline, current period and coming up (step 0.3.1). |
 | `src/transits.ts` | Positions now, sign-change search (Saturn, Jupiter, Rahu/Ketu) and Sade Sati (step 0.3.2). |
+| `src/life-areas.ts` | Life-area table, graha → life-area links with reasons, periods for one area (step 0.3.4). |
 | `src/time.ts` | `localToUtc()`. Uses the Temporal API (`@js-temporal/polyfill`) with the runtime's built-in IANA tz database. |
 | `src/zodiac.ts` | Sign / nakshatra / pada / D-9 arithmetic, done in arcseconds. |
 | `src/dignity.ts`, `src/aspects.ts`, `src/combustion.ts` | The rule tables from D-076, D-012, D-077. |

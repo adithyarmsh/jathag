@@ -48,7 +48,7 @@ describe('chart: a normal birth', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
     expect(res.headers.get('server-timing')).toMatch(/transits;dur=[\d.]+, calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
     expect(json.apiVersion).toBe(1);
-    expect(json.engineVersion).toBe('0.3.0');
+    expect(json.engineVersion).toBe('0.4.0');
     expect(json.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(json.place).toEqual({ kind: 'search', ...CHENNAI });
     expect(json.clock).toEqual({ source: 'timeZone', id: null, chosen: false, utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata', tzdataVersion: process.versions.tz });
@@ -313,7 +313,7 @@ describe('chart: transits + Sade Sati (step 0.3.2)', () => {
   it('returns positions now, sign changes and Sade Sati for the same asOf as the dashas', async () => {
     const { res, json } = await withAsOf(BASE);
     expect(res.status).toBe(200);
-    expect(Object.keys(json)).toEqual(['apiVersion', 'engineVersion', 'settings', 'place', 'clock', 'utc', 'clockQuestion', 'chart', 'dashas', 'transits']);
+    expect(Object.keys(json)).toEqual(['apiVersion', 'engineVersion', 'settings', 'place', 'clock', 'utc', 'clockQuestion', 'chart', 'dashas', 'transits', 'lifeAreas']);
     const t = json.transits;
     expect(Object.keys(t)).toEqual(['asOf', 'natal', 'positions', 'signChanges', 'sadeSati']);
     expect(t.asOf).toBe(json.dashas.asOf);
@@ -348,5 +348,27 @@ describe('chart: transits + Sade Sati (step 0.3.2)', () => {
     const late = await withAsOf({ date: '2100-12-31', time: '23:59', manual: { lat: 28.6, lng: 77.2, utcOffsetSeconds: 19800 } });
     expect(late.res.status).toBe(200);
     expect(late.json.transits.sadeSati.span.end.slice(0, 4)).toBe('2220');
+  });
+});
+
+describe('chart: life-area links (step 0.3.4)', () => {
+  it('R01 (Leo Lagna): every graha with its life areas and reasons, IDs only', async () => {
+    const { json, text } = await chart(BASE);
+    const r = (house: number, sign: number) => ({ kind: 'rules', house, sign });
+    const o = (house: number) => ({ kind: 'occupies', house });
+    expect(json.lifeAreas).toEqual({
+      Su: [{ area: 'self', reasons: [r(1, 5)] }, { area: 'health', reasons: [r(1, 5)] }, { area: 'spirituality', reasons: [o(12)] }],
+      Mo: [{ area: 'relationships', reasons: [o(7)] }, { area: 'spirituality', reasons: [r(12, 4)] }],
+      Ma: [{ area: 'home', reasons: [r(4, 8)] }, { area: 'career', reasons: [o(10)] }, { area: 'luck', reasons: [r(9, 1)] }],
+      Me: [{ area: 'money', reasons: [r(2, 6), r(11, 3)] }, { area: 'spirituality', reasons: [o(12)] }],
+      Ju: [{ area: 'self', reasons: [o(1)] }, { area: 'learning', reasons: [r(5, 9)] }, { area: 'health', reasons: [o(1)] }, { area: 'spirituality', reasons: [r(8, 12)] }],
+      Ve: [{ area: 'self', reasons: [o(1)] }, { area: 'communication', reasons: [r(3, 7)] }, { area: 'health', reasons: [o(1)] }, { area: 'career', reasons: [r(10, 2)] }],
+      Sa: [{ area: 'health', reasons: [r(6, 10), o(6)] }, { area: 'relationships', reasons: [r(7, 11)] }, { area: 'career', reasons: [r(6, 10), o(6)] }],
+      Ra: [{ area: 'learning', reasons: [o(5)] }],
+      Ke: [{ area: 'money', reasons: [o(11)] }],
+    });
+    // Sent once per graha, not per period: no reasons inside the dasha timeline.
+    expect(JSON.stringify(json.dashas)).not.toContain('reasons');
+    expect(text.match(/"reasons"/g)).toHaveLength(23); // 23 area entries in all
   });
 });

@@ -8,8 +8,10 @@ export type { LocalBirthTime, BirthZone, UtcResult, TimeErrorCode } from './time
 export { DEFAULT_SETTINGS, resolveSettings, SettingsError } from './settings.ts';
 export type { Settings, DashaYearSetting } from './settings.ts';
 export { DASHA_YEAR_DAYS } from './settings.ts';
-export { vimshottariTimeline, vimshottariForChart, vimshottariNow, VIMSHOTTARI_YEARS, VIMSHOTTARI_ORDER, DashaInputError } from './dasha.ts';
-export type { VimshottariTimeline, Mahadasha, Antardasha, DashaPeriod, DashaNow, DashaRef, DashaLevels } from './dasha.ts';
+export { vimshottariTimeline, vimshottariForChart, vimshottariNow, dashaRefs, DASHA_LEVELS, VIMSHOTTARI_YEARS, VIMSHOTTARI_ORDER, DashaInputError } from './dasha.ts';
+export type { VimshottariTimeline, Mahadasha, Antardasha, DashaPeriod, DashaNow, DashaRef, DashaLevels, DashaLevel } from './dasha.ts';
+export { LIFE_AREAS, LIFE_AREA_HOUSES, lifeAreaLinks, lifeAreasForChart, periodsForLifeArea, signsRuledBy, LifeAreaInputError } from './life-areas.ts';
+export type { LifeAreaId, LifeAreaReason, LifeAreaLink, LifeAreaLinks, LifeAreaPeriod } from './life-areas.ts';
 export {
   transitsForChart,
   calculateSadeSati,
