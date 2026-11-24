@@ -10,6 +10,7 @@ import {
   Noto_Serif_Telugu,
 } from "next/font/google";
 import { getMessages } from "@/lib/i18n";
+import { StarField } from "./star-field";
 import "./globals.css";
 
 // Fonts are downloaded at build time and served from this site (no calls to Google at runtime).
@@ -73,6 +74,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        {/* Random background stars, made in the browser after loading (D-117 item 4) */}
+        <StarField />
         {/* On every page until the v1.0 launch (FR-HOME-05, D-060) */}
         <p className="beta-notice border-b border-line px-4 py-2 text-center text-xs leading-snug text-muted sm:text-[13px]">
           {messages.betaNotice}

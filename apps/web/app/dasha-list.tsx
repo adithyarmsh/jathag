@@ -4,7 +4,8 @@
 // Antardashas, each of those to its Pratyantardashas. Sub-rows are only put on the page when opened
 // (up to 729 Pratyantardashas otherwise). Openers are buttons with aria-expanded. The current period at
 // each level says "You are here"; the one running at birth shows its true start and "Began before birth";
-// periods that ended before birth are not shown (D-113 item 3).
+// periods that ended before birth are not shown (D-113 item 3). 0.3.7.2 (D-117 item 3): each row has a
+// left rule in its level's colour, the same tokens as the "Right now" tiers (--tier-1/2/3).
 
 import { useState, type ReactNode } from "react";
 import { fill } from "@/lib/chart-format";
@@ -74,13 +75,13 @@ export function DashaList({ ctx }: { ctx: ListContext }) {
 
   // A plain function, not a component: a component defined here would be re-created on every render,
   // and the button would lose keyboard focus when it is pressed.
-  function opener(row: PeriodRow, child: DashaLevel) {
+  function opener(row: PeriodRow, child: DashaLevel, levelClass: string) {
     const isOpen = open.has(row.key);
     const subId = `dasha-sub-${row.key}`;
     return (
       <button
         type="button"
-        className="dasha-opener"
+        className={`dasha-opener dasha-row ${levelClass}`}
         aria-expanded={isOpen}
         aria-controls={isOpen ? subId : undefined}
         onClick={() => toggle(row.key)}
@@ -96,14 +97,14 @@ export function DashaList({ ctx }: { ctx: ListContext }) {
   }
 
   const renderPratyantar = (r: PeriodRow) => (
-    <li key={r.key} className="dasha-leaf">
+    <li key={r.key} className="dasha-leaf dasha-row dasha-row-3">
       <RowText row={r} ctx={ctx} />
     </li>
   );
 
   const renderAntar = (r: PeriodRow) => (
     <li key={r.key}>
-      {opener(r, "pratyantardasha")}
+      {opener(r, "pratyantardasha", "dasha-row-2")}
       {open.has(r.key) && (
         <SubList
           id={`dasha-sub-${r.key}`}
@@ -117,7 +118,7 @@ export function DashaList({ ctx }: { ctx: ListContext }) {
 
   const renderMaha = (r: PeriodRow) => (
     <li key={r.key}>
-      {opener(r, "antardasha")}
+      {opener(r, "antardasha", "dasha-row-1")}
       {open.has(r.key) && (
         <SubList id={`dasha-sub-${r.key}`} label={subLabel("antardasha", r, ctx)} rows={antardashaRows(ctx, r.path[0]!)} render={renderAntar} />
       )}

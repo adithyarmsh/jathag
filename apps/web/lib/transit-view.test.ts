@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fakeResponse } from "./list-fixtures";
 import { listContext } from "./list-context";
-import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, sadeSatiSummary, signChangeGroups, signChangeRowCount, signChangeSummary } from "./transit-view";
+import { positionRows, sadeSatiPeriodViews, sadeSatiStatus, sadeSatiIntro, signChangeGroups, signChangeRowCount, signChangeSummary } from "./transit-view";
 import en from "../messages/en.json";
 
 const AS_OF = "2026-11-22T06:00:00.000Z";
@@ -145,14 +145,21 @@ describe("collapsed-list summaries (0.3.7.1, D-115 item 6)", () => {
     expect(signChangeRowCount(ctx)).toBe(8);
   });
 
-  it("Sade Sati: number of periods", () => {
+  it("Sade Sati: the sentence under the heading carries the number of periods (0.3.7.2)", () => {
     const res = fakeResponse(base);
-    expect(sadeSatiSummary(listContext(res, en))).toBe("No Sade Sati between birth and 120 years after birth.");
+    expect(sadeSatiIntro(listContext(res, en))).toBe("No Sade Sati between birth and 120 years after birth.");
     const p = { start: "2020-01-01T00:00:00Z", end: "2027-01-01T00:00:00Z", startedBeforeBirth: false, startOutsideData: false, endOutsideData: false, phases: phases(null, null, null, null), crossings: [] };
     res.transits.sadeSati.periods = [p] as never;
-    expect(sadeSatiSummary(listContext(res, en))).toBe("1 period from birth to 120 years after birth");
+    expect(sadeSatiIntro(listContext(res, en))).toBe("Every Sade Sati from birth to 120 years after birth: 1 period. Open it to see its phases and Saturn's sign changes.");
     res.transits.sadeSati.periods = [p, p, p, p] as never;
-    expect(sadeSatiSummary(listContext(res, en))).toBe("4 periods from birth to 120 years after birth");
+    expect(sadeSatiIntro(listContext(res, en))).toBe("Every Sade Sati from birth to 120 years after birth: 4 periods. Open one to see its phases and Saturn's sign changes.");
+    // Each period row holds its phases and its dips (shown inside the opener)
+    const v = sadeSatiPeriodViews(listContext(res, en));
+    expect(v).toHaveLength(4);
+    for (const row of v) {
+      expect(row.phases.map((ph) => ph.phase)).toEqual(["rising", "peak", "setting"]);
+      expect(Array.isArray(row.crossings)).toBe(true);
+    }
   });
 });
 
