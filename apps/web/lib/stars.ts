@@ -8,8 +8,8 @@
 
 export const STAR_TILE = 320;
 export const STARS_PER_TILE = 28;
-/** Smallest star, px tip to tip. A four-point shape needs about 3 px to read as a star. */
-export const STAR_MIN = 3;
+/** Smallest star, px tip to tip: 3.5 px (D-118; the largest is 5.25 px). */
+export const STAR_MIN = 3.5;
 /** Largest star = 1.5 × the smallest (D-117 item 4b). */
 export const STAR_MAX = STAR_MIN * 1.5;
 export const OPACITY_MIN = 0.5;

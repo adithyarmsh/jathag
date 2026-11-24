@@ -23,6 +23,8 @@ describe("background stars", () => {
   });
 
   it("sizes from STAR_MIN to 1.5 × STAR_MIN; opacity 0.5–1 rises with size; inside the area", () => {
+    expect(STAR_MIN).toBe(3.5); // D-118: 3.5 px to 5.25 px tip to tip
+    expect(STAR_MAX).toBe(5.25);
     expect(STAR_MAX).toBe(STAR_MIN * 1.5);
     const stars = starsInRect(10, 20, 1000, 2000, seeded(1));
     expect(stars.length).toBe(starCount(1000, 2000));
