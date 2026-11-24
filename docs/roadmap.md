@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.7 · 2026-11-23 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.9 · 2026-11-24 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -114,6 +114,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.3.3 | YOU | Spot-check 2–3 transit / Sade Sati dates in JHora | Match |
 | 0.3.4 | CODE | Life-area window rule (period lord rules/occupies the area's houses), with reasons | Tests pass |
 | 0.3.5 | PROJECT | Design 3–5 approximate-time test cases | Delivered |
+| 0.3.5.1 | CODE | Basic South Indian chart: heading "South Indian Birth Chart" and no degrees in the boxes (founder's request, D-108) | Live; founder checks |
 | 0.3.6 | CODE | Approximate-time scanner (certain vs uncertain values with time sub-ranges) | Tests pass |
 | 0.3.7 | CODE | Show all of the above as plain lists on the live site | Live |
 
@@ -126,7 +127,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.4.3 | PROJECT | Mockups (phone + desktop): overview (the separate chart page, see 0.5.1), charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve |
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given |
 | 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged |
-| 0.4.6 | CODE | Full B2 birth form: 4 time modes, place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged |
+| 0.4.6 | CODE | Full B2 birth form: exact time on the main form, the approximate-time modes (custom range, part-of-day presets, don't know) under Advanced settings (D-106; placement decided in the input design), place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged |
 | 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged |
 
 ## v0.5 — Chart screens

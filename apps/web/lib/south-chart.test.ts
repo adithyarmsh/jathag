@@ -97,12 +97,27 @@ describe("southChartBoxes", () => {
     expect(box(5).signName).toBe("Leo");
   });
 
-  it("cuts degrees off (never rounds) and marks (R), never on Rahu/Ketu", () => {
-    expect(box(5).bodies.map((b) => b.text)).toEqual(["La 3°"]);
-    expect(box(4).bodies.map((b) => b.text)).toEqual(["Su 27°"]);
-    expect(box(10).bodies.map((b) => b.text)).toEqual(["Sa 12° (R)"]);
-    expect(box(9).bodies.map((b) => b.text)).toEqual(["Mo 0°", "Ra 15°"]);
-    expect(box(3).bodies.map((b) => b.text)).toEqual(["Ke 15°"]);
+  it("shows the abbreviation only (no degrees, D-108) and marks (R), never on Rahu/Ketu", () => {
+    expect(box(5).bodies.map((b) => b.text)).toEqual(["La"]);
+    expect(box(4).bodies.map((b) => b.text)).toEqual(["Su"]);
+    expect(box(10).bodies.map((b) => b.text)).toEqual(["Sa (R)"]);
+    expect(box(9).bodies.map((b) => b.text)).toEqual(["Mo", "Ra"]);
+    expect(box(3).bodies.map((b) => b.text)).toEqual(["Ke"]);
+  });
+
+  it("no planet label contains a digit, whatever the degree", () => {
+    for (const deg of [0, 9.99, 15.5, 28.75, 29.999]) {
+      const all = southChartBoxes(chartWith(Object.fromEntries(CODES.map((c, i) => [c, { sign: (i % 12) + 1, deg, retrograde: true }]))), t);
+      for (const b of all.flatMap((x) => x.bodies)) expect(b.text).not.toMatch(/\d/);
+      for (const l of all.flatMap((x) => x.layout.labels)) expect(l.text).not.toMatch(/\d/);
+    }
+  });
+
+  it("the card heading is 'South Indian Birth Chart'", () => {
+    expect(t.southChart.heading).toBe("South Indian Birth Chart");
+    // The key line and the screen-reader description don't mention degrees
+    expect(t.southChart.key).not.toMatch(/degree|°/i);
+    expect(t.southChart.svgDescription).not.toMatch(/degree|°/i);
   });
 
   it("keeps the table order inside a box (La first)", () => {
@@ -114,15 +129,16 @@ describe("southChartBoxes", () => {
 describe("crowded boxes stay inside", () => {
   const worst = CODES.map((code) => ({
     code,
-    // Widest possible labels: two-digit degrees, (R) on every graha that can show it
-    text: `${code} 28°${["Ma", "Me", "Ju", "Ve", "Sa"].includes(code) ? " (R)" : ""}`,
+    // Widest possible labels: (R) on every graha that can be retrograde (never Su, Mo, Ra, Ke)
+    text: `${code}${["Ma", "Me", "Ju", "Ve", "Sa"].includes(code) ? " (R)" : ""}`,
   }));
 
-  it("fits all 9 grahas + La in one box", () => {
+  it("fits all 9 grahas + La in one box, never smaller than the sign names (9.5)", () => {
     const layout = layoutLabels(worst);
     expect(layout.labels).toHaveLength(10);
     expectInside(layout);
-    expect(layout.fontSize).toBeGreaterThanOrEqual(FONT_SIZES[FONT_SIZES.length - 1]);
+    expect(layout.fontSize).toBe(9.5);
+    expect(FONT_SIZES[0]).toBe(14);
   });
 
   it("fits every count from 1 to 10, shrinking the text only as needed", () => {
@@ -134,19 +150,23 @@ describe("crowded boxes stay inside", () => {
       expect(layout.fontSize).toBeLessThanOrEqual(previous);
       previous = layout.fontSize;
     }
-    // Up to three planets keep a comfortable size
-    expect(layoutLabels(worst.slice(0, 3)).fontSize).toBeGreaterThanOrEqual(11);
+    // One or two labels get the largest size; up to three stay at 13 or more
+    expect(layoutLabels(worst.slice(0, 1)).fontSize).toBe(14);
+    expect(layoutLabels(worst.slice(0, 2)).fontSize).toBe(14);
+    expect(layoutLabels(worst.slice(0, 3)).fontSize).toBeGreaterThanOrEqual(13);
   });
 
   it("fits a real crowded chart (La + 8 grahas in one sign) through southChartBoxes", () => {
     const chart = chartWith(
       Object.fromEntries(
-        CODES.map((c) => [c, c === "Ke" ? { sign: 7, deg: 28.5 } : { sign: 1, deg: 28.5, retrograde: true }]),
+        // Retrograde wherever a real chart can be (never the Sun or the Moon)
+        CODES.map((c) => [c, c === "Ke" ? { sign: 7, deg: 28.5 } : { sign: 1, deg: 28.5, retrograde: c !== "Su" && c !== "Mo" }]),
       ),
     );
     const aries = southChartBoxes(chart, t)[0]!;
     expect(aries.bodies).toHaveLength(9);
     expectInside(aries.layout);
+    expect(aries.layout.fontSize).toBeGreaterThanOrEqual(9.5);
   });
 
   it("box geometry: label area sits between the sign name and the house number", () => {
