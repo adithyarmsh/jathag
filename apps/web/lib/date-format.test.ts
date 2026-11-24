@@ -63,7 +63,10 @@ describe("date notes (0.3.7.1, D-115 item 5)", () => {
     expect(en.lists.clockPointer).toBe("Dates use the clock at birth ({offset}).");
     for (const s of [en.lists.clockNote, en.lists.clockPointer]) expect(s).not.toMatch(/Jagannatha|JHora/i);
   });
-  it("the calculation line above the planet table is unchanged (founder decides separately)", () => {
-    expect(en.chart.methodLine).toBe("Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · checked against Jagannatha Hora");
+  it("the calculation line above the planet table names no other program (D-116)", () => {
+    expect(en.chart.methodLine).toBe("Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · verified against independent reference charts");
+  });
+  it("no user-visible text anywhere in en.json mentions Jagannatha Hora or JHora (D-116)", () => {
+    expect(JSON.stringify(en)).not.toMatch(/Jagannatha|JHora/i);
   });
 });

@@ -152,7 +152,7 @@
     "settingsLine": "Settings: {ayanamsa} · {node} · {houses}",
     "placeLine": "Place: {lat}, {lng} · Clock used: {offset}",
     "engineLine": "Engine version {version}",
-    "methodLine": "Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · checked against Jagannatha Hora",
+    "methodLine": "Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · verified against independent reference charts",
     "settings": {
       "ayanamsa": { "lahiri": "Lahiri ayanamsa" },
       "node": { "mean": "mean node", "true": "true node" },
