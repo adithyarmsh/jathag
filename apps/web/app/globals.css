@@ -436,3 +436,110 @@ html {
 .south-chart-title {
   font-variant-numeric: lining-nums;
 }
+
+/* ---------------------------------------------------------------- 0.3.7: lists on the site (D-113, provisional D-093) */
+
+.list-subheading {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+/* Text markers ("You are here", "Began before birth", "current Mahadasha"): words, not colour alone. */
+.list-marker {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.list-marker-strong {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+/* Openers: the whole row is the button; the arrow turns when open. */
+.dasha-opener {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.25rem;
+  border-radius: 0.5rem;
+  text-align: left;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .dasha-opener:hover {
+    background-color: var(--accent-soft);
+  }
+}
+.dasha-opener:focus-visible {
+  outline-offset: 0;
+  border-radius: 0.5rem;
+}
+.list-chevron {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: var(--muted);
+  transition: transform 150ms ease;
+}
+.list-chevron-open {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .list-chevron {
+    transition: none;
+  }
+}
+.dasha-row-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+  min-width: 0;
+}
+.dasha-lord {
+  min-width: 5.5rem;
+  font-weight: 600;
+}
+.dasha-leaf {
+  padding: 0.4rem 0.25rem 0.4rem 1.75rem;
+  font-size: 0.9375rem;
+}
+/* Rows under an opened period: indented, with a thin line on the left to show where they belong. */
+.dasha-sub {
+  margin: 0.15rem 0 0.6rem 0.7rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--line);
+}
+.sade-sati-period + .sade-sati-period {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Date + event rows (sign changes, Saturn's crossings). The date column wraps above the text on very narrow screens. */
+.list-dated-row {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+}
+.list-date {
+  min-width: 6.75rem;
+  color: var(--muted);
+}
+
+/* The transit table reuses the planet table's look; its longer headers may wrap. */
+.list-table thead th {
+  white-space: normal;
+}

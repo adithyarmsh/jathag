@@ -7,7 +7,8 @@ import type { ChartResponse } from "@jathag/api";
 import { clockUsed, fill, formatCoordinate, settingsLine, tableRows } from "@/lib/chart-format";
 import type { Messages } from "@/lib/i18n";
 
-function Cell({ value, t }: { value: string; t: Messages["chart"] }) {
+/** One cell: "—" gets a screen-reader label, "R" an abbreviation (also used by the transit table). */
+export function Cell({ value, t }: { value: string; t: Messages["chart"] }) {
   if (value === t.notApplicable) {
     return (
       <>

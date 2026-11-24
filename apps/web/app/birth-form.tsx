@@ -18,11 +18,16 @@ import { birthDate, daysInMonth, isUsableDate, usableYear } from "@/lib/birth-da
 import { fill, formatUtcOffset } from "@/lib/chart-format";
 import { checkDate, checkTime, type DatePart, type TimePart } from "@/lib/form-checks";
 import { shownOffsetSeconds } from "@/lib/place-offset";
+import { listContext } from "@/lib/list-context";
 import { HOURS, MINUTES, to12hText, to24h, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
 import { PlanetTable } from "./planet-table";
+import { DashaList } from "./dasha-list";
+import { LifeAreaList } from "./life-area-list";
+import { RightNow } from "./right-now";
+import { TransitList } from "./transit-list";
 import { SouthChart, type BirthShown } from "./south-chart";
 
 type Errors = Partial<Record<FormField, string>>;
@@ -91,6 +96,8 @@ export function BirthForm({ t }: { t: Messages }) {
   const [result, setResult] = useState<{ data: ChartResponse; summary: string; birth: BirthShown } | null>(null);
   /** Heading of the chart (the first result card): the page scrolls there after calculating. */
   const resultHeading = useRef<HTMLHeadingElement>(null);
+  /** Dates and words for the 0.3.7 lists, worked out once per result. */
+  const lists = useMemo(() => (result ? listContext(result.data, t) : null), [result, t]);
 
   const fullDate = birthDate(day, month, year);
   const date = fullDate && isUsableDate(fullDate) ? fullDate : null;
@@ -532,6 +539,16 @@ export function BirthForm({ t }: { t: Messages }) {
 
       {result && <SouthChart ref={resultHeading} result={result.data} birth={result.birth} summary={result.summary} t={t.chart} />}
       {result && <PlanetTable result={result.data} summary={result.summary} t={t.chart} />}
+      {/* Step 0.3.7 (D-113): plain lists below the table. Keyed by the calculation moment, so a new
+          chart starts with every list closed. */}
+      {lists && (
+        <>
+          <RightNow ctx={lists} />
+          <DashaList key={`d-${lists.result.dashas.asOf}`} ctx={lists} />
+          <TransitList key={`t-${lists.result.dashas.asOf}`} ctx={lists} />
+          <LifeAreaList ctx={lists} />
+        </>
+      )}
     </>
   );
 }
