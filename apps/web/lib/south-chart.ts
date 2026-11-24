@@ -1,13 +1,14 @@
 // The basic South Indian Rasi (D-1) chart on the home page (step 0.3.2.1, D-101): chart API
 // response → 12 boxes with sign, house number and planet labels, laid out to fit. Display only: no
-// calculation happens here, every sign, degree, house and retrograde comes from the API (the same
-// path as the planet table, chart-format.ts). The drawing is in app/south-chart.tsx.
+// calculation happens here, every sign, house and retrograde comes from the API (the same path as
+// the planet table, chart-format.ts). No degrees in the boxes: the planet table shows them (D-108).
+// The drawing is in app/south-chart.tsx.
 //
 // All sizes are in the SVG's own units: the chart is a 320 × 320 square (viewBox), 4 × 4 boxes of
 // 80 × 80, the middle 2 × 2 merged into the centre. The SVG scales to the space it gets.
 
 import type { ChartResponse } from "@jathag/api";
-import { degreeInSign, fill, TABLE_BODIES } from "./chart-format";
+import { fill, TABLE_BODIES } from "./chart-format";
 import type { Messages } from "./i18n";
 
 type BodyCode = keyof ChartResponse["chart"]["bodies"];
@@ -43,10 +44,20 @@ export function houseFromLagna(sign: number, lagnaSign: number): number {
 
 // ---- Fitting the labels into a box ----------------------------------------------------------------
 
-/** Space inside a box for the planet labels (between the sign name and the house number). */
-export const LABEL_AREA = { x: 3, y: 16, width: CELL - 6, height: 51 } as const;
-/** Font sizes tried, largest first; the largest one where every label fits is used. */
-export const FONT_SIZES = [12, 11, 10, 9, 8, 7, 6] as const;
+/**
+ * Space inside a box for the planet labels (between the sign name and the house number). Since 0.3.5.1
+ * one unit narrower top and bottom than before, so three rows of labels drop to 13 and keep a little
+ * air from the sign name and the house number.
+ */
+export const LABEL_AREA = { x: 3, y: 17, width: CELL - 6, height: 49 } as const;
+/**
+ * Font sizes tried, largest first; the largest one where every label fits is used (D-108 item 3).
+ * Without degrees even the fullest real box (La + all 9 grahas, the five that can be retrograde with
+ * "(R)"; the Sun and Moon never are, Rahu/Ketu never show it) fits at 9.5, the size of the sign names.
+ * The top is capped at 14 (the centre title is 15) so a box with one or two planets doesn't shout;
+ * uncapped they would fit at 20.
+ */
+export const FONT_SIZES = [14, 13, 12, 11, 10, 9.5] as const;
 const LINE_HEIGHT = 1.18; // × font size
 const GAP = 0.45; // space between two labels on one row, × font size
 
@@ -55,7 +66,7 @@ const GAP = 0.45; // space between two labels on one row, × font size
  * (the widest of weights 400, 500 and 600). Characters not listed count as 1 em (wider than any).
  */
 const CHAR_EM: Readonly<Record<string, number>> = (() => {
-  const m: Record<string, number> = { " ": 0.3, "°": 0.46, "(": 0.39, ")": 0.39, ",": 0.27, ".": 0.27, "-": 0.65, "…": 0.96 };
+  const m: Record<string, number> = { " ": 0.3, "(": 0.39, ")": 0.39, ",": 0.27, ".": 0.27, "-": 0.65, "…": 0.96 };
   const set = (chars: string, widths: number[]) => [...chars].forEach((c, i) => (m[c] = widths[i]!));
   set("0123456789", Array(10).fill(0.648));
   set("abcdefghijklmnopqrstuvwxyz", [
@@ -74,7 +85,7 @@ const WIDTH_MARGIN = 1.1;
 
 /**
  * Estimated width of a text in em (× font size): measured character widths plus a 10% margin, so a
- * label never runs out of its box (e.g. "Ma 28° (R)" draws 5.22 em, estimated 5.75 em).
+ * label never runs out of its box.
  */
 export function textWidthEm(text: string): number {
   let w = 0;
@@ -103,7 +114,7 @@ export interface LabelLayout {
 /**
  * Lays out a box's labels (in the given order) on centred rows, wrapping when a row is full, at the
  * largest font size where they all fit inside LABEL_AREA. With the smallest size even 10 labels (La +
- * all 9 grahas, impossible in a real chart since Rahu and Ketu are always opposite) still fit.
+ * all 9 grahas, impossible in a real chart since Rahu and Ketu are always opposite) still fit (tested).
  */
 export function layoutLabels(items: { code: BodyCode; text: string }[]): LabelLayout {
   if (items.length === 0) return { fontSize: FONT_SIZES[0], labels: [], rows: 0 };
@@ -169,20 +180,19 @@ export interface ChartBox {
   houseLabel: string;
   isLagna: boolean;
   /** Bodies in this sign, in table order (La first). */
-  bodies: { code: BodyCode; text: string; deg: number; retrograde: boolean }[];
+  bodies: { code: BodyCode; text: string; retrograde: boolean }[];
   layout: LabelLayout;
 }
 
 /**
- * One label: two-letter abbreviation + whole degree within the sign (cut off, never rounded, the
- * same degree the table shows), plus "(R)" when retrograde. Never (R) for Rahu/Ketu (the table shows
- * "—" for them, D-093) or the Lagna.
+ * One label: the two-letter abbreviation, plus "(R)" when retrograde, e.g. "Sa (R)", "Ve". No degree
+ * (D-108: the planet table shows them). Never (R) for Rahu/Ketu (the table shows "—" for them, D-093)
+ * or the Lagna.
  */
 function labelFor(code: BodyCode, body: ChartResponse["chart"]["bodies"]["La"], t: Messages["chart"]) {
-  const deg = degreeInSign(body.lon, body.sign).deg;
   const retrograde = code !== "La" && code !== "Ra" && code !== "Ke" && body.retrograde === true;
-  const base = fill(t.southChart.planetLabel, { abbr: t.abbreviations[code], deg });
-  return { code, deg, retrograde, text: retrograde ? `${base} ${t.southChart.retrogradeMark}` : base };
+  const base = t.abbreviations[code];
+  return { code, retrograde, text: retrograde ? `${base} ${t.southChart.retrogradeMark}` : base };
 }
 
 /** Chart response → the 12 boxes in sign order (Aries first). */

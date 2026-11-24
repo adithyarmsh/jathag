@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.10 · 2026-11-23 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.12 · 2026-11-24 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -34,7 +34,7 @@ A free, ad-free, private-by-default web app that turns a person's birth details 
 |---|---|---|
 | FR-IN-01 | Input form: Name (free text, used as profile name), Date of birth, Time of birth, Place of birth. | Must |
 | FR-IN-02 | Date range supported: 1 Jan 1800 – 31 Dec 2100. Dates outside are rejected with a clear message. | Must |
-| FR-IN-03 | Time of birth has four modes: (a) **Exact** time (hour, minute; seconds optional in advanced); (b) **Custom range** (from–to, e.g. 07:00–08:00); (c) **Preset (part of day)** — Morning 6 am–12 noon, Afternoon 12 noon–4 pm, Evening 4 pm–8 pm, Night 8 pm–6 am (next day); (d) **Don't know** (whole day). | Must |
+| FR-IN-03 | Time of birth has four modes: (a) **Exact** time (hour, minute; seconds optional in advanced) — the main form asks for this; the approximate modes are offered **under Advanced settings** (D-106, FR-SET-02): (b) **Custom range** (from–to, e.g. 07:00–08:00); (c) **Preset (part of day)** — Morning 6 am–12 noon, Afternoon 12 noon–4 pm, Evening 4 pm–8 pm, Night 8 pm–6 am (next day); whether the presets stay, and the exact placement and wording, are decided with the input details design (v0.4, 0.4.6); (d) **Don't know** (whole day). | Must |
 | FR-IN-04 | Place search with type-ahead suggestions, starting at 3 characters. Each suggestion shows "Place, District, State, Country" (e.g. "Kumbakonam, Thanjavur, Tamil Nadu, India") to disambiguate duplicates: plain names without accents, repeats collapsed, the words "District"/"Division" dropped. Suggestions are ordered: places in India first (matched on all names, incl. old names, e.g. "Bombay" → Mumbai), largest population first; then places outside India (matched on their main name only), largest first; ties: cities and city neighbourhoods before villages, then alphabetical (e.g. "che" → Chennai first). (D-087, D-088) | Must |
 | FR-IN-05 | Place coverage: every populated place in India in GeoNames (cities, towns, villages, neighbourhoods, including abandoned and historical places) plus worldwide places with population ≥ 500. Every populated place worldwide does not fit the free plan (D-087). | Must |
 | FR-IN-06 | After a place is chosen, show its latitude, longitude and time zone in small text (expanded in advanced mode) so users can sanity-check. | Should |
@@ -105,7 +105,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-SET-01 | Defaults: Vedic, Sidereal, Lahiri, Rasi D1 + Navamsa D9, Vimshottari, Whole sign, Mean node, 365.25-day year. | Must |
-| FR-SET-02 | Advanced toggle (hidden by default) exposes: Ayanamsa (Lahiri, Raman, Krishnamurti — only Lahiri is reference-tested; others marked "not verified"), Node (Mean/True), Dasha year length (365.25 / 360 / 365.2422), seconds in time input, manual coordinates. | Must |
+| FR-SET-02 | Advanced toggle (hidden by default) exposes: Ayanamsa (Lahiri, Raman, Krishnamurti — only Lahiri is reference-tested; others marked "not verified"), Node (Mean/True), Dasha year length (365.25 / 360 / 365.2422), seconds in time input, manual coordinates, approximate birth time: custom range, part-of-day presets, don't know (FR-IN-03, D-106; placement decided with the input design). | Must |
 | FR-SET-03 | Every chart screen and download shows the settings used in small text. | Must |
 
 ### 5.6 Calculation API
@@ -161,7 +161,7 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 |---|---|---|
 | FR-CH-01 | Rasi (D1) and Navamsa (D9), switchable; North and South Indian styles, switchable. (From step 0.3.2.1 a basic South Indian Rasi chart is already shown on the home page, D-101; replaced in 0.5.2.) | Must |
 | FR-CH-02 | Drawn as SVG by code; crisp at any size; themed for dark/light. | Must |
-| FR-CH-03 | Planet abbreviations with degree; retrograde marked (R); lagna marked. | Must |
+| FR-CH-03 | Planet abbreviations; retrograde marked (R); lagna marked. Degrees are not shown inside the chart: the planet table carries them (D-108; decided for the basic chart of 0.3.2.1, the 0.5.2 chart design may revisit). | Must |
 | FR-CH-04 | Tap/click a planet in the chart → its planet detail page. | Should |
 | FR-CH-05 | **Divisional chart selector (v1.1):** beside the main chart, a list/selector of all 16 divisional charts; selecting one shows it in the chosen style with its short "what this chart is for" note. | Later (v1.1) |
 | FR-CH-06 | Chart style toggle (South/North) on the chart screen; changing it updates the remembered preference. | Must |

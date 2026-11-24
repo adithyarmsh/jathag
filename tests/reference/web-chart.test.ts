@@ -1,8 +1,8 @@
 // The home page's South Indian chart vs the planet table (step 0.3.2.1, D-101): for all 29 reference
 // births, through the same path the table uses (engine → apps/web/lib), every planet and the Lagna
 // appear exactly once, in the box of their sign; the Lagna's box is the 1st house and houses run 1–12
-// clockwise from it; each label's degree is the table's whole degree; (R) only where the table says
-// retrograde, never on Rahu/Ketu. The table itself is checked against JHora in web-table.test.ts.
+// clockwise from it; each label is the abbreviation with no degree (D-108); (R) only where the table
+// says retrograde, never on Rahu/Ketu. The table itself is checked against JHora in web-table.test.ts.
 
 import { describe, expect, it } from 'vitest';
 import { calculateChart } from '@jathag/engine';
@@ -42,9 +42,9 @@ describe('South Indian chart matches the planet table for every reference birth'
       const { box, body } = seen.find((s) => s.body.code === row.code)!;
       expect(box.signName, label).toBe(row.sign);
       expect([box.col, box.row], label).toEqual(SIGN_CELLS[box.sign]);
-      // Whole degree = the table's degree up to the "°"
-      expect(String(body.deg), label).toBe(row.degree.split('°')[0]);
-      expect(body.text.startsWith(`${t.abbreviations[row.code]} ${body.deg}°`), label).toBe(true);
+      // The abbreviation, no degree (D-108): "Sa" or "Sa (R)", never a digit
+      expect(body.text, label).toMatch(new RegExp(`^${t.abbreviations[row.code]}( \\(R\\))?$`));
+      expect(body.text, label).not.toMatch(/\d/);
       // (R) only where the table says R; never for Rahu/Ketu or the Lagna
       const r = body.text.endsWith(t.southChart.retrogradeMark);
       expect(r, label).toBe(row.retrograde === t.retrograde);

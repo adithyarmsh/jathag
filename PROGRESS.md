@@ -8,11 +8,11 @@
 | | |
 |---|---|
 | **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.5 — Approximate-time test cases (Project step; waiting for the Project's handoff) |
+| **Current step** | 0.3.5 — Approximate-time test cases (Project step) |
 | **Next step** | 0.3.6 — Approximate-time scanner |
 | **Then** | v0.4 — Design system + app shell |
-| **Blocked on** | Nothing |
-| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.4; the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, not shown yet; hidden from search engines) |
+| **Blocked on** | Project: final 0.3.5 case files |
+| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.4 (v0.3.5.1 once PR #19 is merged); the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, not shown yet; hidden from search engines) |
 | **Last updated** | 2026-11-24 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -83,7 +83,9 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.3.2.1 Basic South Indian chart (D-101): Rasi (D-1) chart drawn as SVG between the form and the planet table, house numbers from the Lagna, whole degrees and (R), Lagna corner mark, birth details in the centre, one-line key; matches the table for all 29 reference births; visible "Birth chart" header (PR #17). Founder's comparison with JHora passed (D-103)
 - ✅ 0.3.3 JHora spot-check: all 8 transit / Sade Sati checks match JHora (D-103)
 - ✅ 0.3.4 Life-area windows: graha → life-area links (rules or occupies one of the area's houses, Requirements §6.6; Rahu/Ketu by occupation only; no karaka; every reason listed) in the engine, period helper for all three dasha levels, chart API `lifeAreas`; all tests pass (PR #18)
-- ⏳ 0.3.5 Approx-time test cases · ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
+- 🔄 0.3.5 Approximate-time test cases designed by the Project (D-107); the founder's JHora check passed; the Project is writing the final case files
+- 🔄 0.3.5.1 Basic chart: heading "South Indian Birth Chart", degrees only in the planet table (chart boxes show abbreviations and (R)), planet labels larger (D-108) (PR #19). Live after merge; founder checks
+- ⏳ 0.3.6 Approx-time scanner · ⏳ 0.3.7 Lists on the live site
 
 ### v0.4 — Design system + app shell
 - ⏳ 0.4.1 References · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
@@ -129,6 +131,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-24 | 0.3.5.1 | #19 | Approved by the Project (D-110). D-109 / D-110 committed unchanged. Squash-merged; stays 🔄 until the founder checks it live. |
+| 2026-11-24 | 0.3.5.1 | #19 | Chart card heading now "South Indian Birth Chart"; degrees removed from the chart boxes (label = abbreviation + (R) when retrograde, never on Rahu/Ketu); planet labels now use the largest size that fits, from 14 down to 9.5 (all 29 reference births: 13–14 in every box, was 10–12); key line and screen-reader text unchanged (no degrees in them). Chart matches the table on sign, house and (R) for all 29 births. Only `apps/web`, PROGRESS.md, CLAUDE.md and the three docs (committed unchanged) changed. Waiting for Project review. |
 | 2026-11-24 | 0.3.4 | #18 | Approved by the Project (D-105: built as reported, incl. the small choices). D-105 committed unchanged. Squash-merged. |
 | 2026-11-24 | 0.3.4 | #18 | Life-area windows built: engine table of the 10 life areas (IDs only), each graha linked to the areas whose houses it rules or occupies with every reason (Rahu/Ketu by occupation only, no karaka, no score), `periodsForLifeArea` for all three dasha levels, chart API `lifeAreas` (once per graha, +0.3 KB compressed); engine 0.4.0. Hand-made tests + all 29 births re-derived from `expected/`; 1,265 tests green. D-103 / D-104 committed unchanged; 0.3.2.1 and 0.3.3 marked ✅ (D-103). Waiting for Project review. |
 | 2026-11-23 | 0.3.2.1 | #17 | Approved by the Project with a visible 'Birth chart' header (D-102). D-102 committed unchanged. Squash-merged. |

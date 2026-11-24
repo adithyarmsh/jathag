@@ -178,11 +178,10 @@
       "Ke": "Ke"
     },
     "southChart": {
-      "heading": "Birth chart",
+      "heading": "South Indian Birth Chart",
       "centreTitle": "Rasi chart (D-1)",
       "svgTitle": "South Indian Rasi chart",
       "svgDescription": "Lagna in {sign}. The planet table below lists every position in words.",
-      "planetLabel": "{abbr} {deg}°",
       "retrogradeMark": "(R)",
       "houseLabel": "{n} house",
       "ordinals": ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th"],
