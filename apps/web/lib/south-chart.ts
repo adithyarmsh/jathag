@@ -44,8 +44,12 @@ export function houseFromLagna(sign: number, lagnaSign: number): number {
 
 // ---- Fitting the labels into a box ----------------------------------------------------------------
 
-/** Space inside a box for the planet labels (between the sign name and the house number). */
-export const LABEL_AREA = { x: 3, y: 16, width: CELL - 6, height: 51 } as const;
+/**
+ * Space inside a box for the planet labels (between the sign name and the house number). Since 0.3.5.1
+ * one unit narrower top and bottom than before, so three rows of labels drop to 13 and keep a little
+ * air from the sign name and the house number.
+ */
+export const LABEL_AREA = { x: 3, y: 17, width: CELL - 6, height: 49 } as const;
 /**
  * Font sizes tried, largest first; the largest one where every label fits is used (D-108 item 3).
  * Without degrees even the fullest real box (La + all 9 grahas, the five that can be retrograde with
