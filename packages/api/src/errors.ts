@@ -26,12 +26,23 @@ export type ApiErrorCode =
   // Anything else
   | 'INTERNAL_ERROR';
 
+/**
+ * Codes only the range endpoint (POST /api/chart/range, step 0.3.6) returns. Kept apart from
+ * ApiErrorCode so the birth form's code → field table (apps/web/lib/api-errors.ts) stays complete;
+ * their words are added with the approximate-time screen (0.8.1).
+ */
+export type RangeErrorCode =
+  | 'RANGE_SAME_TIME' // the end equals the start: use the exact time instead (D-111)
+  | 'RANGE_TOO_SHORT' // under 1 minute of local clock time (D-111)
+  | 'RANGE_END_BEFORE_START' // only possible with first/second choices in a repeated hour: the real end is before the real start
+  | 'POLAR_LATITUDE'; // beyond 66.5° north or south the Lagna is not well defined, so no scan
+
 export class ApiError extends Error {
-  readonly code: ApiErrorCode;
+  readonly code: ApiErrorCode | RangeErrorCode;
   readonly status: number;
   /** Only for settings errors: which setting (a key name, never a birth detail). */
   readonly setting?: string;
-  constructor(code: ApiErrorCode, status = 400, setting?: string) {
+  constructor(code: ApiErrorCode | RangeErrorCode, status = 400, setting?: string) {
     super(code);
     this.name = 'ApiError';
     this.code = code;
@@ -41,7 +52,7 @@ export class ApiError extends Error {
 }
 
 export interface ErrorBody {
-  error: { code: ApiErrorCode; setting?: string };
+  error: { code: ApiErrorCode | RangeErrorCode; setting?: string };
 }
 
 export function errorBody(e: ApiError): ErrorBody {

@@ -1,12 +1,12 @@
 # @jathag/api
 
-Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` (from `@jathag/api`) and `handleSearchRequest` (from `@jathag/api/search-endpoint`, which never imports the engine: the search function has no Swiss Ephemeris binary; `test/imports.test.ts` checks this), so everything here is tested without a server.
+Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, the range endpoint (step 0.3.6, no screen yet), and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` and `handleRangeRequest` (from `@jathag/api`) and `handleSearchRequest` (from `@jathag/api/search-endpoint`, which never imports the engine: the search function has no Swiss Ephemeris binary; `test/imports.test.ts` checks this), so everything here is tested without a server.
 
 **Privacy (FR-API-02, D-014):** nothing here logs, stores or caches a request. Errors never contain any part of the request. Every response has `Cache-Control: no-store`. An unexpected failure logs only the error's class name and code (never its message).
 
-## The two endpoints
+## The endpoints
 
-Both are `POST` with a JSON body, so birth details and search text never appear in a URL (URLs can end up in hosting logs). They are separate server functions on Vercel: only the search function carries and loads the 21 MB place index.
+All are `POST` with a JSON body, so birth details and search text never appear in a URL (URLs can end up in hosting logs). They are separate server functions on Vercel: only the search function carries and loads the 21 MB place index; the chart and range functions carry the ephemeris files.
 
 ### `POST /api/places/search`
 
@@ -45,7 +45,7 @@ Response (shortened):
 ```json
 {
   "apiVersion": 1,
-  "engineVersion": "0.4.0",
+  "engineVersion": "0.5.0",
   "settings": { "ayanamsa": "lahiri", "node": "mean", "houseSystem": "whole-sign", "dashaYear": "365.25" },
   "place": { "kind": "search", "geonameId": 1261481, "lat": 28.6139, "lng": 77.209, "timeZone": "Asia/Kolkata", "countryCode": "IN", "admin1Code": "07", "admin2Code": "094" },
   "clock": { "source": "clockRule", "id": "ist", "chosen": true, "utcOffsetSeconds": 19800, "timeZone": null, "tzdataVersion": null },
@@ -92,10 +92,46 @@ Response (shortened):
 
 `lifeAreas` (step 0.3.4, D-104): the engine's `lifeAreasForChart` — for each of the 9 grahas, the life areas it rules or occupies a house of, each with every reason (`{ "kind": "rules", "house": 7, "sign": 11 }` / `{ "kind": "occupies", "house": 7 }`). It is sent **once per graha, not per period**: every dasha period already carries its `lord`, and a period's life areas are its lord's, so a screen looks them up here (or uses the engine's `periodsForLifeArea`). About 1.7 KB raw / 0.3 KB compressed. Example (R01, Leo Lagna): `"Sa": [ { "area": "health", "reasons": [ { "kind": "rules", "house": 6, "sign": 10 }, { "kind": "occupies", "house": 6 } ] }, { "area": "relationships", "reasons": [ { "kind": "rules", "house": 7, "sign": 11 } ] }, { "area": "career", "reasons": [ … same as health … ] } ]`.
 
+### `POST /api/chart/range` (step 0.3.6, D-111)
+
+The approximate-time scan for a local from–to range. Nothing on the site calls it yet (lists in 0.3.7, the screen in 0.8.1).
+
+```json
+{ "date": "2001-10-27", "fromTime": "20:00", "toTime": "06:00",
+  "place": { "geonameId": 5101798, "lat": 40.733333, "lng": -74.166667, "timeZone": "America/New_York",
+             "countryCode": "US", "admin1Code": "NJ", "admin2Code": "013" } }
+```
+- `place` / `manual`, `clock` and `settings`: exactly as for `/api/chart`. `date` is the local date of the start.
+- `fromTime`, `toTime`: `HH:MM` or `HH:MM:SS` on the local clock; `toTime` may also be `24:00`. **Range rules (D-111):** a `toTime` earlier than `fromTime` ends on the next date (20:00–06:00 is 10 hours); equal times → `RANGE_SAME_TIME` ("use the exact time"); under 1 minute → `RANGE_TOO_SHORT`; the whole day is `00:00`–`24:00` (24 hours, so no range is longer).
+- **Clock:** the "Which clock?" rule is applied once, for `date`, and that clock is used at both ends (one birth record, one clock). Outside every rule window both ends go through the place's IANA zone: an end in a skipped hour → `NONEXISTENT_LOCAL_TIME`; an end in a repeated hour → `AMBIGUOUS_LOCAL_TIME` unless `fromRepeatedTime` / `toRepeatedTime` (`earlier` / `later`) says which; if those choices make the real end come before the real start → `RANGE_END_BEFORE_START`.
+- The scan covers the **real elapsed time** between the two ends (D-107 item 3): A5 above is 10 clock hours but 11 real hours.
+
+Response (shortened; case A5):
+```json
+{
+  "apiVersion": 1, "engineVersion": "0.5.0", "settings": { … }, "place": { "kind": "search", … },
+  "clock": { "source": "timeZone", "id": null, "chosen": false, "utcOffsetSeconds": -14400, "timeZone": "America/New_York", "tzdataVersion": "…" },
+  "clockQuestion": { "applies": false, … }, "ephemeris": { … },
+  "range": { "from": { "date": "2001-10-27", "time": "20:00:00", "utc": "2001-10-28T00:00:00Z", "utcOffsetSeconds": -14400 },
+             "to":   { "date": "2001-10-28", "time": "06:00:00", "utc": "2001-10-28T11:00:00Z", "utcOffsetSeconds": -18000 },
+             "seconds": 39600, "clockSeconds": 36000 },
+  "events": [ { "utc": "2001-10-28T05:10:00Z", "local": "2001-10-28 01:10:00", "repeatedLocalTime": "first",
+                "changes": [ { "value": "ld9", "from": 11, "to": 12 } ] }, … ],
+  "segments": [ { "from": "2001-10-28T00:00:00Z", "to": "2001-10-28T00:10:27Z", "fromLocal": "2001-10-27 20:00:00", "toLocal": "2001-10-27 20:10:27",
+                  "ls": 2, "ln": 4, "ld9": 4, "ms": 11, "mn": 25, "mp": 1 }, … ],
+  "certain": ["ms", "mn"],
+  "dasha": [ { "from": "…", "to": "…", "fromLocal": "…", "toLocal": "…", "moonNakshatra": 25, "lordAtBirth": "Ju",
+               "mahadashas": [ { "lord": "Ju", "startMin": "…", "startMax": "…", "endMin": "…", "endMax": "…" }, … ],
+               "antardashas": [ { "maha": "Ju", "lord": "Ju", … }, … ] } ]
+}
+```
+Everything except the local fields is the engine's `scanTimeRange` output (rules and method: `packages/engine/README.md`). `local` is the clock used (the place's zone, the "Which clock?" option or the manual offset), `YYYY-MM-DD HH:MM:SS`; `repeatedLocalTime` / `fromRepeatedLocalTime` / `toRepeatedLocalTime` (`first` / `second`) appear only inside an hour that happened twice. Dasha dates stay UTC (shown on the birth clock by the screens, D-097). The whole day (case A4) is about 77 KB raw, 11 KB gzip, 7 KB Brotli; about 40 ms locally. `Server-Timing` has a `scan` entry.
+
 ### Errors
 
 `{ "error": { "code": "…" } }`, HTTP 400 (413 for a body over the limit, 500 for `INTERNAL_ERROR`). Settings errors also carry `"setting"` (the key name). The codes are listed in `src/errors.ts`:
 `INVALID_REQUEST`, `REQUEST_TOO_LARGE`, `INVALID_DATE`, `DATE_OUT_OF_RANGE`, `INVALID_TIME`, `NONEXISTENT_LOCAL_TIME`, `AMBIGUOUS_LOCAL_TIME`, `INVALID_REPEATED_TIME`, `MISSING_PLACE`, `INVALID_PLACE`, `INVALID_LOCATION`, `INVALID_TIME_ZONE`, `INVALID_UTC_OFFSET`, `INVALID_CLOCK_CHOICE`, `UNKNOWN_SETTING`, `SETTING_NOT_SUPPORTED`, `INTERNAL_ERROR`.
+Range endpoint only (`RangeErrorCode`, kept apart so the birth form's code list stays complete; their words come with the 0.8.1 screen): `RANGE_SAME_TIME`, `RANGE_TOO_SHORT`, `RANGE_END_BEFORE_START`, `POLAR_LATITUDE` (beyond 66.5° north or south).
 
 Every response also has a `Server-Timing` header (wall time, CPU time, and for search the index load on a cold start) for measuring; it contains no request data.
 
@@ -115,4 +151,4 @@ Overlaps (D-090): all options of every matching window; default `war` in 1942-09
 
 ## Tests
 
-`packages/api/test/` (clock rule: every window, first/last day, day after, overlaps, non-Indian places; endpoints: every error code, no echo, no logging, headers) and `tests/reference/api.test.ts` (R27–R29 end to end against JHora).
+`packages/api/test/` (clock rule: every window, first/last day, day after, overlaps, non-Indian places; endpoints: every error code, no echo, no logging, headers; `range-endpoint.test.ts`: range rules, clocks incl. case A5 with first/second, every range error code) and `tests/reference/api.test.ts` (R27–R29 end to end against JHora).

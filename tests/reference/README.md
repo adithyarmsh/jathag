@@ -15,6 +15,7 @@ Jathag's definition of "correct" is: the same answer as Jagannatha Hora (JHora 8
 | `checks.test.ts` | Self-checks on the answer key. Always on, must always pass. |
 | `engine.test.ts` | Tests that compare the engine to `expected/`. Positions are on (0.2.8), Vimshottari dashas are on (0.3.1); see the top of the file for how each later step switches its group on. |
 | `api.test.ts` | End-to-end through the chart endpoint's logic (`packages/api`, step 0.2.12): R27–R29 entered as a user would (a searched place + their "Which clock?" answer) give JHora's instant and positions; R01 and R06 as controls. |
+| `approx-time/` + `approx-time.test.ts` | The Project's five approximate-time cases (step 0.3.5, D-107, D-109; `approx-time/README.md`; never edited here) and the test holding the scanner (step 0.3.6) to them: change moments within 2 s, everything else exact. |
 | `life-areas.test.ts` | Life-area links (step 0.3.4, D-104) for all 29 births: re-derived independently from the signs in `expected/` (own lord table and area houses) and checked against the chart's own houses. JHora has no life-area output, so no JHora data is involved. |
 
 ## What `expected/RNN.json` contains

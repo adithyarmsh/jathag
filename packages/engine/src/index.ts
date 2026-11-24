@@ -3,8 +3,8 @@
 
 export { calculateChart, ChartInputError } from './chart.ts';
 export type { Chart, ChartInput, BodyResult, HouseResult } from './chart.ts';
-export { localToUtc, TimeError, tzdataVersion } from './time.ts';
-export type { LocalBirthTime, BirthZone, UtcResult, TimeErrorCode } from './time.ts';
+export { localToUtc, utcToLocal, TimeError, tzdataVersion } from './time.ts';
+export type { LocalBirthTime, BirthZone, UtcResult, TimeErrorCode, LocalClockTime } from './time.ts';
 export { DEFAULT_SETTINGS, resolveSettings, SettingsError } from './settings.ts';
 export type { Settings, DashaYearSetting } from './settings.ts';
 export { DASHA_YEAR_DAYS } from './settings.ts';
@@ -43,6 +43,20 @@ export type {
   SadeSatiStatus,
   PhaseDates,
 } from './transits.ts';
+export { scanTimeRange, TimeRangeError, TIME_VALUES, SAMPLE_SECONDS, MAX_SCAN_LATITUDE, MAX_SCAN_SECONDS } from './approx-time.ts';
+export type {
+  TimeRangeInput,
+  TimeRangeScan,
+  TimeRangeEvent,
+  TimeRangeSegment,
+  TimeRangeErrorCode,
+  TimeValueId,
+  TimeValues,
+  ValueChange,
+  DashaStretch,
+  DashaDateRange,
+  AntardashaDateRange,
+} from './approx-time.ts';
 export { ENGINE_VERSION } from './version.ts';
 export * from './ids.ts';
 export { placement, angularDistance, houseOf, nthSignFrom } from './zodiac.ts';

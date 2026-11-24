@@ -4,7 +4,7 @@
 // Update it in every PR (CLAUDE.md, "End of every PR"). The commit comes from Vercel at build time
 // (VERCEL_GIT_COMMIT_SHA); locally there is none, so only the step is shown.
 
-export const STEP = "0.3.5.1";
+export const STEP = "0.3.6";
 
 export function versionLabel(
   step: string,
