@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.3 Timing engine — 🔄 in progress (v0.2 First real chart ✅) |
-| **Current step** | 0.3.7 — Lists on the live site 🔄 built, PR open, waiting for Project review (D-113) |
-| **Next step** | v0.4 — Design system + app shell (0.4.1 References) |
+| **Milestone** | v0.3 Timing engine — ✅ done (all steps 0.3.1–0.3.7) |
+| **Current step** | 0.3.7 — Lists on the live site ✅ done (D-114) |
+| **Next step** | v0.4 — Design system + app shell, starting with 0.4.1 References from the founder |
 | **Then** | v0.5 — Chart screens |
-| **Blocked on** | Project review of the 0.3.7 PR, then founder approval to merge |
-| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.6; the chart API also returns the dasha timeline, transits, Sade Sati and life-area links, and `POST /api/chart/range` the approximate-time scan, neither shown yet; hidden from search engines). After 0.3.7 merges: four list cards below the table (Right now, Dasha periods, Transits and Sade Sati, Life areas) |
+| **Blocked on** | Nothing (waiting for the founder's references for 0.4.1) |
+| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.3.7; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) has no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-24 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -25,7 +25,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 |---|---|
 | v0.1 Coming soon | ✅ |
 | v0.2 First real chart | ✅ |
-| v0.3 Timing engine | 🔄 |
+| v0.3 Timing engine | ✅ |
 | v0.4 Design system + app shell | ⏳ |
 | v0.5 Chart screens | ⏳ |
 | v0.6 Timing screens | ⏳ |
@@ -86,7 +86,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.3.5 Approximate-time test cases: five cases A1–A5 in `tests/reference/approx-time/` (D-107), founder's JHora check passed (D-109), delivered (D-111)
 - ✅ 0.3.5.1 Basic chart: heading "South Indian Birth Chart", degrees only in the planet table (chart boxes show abbreviations and (R)), planet labels larger (D-108) (PR #19). Founder checked the live chart (D-111)
 - ✅ 0.3.6 Approximate-time scanner: `scanTimeRange` in the engine (change moments, segments, certain values, mahadasha/antardasha date ranges; nothing missed, checked second by second; refuses beyond 66.5° latitude) and `POST /api/chart/range` (D-111 range rules, "Which clock?" at both ends, local times with first/second), no screen; all five 0.3.5 cases match exactly; whole day on Vercel 1.2 s cold / 0.44–0.91 s warm from India, 77 KB raw / 11.6 KB sent (PR #20)
-- 🔄 0.3.7 Lists on the live site: four plain cards below the planet table (Right now, Dasha periods, Transits and Sade Sati, Life areas), built only from the chart API response; dates on the clock at birth; built and tested (PR #21), waiting for Project review and merge ("Done when": live)
+- ✅ 0.3.7 Lists on the live site: four plain cards below the planet table (Right now, Dasha periods, Transits and Sade Sati, Life areas), built only from the chart API response; dates on the clock at birth; approved as built (D-114) (PR #21)
 
 ### v0.4 — Design system + app shell
 - ⏳ 0.4.1 References · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
@@ -132,6 +132,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-24 | 0.3.7 | #21 | Approved by the Project as built (D-114): "cycle ended on <date>" wording for old births kept; "As of" and "Planets today" dates stay on the birth clock; date note and Health line accepted. D-114 committed unchanged. Squash-merged; live on jathag.vercel.app. v0.3 complete. |
 | 2026-11-24 | 0.3.7 | #21 | Lists on the site built (D-113): "Right now" (current Mahadasha/Antardasha/Pratyantardasha with the life areas they activate, coming up, Sade Sati status), "Dasha periods" (Mahadashas open to Antardashas and Pratyantardashas, drawn only when opened, periods before birth hidden, "You are here"), "Transits and Sade Sati" (today's positions, every sign change of Saturn/Jupiter/Rahu/Ketu, all Sade Sati periods with phases and Saturn's crossings), "Life areas" (linked planets with reasons, wellness line on Health). Every date on the clock at birth (new `date-format.ts`). No engine/API change. D-113 committed unchanged. Waiting for Project review. |
 | 2026-11-24 | 0.3.6 | #20 | Approved by the Project as built (D-112), including keeping AMBIGUOUS_LOCAL_TIME for a range end in a repeated clock hour unless first/second is sent (D-112 item 1, no code change). D-112 committed unchanged. Squash-merged; live on jathag.vercel.app. |
 | 2026-11-24 | 0.3.6 | #20 | Approximate-time scanner built: engine `scanTimeRange` (engine 0.5.0) finds every second where the Lagna sign/nakshatra/navamsa or Moon sign/nakshatra/pada changes, with segments, certain values and dasha date ranges; `POST /api/chart/range` with the D-111 range rules and local times (first/second in a repeated hour). All five Project cases match `cases.json` exactly (0 s difference); 47 place-days identical to a second-by-second check; whole day ≈12 ms in the engine locally, on the Vercel preview the whole-day request takes 1.2 s cold and 0.44–0.91 s warm seen from India (66–165 ms inside the function; target under 5 s), 77 KB raw / 11.6 KB sent, gives exactly case A4, no runtime log lines. D-111 and roadmap v2.10 and the case files committed unchanged; 0.3.5 and 0.3.5.1 marked ✅ (D-111). Waiting for Project review. |
