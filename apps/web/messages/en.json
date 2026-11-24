@@ -215,6 +215,117 @@
       "DB": "Debilitated"
     }
   },
+  "lists": {
+    "monthsShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "dateRange": "{start} – {end}",
+    "asOf": "As of {date}",
+    "clockNote": "Dates are shown on the clock used at birth ({offset} for this chart), as in Jagannatha Hora.",
+    "clockPointer": "Dates use the clock at birth ({offset}), as in Jagannatha Hora.",
+    "youAreHere": "You are here",
+    "beganBeforeBirth": "Began before birth",
+    "levels": {
+      "mahadasha": "Mahadasha",
+      "antardasha": "Antardasha",
+      "pratyantardasha": "Pratyantardasha"
+    },
+    "levelsPlural": {
+      "mahadasha": "Mahadashas",
+      "antardasha": "Antardashas",
+      "pratyantardasha": "Pratyantardashas"
+    },
+    "terms": {
+      "mahadasha": "long-term",
+      "antardasha": "medium-term",
+      "pratyantardasha": "short-term"
+    },
+    "levelLabel": "{level} ({term})",
+    "subListLabel": "{levels} ({term}) in the {lord} {level}",
+    "opensLabel": "Show the {levels} in the {lord} {level}",
+    "rightNow": {
+      "title": "Right now",
+      "running": "Running now",
+      "comingUp": "Coming up",
+      "startsOn": "starts {date}",
+      "activates": "Activates: {areas}",
+      "noArea": "No life area linked",
+      "notBorn": "The timeline starts at birth ({date}). No period is running yet.",
+      "cycleEnded": "The 120-year dasha cycle of this chart ended on {date}. No period is running now.",
+      "nothingNext": "Nothing: the 120-year cycle has ended."
+    },
+    "dashas": {
+      "title": "Dasha periods",
+      "intro": "Vimshottari dashas from birth. Open a Mahadasha to see its Antardashas, and an Antardasha to see its Pratyantardashas."
+    },
+    "transits": {
+      "title": "Transits and Sade Sati",
+      "positionsTitle": "Planets today",
+      "positionsCaption": "Where the 9 planets are on {date}",
+      "columns": {
+        "planet": "Planet",
+        "sign": "Sign",
+        "fromMoon": "House from the Moon",
+        "fromLagna": "House from the Lagna",
+        "retrograde": "Retrograde"
+      },
+      "signChangesTitle": "Sign changes",
+      "signChangesIntro": "Saturn, Jupiter, Rahu and Ketu: the latest sign change and every change in the next 10 years, including the moves back while a planet is retrograde.",
+      "crossing": {
+        "enters": "Enters {sign}",
+        "moves-back": "Moves back into {sign}",
+        "enters-again": "Enters {sign} again"
+      },
+      "noSignChanges": "No sign change in this window."
+    },
+    "sadeSati": {
+      "title": "Sade Sati",
+      "statusLabel": "Sade Sati now",
+      "status": {
+        "none": "Not running",
+        "rising": "Rising phase",
+        "peak": "Peak phase",
+        "setting": "Setting phase"
+      },
+      "phases": {
+        "rising": "Rising",
+        "peak": "Peak",
+        "setting": "Setting"
+      },
+      "phaseLine": "{phase}: Saturn in {sign}, from {date}",
+      "period": "{start} – {end}",
+      "nextStarts": "Next Sade Sati starts {date}",
+      "noNext": "No further Sade Sati within 120 years of birth.",
+      "saturnNow": "Saturn now: {sign}, house {house} from the Moon",
+      "allTitle": "All Sade Sati periods",
+      "allIntro": "Every Sade Sati from birth to 120 years after birth. Open a period to see each of Saturn's sign changes inside it.",
+      "none": "No Sade Sati between birth and 120 years after birth.",
+      "opensLabel": "Show Saturn's sign changes in the Sade Sati of {period}",
+      "crossingsLabel": "Saturn's sign changes in the Sade Sati of {period}",
+      "crossing": "{change} · house {house} from the Moon",
+      "beforeData": "before 1800 (outside our data)",
+      "afterData": "after 2399 (outside our data)"
+    },
+    "lifeAreas": {
+      "title": "Life areas",
+      "intro": "Each planet is linked to the life areas whose houses it rules or sits in. Houses count from the Lagna.",
+      "names": {
+        "self": "Personality & self",
+        "money": "Money & family",
+        "communication": "Communication, courage & siblings",
+        "home": "Home, mother & inner peace",
+        "learning": "Learning, creativity & children",
+        "health": "Health & wellness",
+        "relationships": "Relationships & marriage",
+        "career": "Career & work",
+        "luck": "Luck, beliefs & mentors",
+        "spirituality": "Spirituality, rest & letting go"
+      },
+      "rules": "rules house {house} ({sign})",
+      "occupies": "sits in house {house}",
+      "noPlanet": "No planet linked",
+      "healthNote": "This is general wellness information, not medical advice.",
+      "currentMark": "current {level}"
+    }
+  },
   "footer": {
     "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
     "sourceLink": "Source code (AGPL)",
