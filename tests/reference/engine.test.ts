@@ -1,6 +1,7 @@
 // Engine reference tests: Jathag's engine must reproduce the JHora answer key (tests/reference/expected/).
 //
-// STATUS: written in step 0.2.7, before the engine exists, so every group is SKIPPED for now.
+// STATUS: written in step 0.2.7, before the engine existed. Positions (0.2.8), dashas (0.3.1) and
+// panchanga (0.9.1) are ON; divisional charts (1.0.1) are still SKIPPED.
 //
 // HOW TO SWITCH THEM ON (step 0.2.8 and later):
 //   1. Fill in `runEngine()` below so it calls the real engine (packages/engine) and returns an `EngineResult`.
@@ -9,7 +10,7 @@
 //        positions   → 0.2.8  (longitudes, sign, nakshatra, pada, retrograde, D-9)
 //        divisional  → 1.0.1  (all other divisional charts, D-2 … D-60)
 //        dashas      → 0.3.1  (Vimshottari mahadasha, antardasha, pratyantardasha)  ← ON since 0.3.1
-//        panchanga   → 0.9.1  (tithi, nakshatra, weekday, yoga, karana, hora)
+//        panchanga   → 0.9.1  (tithi, nakshatra, weekday, yoga, karana, hora)  ← ON since 0.9.1
 //   3. Run `pnpm test`. All enabled groups must pass before the step is merged (CLAUDE.md rule 4).
 //
 // Tolerances (D-074, amended by D-081; both stricter than the public D-013 promise):
@@ -37,7 +38,7 @@ const ENABLED = {
   positions: true, // 0.2.8
   divisional: false, // 1.0.1
   dashas: true, // 0.3.1
-  panchanga: false, // 0.9.1
+  panchanga: true, // 0.9.1
 };
 
 // D-074: births from 1900-01-01 on.
@@ -66,6 +67,8 @@ export type EngineInput = {
   utc: string;
   lat: number;
   lng: number;
+  /** The true UTC offset at birth from births.json, in seconds (decides the sunrise date, 0.9.1). */
+  utcOffsetSeconds: number;
 };
 
 export type EngineResult = {
@@ -86,7 +89,7 @@ export type EngineResult = {
 };
 
 async function runEngine(input: EngineInput): Promise<EngineResult> {
-  const { calculateChart, vimshottariForChart } = await import('@jathag/engine');
+  const { calculateChart, vimshottariForChart, panchangaForChart } = await import('@jathag/engine');
   const chart = calculateChart(input);
   const timeline = vimshottariForChart(chart);
   const period = (p: { lord: string; start: string; end: string }) => ({ lord: p.lord as BodyCode, startUtc: p.start, endUtc: p.end });
@@ -111,7 +114,11 @@ async function runEngine(input: EngineInput): Promise<EngineResult> {
       ...period(m),
       antardashas: m.antardashas.map((a) => ({ ...period(a), pratyantardashas: a.pratyantardashas.map(period) })),
     })),
-    get panchanga(): never { throw new Error('Panchanga not built yet (step 0.9.1)'); },
+    get panchanga() {
+      // The clock offset at birth decides the local date of the sunrise (D-098); the true offset from births.json.
+      const p = panchangaForChart(chart, { utcOffsetSeconds: input.utcOffsetSeconds });
+      return { tithi: p.tithi, nakshatra: p.nakshatra, weekday: p.weekday, yoga: p.yoga, karana: p.karana, horaLord: p.horaLord as BodyCode };
+    },
   };
 }
 
@@ -128,7 +135,7 @@ function inputFor(b: Birth): EngineInput {
   const [y, mo, d] = b.date.split('-').map(Number);
   const [h, mi, sec = 0] = b.time.split(':').map(Number); // R27–R29 have seconds
   const ms = Date.UTC(y, mo - 1, d, h, mi, sec) - Math.round(b.utc_offset * 3600) * 1000;
-  return { utc: new Date(ms).toISOString(), lat: b.lat, lng: b.lng };
+  return { utc: new Date(ms).toISOString(), lat: b.lat, lng: b.lng, utcOffsetSeconds: Math.round(b.utc_offset * 3600) };
 }
 
 const cache = new Map<string, Promise<EngineResult>>();
@@ -289,5 +296,16 @@ describe.skipIf(!ENABLED.panchanga)('engine: panchanga (0.9.1)', () => {
     const r = await engine(b);
     const { tithi, nakshatra, weekday, yoga, karana, horaLord } = expected[id].panchanga;
     expect(r.panchanga).toEqual({ tithi, nakshatra, weekday, yoga, karana, horaLord });
+  });
+
+  // Added in 0.9.1 (D-123 item 4): the two "% left" values within 0.05 percentage points of JHora's printout.
+  const TOL_LEFT_PERCENT = 0.05;
+  it.each(cases)('%s: tithi and nakshatra %% left within 0.05 percentage points', async (id, b) => {
+    const { calculateChart, panchangaForChart } = await import('@jathag/engine');
+    const input = inputFor(b);
+    const p = panchangaForChart(calculateChart(input), { utcOffsetSeconds: input.utcOffsetSeconds });
+    const e = expected[id].panchanga;
+    expect(Math.abs(p.tithiLeftPercent - e.tithiLeftPercent), `tithi ${p.tithiLeftPercent} vs ${e.tithiLeftPercent}`).toBeLessThanOrEqual(TOL_LEFT_PERCENT);
+    expect(Math.abs(p.nakshatraLeftPercent - e.nakshatraLeftPercent), `nakshatra ${p.nakshatraLeftPercent} vs ${e.nakshatraLeftPercent}`).toBeLessThanOrEqual(TOL_LEFT_PERCENT);
   });
 });

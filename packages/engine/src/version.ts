@@ -1,8 +1,9 @@
 // Engine version, included in every result (§5, FR-SET-03, NFR-DET-01).
 // Bump it whenever a change could alter any calculated value. Must equal package.json "version".
+// 0.6.0 (step 0.9.1): new output (Panchanga at birth, panchangaForChart; sunrise in the adapter); every earlier value is unchanged.
 // 0.5.0 (step 0.3.6): new output (approximate-time scanner, scanTimeRange); every earlier value is unchanged.
 // 0.4.0 (step 0.3.4): new output (life-area links per graha); every earlier value is unchanged.
 // 0.3.0 (step 0.3.2): new output (transits "now", sign changes, Sade Sati); every earlier value
 // (positions, Lagna, dashas) is unchanged, so the middle number goes up again.
 // 0.2.0 (step 0.3.1): Vimshottari dashas and the dashaYear setting. 0.1.0 was step 0.2.8.
-export const ENGINE_VERSION = '0.5.0';
+export const ENGINE_VERSION = '0.6.0';

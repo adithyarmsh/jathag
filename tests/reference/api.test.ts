@@ -94,3 +94,14 @@ describe('controls', () => {
     matchesJhora('R06', r);
   });
 });
+
+describe('panchanga through the chart endpoint (step 0.9.1)', () => {
+  it.each([['R01', undefined], ['R06', undefined], ['R27', 'bombay'], ['R28', 'calcutta'], ['R29', 'lmt']] as const)(
+    '%s: the six answer-key fields match JHora, with the clock the user would choose',
+    async (id, clock) => {
+      const r = await viaEndpoint(byId(id), clock);
+      const { tithi, nakshatra, weekday, yoga, karana, horaLord } = expected(id).panchanga;
+      expect(r.panchanga).toMatchObject({ tithi, nakshatra, weekday, yoga, karana, horaLord, weekdayFrom: 'sunrise' });
+    },
+  );
+});

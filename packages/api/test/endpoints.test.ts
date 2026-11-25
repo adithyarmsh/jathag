@@ -48,7 +48,7 @@ describe('chart: a normal birth', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
     expect(res.headers.get('server-timing')).toMatch(/transits;dur=[\d.]+, calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
     expect(json.apiVersion).toBe(1);
-    expect(json.engineVersion).toBe('0.5.0');
+    expect(json.engineVersion).toBe('0.6.0');
     expect(json.settings).toEqual({ ayanamsa: 'lahiri', node: 'mean', houseSystem: 'whole-sign', dashaYear: '365.25' });
     expect(json.place).toEqual({ kind: 'search', ...CHENNAI });
     expect(json.clock).toEqual({ source: 'timeZone', id: null, chosen: false, utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata', tzdataVersion: process.versions.tz });
@@ -313,7 +313,7 @@ describe('chart: transits + Sade Sati (step 0.3.2)', () => {
   it('returns positions now, sign changes and Sade Sati for the same asOf as the dashas', async () => {
     const { res, json } = await withAsOf(BASE);
     expect(res.status).toBe(200);
-    expect(Object.keys(json)).toEqual(['apiVersion', 'engineVersion', 'settings', 'place', 'clock', 'utc', 'clockQuestion', 'chart', 'dashas', 'transits', 'lifeAreas']);
+    expect(Object.keys(json)).toEqual(['apiVersion', 'engineVersion', 'settings', 'place', 'clock', 'utc', 'clockQuestion', 'chart', 'dashas', 'transits', 'lifeAreas', 'panchanga']);
     const t = json.transits;
     expect(Object.keys(t)).toEqual(['asOf', 'natal', 'positions', 'signChanges', 'sadeSati']);
     expect(t.asOf).toBe(json.dashas.asOf);
@@ -370,5 +370,41 @@ describe('chart: life-area links (step 0.3.4)', () => {
     // Sent once per graha, not per period: no reasons inside the dasha timeline.
     expect(JSON.stringify(json.dashas)).not.toContain('reasons');
     expect(text.match(/"reasons"/g)).toHaveLength(23); // 23 area entries in all
+  });
+});
+
+describe('chart: panchanga (step 0.9.1)', () => {
+  it('R01 through the endpoint returns the same panchanga as the engine, IDs only', async () => {
+    const { calculateChart, panchangaForChart } = await import('@jathag/engine');
+    const { json } = await chart(BASE);
+    const engine = panchangaForChart(calculateChart({ utc: '1992-08-14T01:15:00Z', lat: CHENNAI.lat, lng: CHENNAI.lng }), { utcOffsetSeconds: 19800 });
+    expect(json.panchanga).toEqual(engine);
+    expect(json.panchanga).toMatchObject({ tithi: 16, paksha: 2, nakshatra: 23, weekday: 6, yoga: 5, karana: 3, horaLord: 'Ve', weekdayFrom: 'sunrise' });
+    expect(json.panchanga!.sunrise).toMatch(/^1992-08-14T00:26:\d\dZ$/);
+    expect(Object.keys(json.panchanga!)).toEqual([
+      'tithi', 'paksha', 'tithiLeftPercent', 'nakshatra', 'nakshatraLeftPercent', 'yoga', 'karana', 'weekday', 'weekdayFrom', 'sunrise', 'horaLord',
+    ]);
+  });
+
+  it('uses the clock offset at birth for the sunrise date: manual entry +5:30 gives the same as the searched place', async () => {
+    const searched = await chart(BASE);
+    const manual = await chart({ date: '1992-08-14', time: '06:45', manual: { lat: CHENNAI.lat, lng: CHENNAI.lng, utcOffsetSeconds: 19800 } });
+    expect(manual.json.panchanga).toEqual(searched.json.panchanga);
+  });
+
+  it('a birth just before sunrise gets the previous weekday (Chennai, Fri 14 Aug 1992, 05:50 IST → Thursday)', async () => {
+    const { json } = await chart({ ...BASE, time: '05:50' });
+    expect(json.panchanga!.weekday).toBe(5);
+    expect(json.panchanga!.sunrise!.slice(0, 10)).toBe('1992-08-13');
+  });
+
+  it('the first hours of 1800 west of Greenwich, before sunrise: chart works, panchanga null (sunrise before the ephemeris data)', async () => {
+    const early = await chart({ date: '1800-01-01', time: '00:00', manual: { lat: 40.7, lng: -74, utcOffsetSeconds: -17760 } });
+    expect(early.res.status).toBe(200);
+    expect(early.json.panchanga).toBeNull();
+    const delhi = await chart({ date: '1800-01-02', time: '12:00', manual: { lat: 28.6, lng: 77.2, utcOffsetSeconds: 19800 } });
+    expect(delhi.json.panchanga).toMatchObject({ weekday: 5, weekdayFrom: 'sunrise' }); // Thu 2 Jan 1800
+    const late = await chart({ date: '2100-12-31', time: '23:59:59', place: CHENNAI });
+    expect(late.json.panchanga).toMatchObject({ weekday: 6, weekdayFrom: 'sunrise' }); // Fri 31 Dec 2100
   });
 });

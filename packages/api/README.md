@@ -81,7 +81,9 @@ Response (shortened):
                   "next": { "index": 2, … }, "saturn": { "sign": 12, "houseFromMoon": 2 } }
     }
   },
-  "lifeAreas": { "Su": [ { "area": "self", "reasons": [ { "kind": "rules", "house": 1, "sign": 5 } ] }, … ], …, "Ke": [ { "area": "money", "reasons": [ { "kind": "occupies", "house": 11 } ] } ] }
+  "lifeAreas": { "Su": [ { "area": "self", "reasons": [ { "kind": "rules", "house": 1, "sign": 5 } ] }, … ], …, "Ke": [ { "area": "money", "reasons": [ { "kind": "occupies", "house": 11 } ] } ] },
+  "panchanga": { "tithi": 16, "paksha": 2, "tithiLeftPercent": 44.04…, "nakshatra": 23, "nakshatraLeftPercent": 16.53…, "yoga": 5, "karana": 3,
+                 "weekday": 6, "weekdayFrom": "sunrise", "sunrise": "1992-08-14T00:26:29Z", "horaLord": "Ve" }
 }
 ```
 `clock.source` is `timeZone` (the place's IANA zone; `tzdataVersion` set), `clockRule` (a "Which clock?" option; `chosen` = sent by the client, otherwise the default) or `manual`. `chart` is exactly the engine's output (`packages/engine/README.md`).
@@ -91,6 +93,8 @@ Response (shortened):
 `transits` (step 0.3.2, D-099): the engine's `transitsForChart` for the same `asOf` as `dashas` — the 9 grahas at asOf with whole-sign houses from the natal Moon and Lagna signs, the sign changes of Saturn, Jupiter, Rahu and Ketu (from the latest `enters` at or before asOf, then 10 years ahead; kinds `enters` / `moves-back` / `enters-again`), and every Sade Sati from birth to 120 years after birth with phases, the crossings inside each period and the status at asOf. Rules and search method: `packages/engine/README.md`. Exact UTC only; shown on the clock at birth by the screens (0.3.7, D-099 item 6). About 14 KB raw / 2.3 KB compressed; the `Server-Timing` header has a `transits` entry with the time it took.
 
 `lifeAreas` (step 0.3.4, D-104): the engine's `lifeAreasForChart` — for each of the 9 grahas, the life areas it rules or occupies a house of, each with every reason (`{ "kind": "rules", "house": 7, "sign": 11 }` / `{ "kind": "occupies", "house": 7 }`). It is sent **once per graha, not per period**: every dasha period already carries its `lord`, and a period's life areas are its lord's, so a screen looks them up here (or uses the engine's `periodsForLifeArea`). About 1.7 KB raw / 0.3 KB compressed. Example (R01, Leo Lagna): `"Sa": [ { "area": "health", "reasons": [ { "kind": "rules", "house": 6, "sign": 10 }, { "kind": "occupies", "house": 6 } ] }, { "area": "relationships", "reasons": [ { "kind": "rules", "house": 7, "sign": 11 } ] }, { "area": "career", "reasons": [ … same as health … ] } ]`.
+
+`panchanga` (step 0.9.1, D-123): the engine's `panchangaForChart` with the clock offset at birth (`clock.utcOffsetSeconds`), which decides the date of the sunrise that starts the Vedic day. IDs only (see `packages/engine/README.md`). Where the Sun did not rise that date (polar day or night) `weekdayFrom` is `calendarDay` and `sunrise` and `horaLord` are `null`. The whole section is `null` only for a birth in the first hours of 1800 whose sunrise falls before the ephemeris data (mostly west of Greenwich, before sunrise on 1 January 1800); the chart itself still works there. About 0.2 KB raw / 0.1 KB compressed. No screen yet (the card is step 0.9.3).
 
 ### `POST /api/chart/range` (step 0.3.6, D-111)
 
