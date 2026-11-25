@@ -12,6 +12,7 @@ import {
   ENGINE_VERSION,
   lifeAreasForChart,
   localToUtc,
+  panchangaForChart,
   resolveSettings,
   SettingsError,
   TimeError,
@@ -23,6 +24,7 @@ import {
   type DashaNow,
   type EphemerisAdapter,
   type LifeAreaLinks,
+  type Panchanga,
   type Settings,
   type Transits,
   type VimshottariTimeline,
@@ -123,6 +125,16 @@ export interface ChartResponse {
    * lord's (`dashas…lord`), so a screen looks them up here (engine helper `periodsForLifeArea`).
    */
   lifeAreas: LifeAreaLinks;
+  /**
+   * Panchanga at birth (step 0.9.1, D-123, FR-CALC-11): tithi (1–30) with paksha (1 Shukla, 2 Krishna)
+   * and % left, the Moon's nakshatra with % left, the sunrise-based weekday (1 = Sunday), yoga (1–27),
+   * karana (1–11), hora lord, and the sunrise that started the Vedic day (UTC). The local date of that
+   * sunrise is taken on `clock.utcOffsetSeconds` (D-098). Where the Sun did not rise that date (polar
+   * day or night) `weekdayFrom` is 'calendarDay' and `sunrise` and `horaLord` are null. IDs only.
+   * Null only for a birth in the first hours of 1800 whose sunrise is before the ephemeris data
+   * (PANCHANGA_EDGE_BEFORE).
+   */
+  panchanga: Panchanga | null;
 }
 
 // ---------------------------------------------------------------- validation helpers
@@ -262,6 +274,14 @@ export const TIME_ERRORS: Record<TimeError['code'], ApiErrorCode> = {
  */
 export const EPHEMERIS_EDGE_BEFORE = '1800-01-02T00:00:00Z';
 
+/**
+ * The Panchanga needs the sunrise of the birth's date, or of the date before (step 0.9.1). For a birth
+ * in the first hours of 1800 (before sunrise, mostly west of Greenwich) that sunrise falls before the
+ * data files start. The chart still works there (it did before 0.9.1), so `panchanga` is null for those
+ * births: never a Moshier answer, never an error. Any later ephemeris failure stays an internal error.
+ */
+export const PANCHANGA_EDGE_BEFORE = '1800-01-03T00:00:00Z';
+
 export interface ChartOptions {
   /** Ephemeris adapter (the web app passes one with the deployed data-file path). */
   ephemeris?: EphemerisAdapter;
@@ -364,6 +384,14 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
   const transits = transitsForChart(chart, { asOf: now.asOf, ...(options.ephemeris ? { ephemeris: options.ephemeris } : {}) });
   if (options.timing) options.timing.transits = performance.now() - t0;
 
+  let panchanga: Panchanga | null;
+  try {
+    panchanga = panchangaForChart(chart, { utcOffsetSeconds: clock.utcOffsetSeconds, ...(options.ephemeris ? { ephemeris: options.ephemeris } : {}) });
+  } catch (e) {
+    if (!(e instanceof EphemerisError && e.code === 'EPHEMERIS_FALLBACK' && utc < PANCHANGA_EDGE_BEFORE)) throw e;
+    panchanga = null;
+  }
+
   return {
     apiVersion: API_VERSION,
     engineVersion: ENGINE_VERSION,
@@ -376,5 +404,6 @@ export function calculateChartResponse(req: ChartRequest, options: ChartOptions)
     dashas: { asOf: now.asOf, vimshottari, current: now.current, next: now.next },
     transits,
     lifeAreas: lifeAreasForChart(chart),
+    panchanga,
   };
 }

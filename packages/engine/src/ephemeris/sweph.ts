@@ -43,7 +43,12 @@ const SE_BODY: Record<EphemerisBody, number> = {
   Ra: C.SE_MEAN_NODE, // mean node (D-009); true node is a later setting
 };
 
-const EPHEMERIS_BITS = C.SEFLG_JPLEPH | C.SEFLG_SWIEPH | C.SEFLG_MOSEPH;
+// Sunrise / sunset observer conditions (D-072).
+const SUN_ALTITUDE_M = 0;
+const SUN_PRESSURE_HPA = 1013.25;
+const SUN_TEMPERATURE_C = 20;
+
+const EPHEMERIS_BITS =C.SEFLG_JPLEPH | C.SEFLG_SWIEPH | C.SEFLG_MOSEPH;
 
 // The data path is also process-wide. Re-setting it closes and reopens the files, so we only
 // set it when it differs from what was last set in this process.
@@ -108,6 +113,23 @@ export function createSwephAdapter(options: { ephePath?: string } = {}): Ephemer
         throw new EphemerisError('EPHEMERIS_FAILED', `Swiss Ephemeris failed (ascendant): ${r.error}`);
       }
       return r.data.points[0];
+    },
+
+    nextSunEvent(jdUt, lat, lng, kind) {
+      prepare();
+      // Swiss Ephemeris' own rise/set search (swe_rise_trans). No extra SE_BIT_* flags: the default is
+      // the upper limb with refraction (D-071). Pressure and temperature as typed into JHora (D-072).
+      const rsmi = kind === 'rise' ? C.SE_CALC_RISE : C.SE_CALC_SET;
+      const r = sweph.rise_trans(jdUt, C.SE_SUN, null, C.SEFLG_SWIEPH, rsmi, [lng, lat, SUN_ALTITUDE_M], SUN_PRESSURE_HPA, SUN_TEMPERATURE_C);
+      if (r.flag === -2) return null; // the Sun stays above or below the horizon (polar day or night)
+      if (r.flag < 0) {
+        throw new EphemerisError('EPHEMERIS_FAILED', `Swiss Ephemeris failed (sun ${kind}): ${r.error}`);
+      }
+      // rise_trans reports no ephemeris bits, so check with one Sun position at the found moment that
+      // the data files (not the Moshier fallback) are in use.
+      const s = sweph.calc_ut(r.data, C.SE_SUN, C.SEFLG_SWIEPH);
+      check(`sun ${kind}`, s.flag, s.error);
+      return r.data;
     },
   };
 }

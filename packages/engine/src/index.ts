@@ -57,6 +57,8 @@ export type {
   DashaDateRange,
   AntardashaDateRange,
 } from './approx-time.ts';
+export { panchangaForChart, lunarParts, vedicDay, horaLordAt, karanaForHalfTithi, WEEKDAY_LORD, HORA_ORDER, PanchangaInputError } from './panchanga.ts';
+export type { Panchanga, LunarParts, Paksha, VedicDay } from './panchanga.ts';
 export { ENGINE_VERSION } from './version.ts';
 export * from './ids.ts';
 export { placement, angularDistance, houseOf, nthSignFrom } from './zodiac.ts';
@@ -67,4 +69,4 @@ export type { AspectResult } from './aspects.ts';
 export { isCombust, COMBUSTION_ORB } from './combustion.ts';
 export { createSwephAdapter, defaultEphePath, DATA_FILES } from './ephemeris/sweph.ts';
 export { EphemerisError } from './ephemeris/types.ts';
-export type { EphemerisAdapter, EphemerisInfo } from './ephemeris/types.ts';
+export type { EphemerisAdapter, EphemerisInfo, SunEvent } from './ephemeris/types.ts';

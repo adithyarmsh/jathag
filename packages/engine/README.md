@@ -126,6 +126,25 @@ r.meta;        // { engineVersion, settings, ephemeris, input, seconds }
 - Not here (D-107 item 2): houses, life areas, Sade Sati or transits per segment; those come in 0.8.1 by running the chart once per segment.
 - `utcToLocal(utc, zone)` in `src/time.ts` (the reverse of `localToUtc`) gives the birth-place clock time of an instant, with `repeated: 'first' | 'second'` inside an hour that happened twice; the range endpoint uses it.
 
+## Panchanga at birth (step 0.9.1, `src/panchanga.ts`)
+
+FR-CALC-11, D-053, D-123. Tithi with paksha, nakshatra, vara (weekday), yoga, karana and the hora lord for a chart, matching JHora for all 29 reference births.
+
+```ts
+import { calculateChart, panchangaForChart } from '@jathag/engine';
+
+const p = panchangaForChart(calculateChart({ utc: '1992-08-14T01:15:00Z', lat: 13.083333, lng: 80.283333 }), { utcOffsetSeconds: 19800 });
+// { tithi: 16, paksha: 2, tithiLeftPercent: 44.04…, nakshatra: 23, nakshatraLeftPercent: 16.53…, yoga: 5, karana: 3,
+//   weekday: 6, weekdayFrom: 'sunrise', sunrise: '1992-08-14T00:26:29Z', horaLord: 'Ve' }
+```
+
+- **IDs only:** tithi 1–30 (1–15 Shukla Pratipada … Purnima, 16–30 Krishna Pratipada … Amavasya), paksha 1 Shukla / 2 Krishna, nakshatra 1–27, weekday 1 = Sunday … 7 = Saturday, yoga 1 = Vishkambha … 27 = Vaidhriti, karana 1 Bava … 7 Vishti, 8 Shakuni, 9 Chatushpada, 10 Naga, 11 Kimstughna, hora lord a body code. Same IDs as `tests/reference/scripts/ids.mjs`.
+- **Formulas** (on the chart's own sidereal Sun and Moon, in arcseconds): tithi = floor((Moon − Sun) / 12°) + 1; yoga = floor((Sun + Moon) / 13°20′) + 1; half-tithi h = floor((Moon − Sun) / 6°) + 1, karana h = 1 → 11, h = 2…57 → ((h − 2) mod 7) + 1, 58 → 8, 59 → 9, 60 → 10. A value exactly on a boundary belongs to the new one. "% left" = share of the current tithi or nakshatra still to go.
+- **Vara is sunrise-based:** the weekday of the last sunrise at or before birth, its date on the clock offset at birth (`utcOffsetSeconds`, D-098). A birth before sunrise gets the previous weekday (R19, R24).
+- **Sunrise** comes from the adapter's `nextSunEvent` (Swiss Ephemeris `rise_trans`, upper limb, refraction, 0 m, 1013.25 hPa, 20 °C; D-070 to D-072). It returns null where the Sun does not rise or set (polar day or night). There the weekday is the calendar weekday of the birth's local date, `weekdayFrom: 'calendarDay'`, and `sunrise` and `horaLord` are null (JHora has no reference for that).
+- **Hora:** 24 equal horas of 60 minutes from the Vedic day's sunrise; the first is the weekday lord's, then Su, Ve, Me, Mo, Sa, Ju, Ma repeating. This matches JHora (HoraPreference=0) for all 29 births; day and night split into 12 equal parts each matches only 23.
+- Pure apart from the sunrise; never reads the clock (NFR-DET-01). Bad offset: `PanchangaInputError`.
+
 ## Layout
 
 | Path | What |
@@ -136,6 +155,7 @@ r.meta;        // { engineVersion, settings, ephemeris, input, seconds }
 | `src/dasha.ts` | Vimshottari timeline, current period and coming up (step 0.3.1). |
 | `src/transits.ts` | Positions now, sign-change search (Saturn, Jupiter, Rahu/Ketu) and Sade Sati (step 0.3.2). |
 | `src/life-areas.ts` | Life-area table, graha → life-area links with reasons, periods for one area (step 0.3.4). |
+| `src/panchanga.ts` | Panchanga at birth: tithi, paksha, nakshatra, sunrise-based weekday, yoga, karana, hora lord (step 0.9.1). |
 | `src/approx-time.ts` | Approximate-time scanner: change moments, segments, certain values, dasha date ranges (step 0.3.6). |
 | `src/time.ts` | `localToUtc()` and its reverse `utcToLocal()`. Uses the Temporal API (`@js-temporal/polyfill`) with the runtime's built-in IANA tz database. |
 | `src/zodiac.ts` | Sign / nakshatra / pada / D-9 arithmetic, done in arcseconds. |

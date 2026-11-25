@@ -54,7 +54,7 @@ describe('a normal range (case A1 through the endpoint)', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
     expect(res.headers.get('server-timing')).toMatch(/scan;dur=[\d.]+, calc;dur=[\d.]+, cpu;dur=[\d.]+, total;dur=[\d.]+/);
     expect(json.apiVersion).toBe(1);
-    expect(json.engineVersion).toBe('0.5.0');
+    expect(json.engineVersion).toBe('0.6.0');
     expect(json.place).toEqual({ kind: 'search', ...CHENNAI });
     expect(json.clock).toEqual({ source: 'timeZone', id: null, chosen: false, utcOffsetSeconds: 19800, timeZone: 'Asia/Kolkata', tzdataVersion: process.versions.tz });
     expect(json.clockQuestion.applies).toBe(false);

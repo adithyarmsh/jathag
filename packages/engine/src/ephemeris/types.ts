@@ -39,7 +39,18 @@ export interface EphemerisAdapter {
 
   /** Tropical ascendant in degrees (apparent, true obliquity). */
   tropicalAscendant(jdUt: number, lat: number, lng: number): number;
+
+  /**
+   * The next sunrise or sunset from `jdUt` on (Julian day, UT), for an observer at `lat`/`lng`. An event
+   * exactly at `jdUt` may be returned itself, so to find the one after an event, search from a little later.
+   * Upper limb of the Sun, with refraction, altitude 0 m, 1013.25 hPa, 20 °C (D-070 to D-072; JHora's
+   * "tip of the Sun's disk appears on the eastern horizon"). Returns null when the Sun does not rise or
+   * set there around that time (polar day or night); never throws for that.
+   */
+  nextSunEvent(jdUt: number, lat: number, lng: number, kind: SunEvent): number | null;
 }
+
+export type SunEvent = 'rise' | 'set';
 
 /** Thrown when the ephemeris cannot give a full-precision Swiss Ephemeris answer. */
 export class EphemerisError extends Error {
