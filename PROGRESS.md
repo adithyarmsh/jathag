@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1 references in progress); v0.9 🔄 (0.9.1 pulled forward, D-123). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.9.1 Panchanga calculation (pulled forward, D-123), in review; the founder collects design references (0.4.1) in parallel |
-| **Next step** | 0.4.2 Design System (Project, once the references are in) |
+| **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1 references in progress); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
+| **Current step** | 0.4.1 References from the founder (O-001), in progress |
+| **Next step** | 0.4.2 Design System (Project) |
 | **Then** | 0.4.3 Mockups, 0.4.4 Design handoff, then 0.4.5 App shell |
-| **Blocked on** | Project review of the 0.9.1 PR; the founder's design references (O-001) |
-| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.9.1 once merged; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
+| **Blocked on** | The founder's design references (O-001) |
+| **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.9.1; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-25 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -107,7 +107,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ⏳ 0.8.1 Approx-time UX · ⏳ 0.8.2 Settings · ⏳ 0.8.3 Download design · ⏳ 0.8.4 Downloads · ⏳ 0.8.5 Report an issue
 
 ### v0.9 — Panchanga + legal
-- 🔄 0.9.1 Panchanga calc, in review (pulled forward, D-123): tithi with paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine and the chart API (`panchanga`); all 29 births match JHora; no screen (PR #26)
+- ✅ 0.9.1 Panchanga calc (pulled forward, D-123): tithi with paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine and the chart API (`panchanga`); all 29 births match JHora; no screen; approved (D-124) (PR #26)
 - ⏳ 0.9.2 Explanations · ⏳ 0.9.3 Panchanga card · ⏳ 0.9.4 Legal drafts · ⏳ 0.9.5 Legal pages · ⏳ 0.9.6 Analytics decision
 
 ### v1.0 — Beta launch
@@ -136,7 +136,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
-| 2026-11-25 | 0.9.1 | #26 | Panchanga calculation built (pulled forward, D-123): sunrise through the adapter (Swiss Ephemeris rise/set, upper limb, refraction), tithi/paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine (`panchangaForChart`, engine 0.6.0) and a `panchanga` section in the chart API. All 29 reference births match JHora exactly on all six fields and within 0.05 points on both "% left"; the hora lord matches with 60-minute horas from sunrise (29/29; day/night split into 12 parts: 23/29). Polar fallback: calendar weekday, flagged. D-123 and roadmap v2.14 committed unchanged. Nothing new on the site except the footer. In review. |
+| 2026-11-25 | 0.9.1 | #26 | Panchanga calculation built (pulled forward, D-123): sunrise through the adapter (Swiss Ephemeris rise/set, upper limb, refraction), tithi/paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine (`panchangaForChart`, engine 0.6.0) and a `panchanga` section in the chart API. All 29 reference births match JHora exactly on all six fields and within 0.05 points on both "% left"; the hora lord matches with 60-minute horas from sunrise (29/29; day/night split into 12 parts: 23/29). Polar fallback: calendar weekday, flagged. D-123 and roadmap v2.14 committed unchanged. Nothing new on the site except the footer. Approved by the Project (D-124, committed unchanged); squash-merged. |
 | 2026-11-25 | 0.3.7.3 | #25 | Step 0.3.7.3 and milestone v0.3 closed (D-121): the founder zoomed out on his phone and the page fills the screen; D-121 and D-122 committed unchanged. The founder's optional JHora comparison matched everything (settings test, Dasas view for R01, R06 and R16, Saturn into Libra, Scorpio and Sagittarius; D-122). Docs and progress only, no code change. |
 | 2026-11-24 | 0.3.7.3 | #24 | Page width bug fixed (D-119): measured on a production build at 390 px after calculating R01, the page was 815 px wide; the only elements past the screen were 12 hidden "Does not apply" texts (position absolute) in the planet table (right edges up to 814 px) and the today's-positions table (410 px), nothing else even with every list open. Both scroll boxes now `relative`; afterwards the page equals the screen at 320/360/390/430 px, light and dark, in every state; tables still scroll inside their boxes. Regression test renders both tables and checks every scroll box in the page code. 0.3.7.1 and 0.3.7.2 marked ✅ (founder checked them on his phone, D-119). D-119 and roadmap v2.13 committed unchanged. Approved by the Project as built (D-120, committed unchanged). Squash-merged; stays 🔄 until the founder zooms out on his phone. |
 | 2026-11-24 | 0.3.7.2 | #23 | Founder polish round 2 built (D-117): Sade Sati list without the outer opener, one opener per period with Rising/Peak/Setting and Saturn's sign changes inside (indented 15 px, own sub-heading), count in the sentence under the heading; Dasha periods rows get the same level colours as the Right now tiers; the tiled star dust is replaced by random four-point stars drawn once per page load in one SVG (opacity 0.5–1 × the old dots, 28 per 320 × 320 px, page grows without stars moving). D-117 and roadmap v2.12 committed unchanged. Approved by the Project (D-118, committed unchanged) with one change: stars 3.5 to 5.25 px tip to tip (were 3 to 4.5). Squash-merged; 0.3.7.2 and 0.3.7.1 stay 🔄 until the founder checks the live site. |
