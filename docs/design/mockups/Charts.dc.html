@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Drawn charts, South and North, D1 and D9</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="{{t.vars}}">
+<div style="width: 880px; box-sizing: border-box; padding: 24px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 16px">
+<p style="margin: 0 0 18px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">{{t.label}}</p>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+<sc-for list="{{t.charts}}" as="c" hint-placeholder-count="4">
+<figure style="margin: 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px">
+<figcaption style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Fraunces, Georgia, serif; font-size: 20px; line-height: 28px">{{c.title}}</span><span style="font-size: 13px; line-height: 20px; color: var(--muted)">{{c.note}}</span></figcaption>
+<svg role="img" aria-label="{{c.aria}}" viewBox="0 0 400 400" style="display: block; width: 100%; height: auto">
+<rect x="0.5" y="0.5" width="399" height="399" rx="10" fill="var(--card)" stroke="var(--fb)"></rect>
+<sc-if value="{{c.south}}" hint-placeholder-val="{{true}}">
+<sc-for list="{{c.boxes}}" as="b" hint-placeholder-count="12">
+<rect x="{{b.x}}" y="{{b.y}}" width="100" height="100" fill="{{b.fill}}" stroke="var(--fb)"></rect>
+<text x="{{b.sx}}" y="{{b.sy}}" font-size="10" fill="var(--muted)">{{b.sign}}</text>
+<text x="{{b.hx}}" y="{{b.hy}}" font-size="10" fill="var(--muted)" text-anchor="end">{{b.house}}</text>
+<sc-for list="{{b.lines}}" as="l"><text x="{{l.x}}" y="{{l.y}}" font-size="17" fill="{{l.fill}}" font-weight="{{l.w}}" text-anchor="middle">{{l.t}}</text></sc-for>
+</sc-for>
+<rect x="100" y="100" width="200" height="200" fill="var(--raised)" stroke="var(--fb)"></rect>
+<path d="{{c.diag}}" stroke="var(--accent)" stroke-width="1.6"></path>
+<text x="200" y="184" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="16" fill="var(--ink)">{{c.centre}}</text>
+<text x="200" y="210" text-anchor="middle" font-size="11" fill="var(--muted)">14 Aug 1992 · 6:45 AM</text>
+<text x="200" y="228" text-anchor="middle" font-size="11" fill="var(--muted)">Chennai, Tamil Nadu</text>
+</sc-if>
+<sc-if value="{{c.north}}" hint-placeholder-val="{{false}}">
+<path d="M200 0L400 200L200 400L0 200Z" fill="var(--soft)" fill-opacity="0"></path>
+<path d="M200 0L300 100L200 200L100 100Z" fill="var(--soft)"></path>
+<path d="M0 0L400 400M400 0L0 400M200 0L400 200L200 400L0 200Z" stroke="var(--fb)" fill="none"></path>
+<sc-for list="{{c.houses}}" as="h" hint-placeholder-count="12">
+<text x="{{h.nx}}" y="{{h.ny}}" font-size="11" fill="var(--muted)" text-anchor="middle">{{h.num}}</text>
+<sc-for list="{{h.lines}}" as="l"><text x="{{l.x}}" y="{{l.y}}" font-size="15" fill="{{l.fill}}" font-weight="{{l.w}}" text-anchor="middle">{{l.t}}</text></sc-for>
+</sc-for>
+</sc-if>
+</svg>
+<div style="padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Index</p>
+<p style="margin: 0; font-size: 12px; font-weight: 600; color: var(--muted)">Signs</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 10px; font-size: 12px; line-height: 18px"><sc-for list="{{t.index.signs}}" as="g" hint-placeholder-count="12"><span><strong style="font-weight: 600">{{g.a}}</strong> <span style="color: var(--muted)">{{g.n}}</span></span></sc-for></div>
+<p style="margin: 4px 0 0; font-size: 12px; font-weight: 600; color: var(--muted)">Planets</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 10px; font-size: 12px; line-height: 18px"><sc-for list="{{t.index.planets}}" as="g" hint-placeholder-count="11"><span><strong style="font-weight: 600">{{g.a}}</strong> <span style="color: var(--muted)">{{g.n}}</span></span></sc-for></div>
+</div>
+</figure>
+</sc-for>
+</div>
+<p style="margin: 18px 0 0; font-size: 13px; color: var(--muted)">South: signs stay in fixed boxes, house numbers count from the Lagna. North: houses stay fixed (1st at the top) and the small names are the signs. Every chart has its index underneath.</p>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1840,"height":1620}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--soft':'#F4EAD2','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--soft':'#262A3A','--shadow':'none'};
+    const SHORT = ['','Ari','Tau','Gem','Can','Leo','Vir','Lib','Sco','Sag','Cap','Aqu','Pis'];
+    const IDX = { signs: [['Ari','Aries'],['Tau','Taurus'],['Gem','Gemini'],['Can','Cancer'],['Leo','Leo'],['Vir','Virgo'],['Lib','Libra'],['Sco','Scorpio'],['Sag','Sagittarius'],['Cap','Capricorn'],['Aqu','Aquarius'],['Pis','Pisces']].map(([a, n]) => ({ a, n })),
+      planets: [['La','Lagna, rising sign'],['Su','Sun'],['Mo','Moon'],['Ma','Mars'],['Me','Mercury'],['Ju','Jupiter'],['Ve','Venus'],['Sa','Saturn'],['Ra','Rahu'],['Ke','Ketu'],['(R)','retrograde']].map(([a, n]) => ({ a, n })) };
+    const SIGNS = ['','Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+    const POS = {12:[0,0],1:[100,0],2:[200,0],3:[300,0],4:[300,100],5:[300,200],6:[300,300],7:[200,300],8:[100,300],9:[0,300],10:[0,200],11:[0,100]};
+    const ord = (n) => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+    const D1 = { lagna: 5, by: {5:['La','Ju','Ve'],4:['Su','Me'],11:['Mo'],2:['Ma'],10:['Sa (R)'],9:['Ra'],3:['Ke']} };
+    const D9 = { lagna: 3, by: {3:['La','Ma'],4:['Sa (R)'],5:['Ve'],7:['Me'],8:['Mo','Ju','Ke'],12:['Su'],2:['Ra']} };
+    const toLines = (ps, cx, cy, lh) => {
+      const rows = []; let rest = ps.slice();
+      if (rest[0] === 'La') { rows.push(['La']); rest = rest.slice(1); }
+      while (rest.length) { rows.push(rest.slice(0, 2)); rest = rest.slice(2); }
+      const y0 = cy - (rows.length - 1) * lh / 2 + 6;
+      return rows.map((r, i) => ({ t: r.join('  '), x: cx, y: y0 + i * lh, fill: r[0] === 'La' ? 'var(--at)' : 'var(--ink)', w: r[0] === 'La' ? 600 : 500 }));
+    };
+    const south = (d, title, centre, note) => {
+      const boxes = Object.keys(POS).map(Number).map((s) => { const [x, y] = POS[s]; const house = ((s - d.lagna + 12) % 12) + 1;
+        return { x, y, sign: SIGNS[s], house: ord(house), sx: x + 8, sy: y + 92, hx: x + 92, hy: y + 15, fill: s === d.lagna ? 'var(--soft)' : 'var(--card)', lines: toLines(d.by[s] || [], x + 50, y + 50, 22) }; });
+      const [lx, ly] = POS[d.lagna];
+      return { south: true, north: false, title, note, centre, boxes, diag: 'M' + lx + ' ' + (ly + 26) + 'L' + (lx + 26) + ' ' + ly, aria: title + ' for the sample birth, South Indian style' };
+    };
+    const HC = {1:[200,96,200,168],2:[100,34,100,74],3:[34,100,74,104],4:[100,196,168,204],5:[34,300,74,304],6:[100,362,100,334],7:[200,300,200,240],8:[300,362,300,334],9:[366,300,326,304],10:[300,196,232,204],11:[366,100,326,104],12:[300,34,300,74]};
+    const north = (d, title, note) => {
+      const houses = Object.keys(HC).map(Number).map((h) => { const [cx, cy, nx, ny] = HC[h]; const s = ((d.lagna + h - 2) % 12) + 1;
+        return { num: SHORT[s], nx, ny, lines: toLines(d.by[s] || [], cx, cy, 19) }; });
+      return { south: false, north: true, title, note, houses, aria: title + ' for the sample birth, North Indian style' };
+    };
+    const n1 = 'Rasi, the main chart: where each planet stood at birth.';
+    const n9 = 'Navamsa: each sign split into nine parts. Read alongside the main chart, often for relationships and how strong each planet is.';
+    const charts = [ south(D1, 'South · Rasi (D1)', 'Rasi chart (D-1)', n1), south(D9, 'South · Navamsa (D9)', 'Navamsa (D-9)', n9), north(D1, 'North · Rasi (D1)', n1), north(D9, 'North · Navamsa (D9)', n9) ];
+    return { themes: [ { vars: light, label: 'Light', charts, index: IDX }, { vars: dark, label: 'Dark', charts, index: IDX } ] };
+  }
+}
+</script>
+</body>
+</html>

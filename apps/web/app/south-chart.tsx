@@ -37,10 +37,10 @@ export const SouthChart = forwardRef<
     return (
       <section
         aria-labelledby="south-chart-title"
-        className="card-outer rounded-[24px] bg-card p-4 shadow-soft sm:p-8 lg:col-span-2"
+        className="card-outer p-4 sm:p-6 lg:col-span-2"
       >
         {/* Visible header, same style as the planet table's (D-102) */}
-        <h2 id="south-chart-title" ref={headingRef} tabIndex={-1} className="font-serif text-[28px] leading-tight font-medium">
+        <h2 id="south-chart-title" ref={headingRef} tabIndex={-1} className="type-h2">
           {s.heading}
         </h2>
         <p className="mt-1 text-sm text-muted">{summary}</p>
@@ -95,7 +95,7 @@ export const SouthChart = forwardRef<
                 textAnchor="middle"
                 fontSize={l.size}
                 fontWeight={l.kind === "title" ? 500 : 400}
-                className={l.kind === "title" ? "south-chart-title fill-ink font-serif" : l.kind === "place" ? "fill-muted" : "fill-ink"}
+                className={l.kind === "title" ? "south-chart-title fill-ink font-display" : l.kind === "place" ? "fill-muted" : "fill-ink"}
               >
                 {l.text}
               </text>

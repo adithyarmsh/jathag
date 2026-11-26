@@ -52,10 +52,10 @@ describe('error messages', () => {
 });
 
 describe('fixed wording from the handoff (D-092, D-093)', () => {
-  it('form title, Beta notice and page description (D-093)', () => {
+  it('form title, Beta notice and page description (D-093; Beta band text from the design spec §4, step 0.4.5)', () => {
     expect(en.form.title).toBe('Generate Your Chart');
     expect(en.form.subtitle).toBe('Date, time and place of birth.');
-    expect(en.betaNotice).toBe('Jathag Beta — The stars are still aligning. We are actively refining our features and design. Expect occasional shifts as we calibrate the cosmos.');
+    expect(en.betaBand).toBe('Jathag Beta. The stars are still aligning: we are actively refining our features and design.');
     expect(en.meta.description.endsWith('Beta, stars are being aligned.')).toBe(true);
   });
   it('privacy line', () => {

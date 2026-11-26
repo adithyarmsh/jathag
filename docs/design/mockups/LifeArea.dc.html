@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Life-area page, Health and wellness</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+
+<main style="max-width: 760px; margin: 0 auto; padding: 20px 16px 56px; display: flex; flex-direction: column; gap: 22px">
+<a href="#" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--at); text-decoration: none"><span aria-hidden="true">←</span> Meera's chart</a>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Life area</p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 36px; line-height: 42px">Health &amp; wellness</h1>
+<p style="margin: 0; font-size: 16px; line-height: 26px; color: var(--muted)">Read from two houses: the 1st, your body and energy, and the 6th, your daily habits and recovery.</p>
+</section>
+
+<aside role="note" style="display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--accent); border-radius: 12px; background: var(--soft)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--at)" stroke-width="1.8" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9.5"></circle><path d="M12 11v6M12 7.5v.01"></path></svg>
+<p style="margin: 0; font-size: 14px; line-height: 22px"><strong style="font-weight: 600">General wellness only, not medical advice.</strong> For any health concern, please talk to a doctor.</p>
+</aside>
+
+<section style="padding: 18px; background: var(--card); border: 1px solid var(--accent); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px">
+<span style="align-self: flex-start; padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--at); font-size: 12px; font-weight: 600">Active now</span>
+<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 20px; line-height: 28px">Jupiter's Mahadasha touches this area</p>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">Jupiter sits in your 1st house. Its chapter runs from 11 Oct 2011 to 11 Oct 2027.</p>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px">
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 4px"><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">1st house · Leo</p><p style="margin: 0; font-size: 15px; font-weight: 500">Body, energy, how you carry yourself</p><p style="margin: 0; font-size: 13px; color: var(--muted)">Ruled by the Sun · holds Jupiter and Venus</p></div>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 4px"><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">6th house · Capricorn</p><p style="margin: 0; font-size: 15px; font-weight: 500">Daily routines, work habits, recovery</p><p style="margin: 0; font-size: 13px; color: var(--muted)">Ruled by Saturn · holds Saturn</p></div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">Planets linked to this area</h2>
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden">
+<sc-for list="{{f.links}}" as="l" hint-placeholder-count="4"><a href="#" style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding: 0 14px; border-bottom: 1px solid var(--line); text-decoration: none"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">{{l.p}}</span><span style="font-size: 13px; color: var(--muted)">{{l.why}}</span></span><span aria-hidden="true" style="color: var(--at)">→</span></a></sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">Periods that touch this area</h2>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">From today to 2046: long-term chapters led by a linked planet, and the medium-term periods inside them.</p>
+<sc-for list="{{f.periods}}" as="p" hint-placeholder-count="2">
+<div style="{{p.row}}">
+<p style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t1)"><span style="width: 18px; height: 8px; border-radius: 999px; background: var(--t1)"></span>Long-term · Mahadasha</p>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="font-family: Fraunces, Georgia, serif; font-size: 20px">{{p.lord}} <span style="font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; color: var(--at)">{{p.tag}}</span></span><span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums">{{p.range}}</span></div>
+<span style="font-size: 13px; color: var(--muted)">{{p.why}}</span>
+<sc-if value="{{p.hasAds}}" hint-placeholder-val="{{false}}">
+<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t2)"><span style="width: 18px; height: 6px; border-radius: 999px; background: var(--t2)"></span>Medium-term · Antardasha</p>
+<sc-for list="{{p.ads}}" as="a" hint-placeholder-count="4"><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; padding: 8px 12px; border-radius: 8px; background: var(--raised); border: 1px solid var(--line)"><span style="font-size: 14px; font-weight: 600; color: var(--t2)">{{a.lord}} <span style="font-weight: 400; color: var(--muted)">· {{a.why}}</span></span><span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums">{{a.range}}</span></div></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<p style="margin: 0; font-size: 13px; line-height: 20px; color: var(--muted)">Later: the Venus (2070–2090) and Sun (2090–2096) Mahadashas, and the matching shorter periods inside every chapter.</p>
+<a href="#" style="align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 600; color: var(--at)">Open the full timeline</a>
+</section>
+
+<section style="padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">What this means for you</h2><span style="flex: none; padding: 2px 10px; border-radius: 999px; background: var(--soonB); color: var(--soonT); font-size: 12px; font-weight: 600">Coming soon</span></div>
+<p style="margin: 0; font-size: 15px; line-height: 24px; color: var(--muted)">A short, calm reading of this area from the planets above, with habits worth keeping. Wellness only, never diagnosis.</p>
+</section>
+
+<nav aria-label="Other life areas" style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{f.areas}}" as="a" hint-placeholder-count="10"><a href="#" style="{{a.style}}">{{a.name}}</a></sc-for>
+</nav>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":2420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--t1':'#76560F','--t2':'#23666F','--soonT':'#9A3324','--soonB':'#FBEEEA','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--t1':'#D9B566','--t2':'#7FC6CF','--soonT':'#F0A596','--soonB':'#3A2024','--shadow':'none'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const links = [ { p: 'Sun', why: 'rules the 1st house' }, { p: 'Jupiter', why: 'sits in the 1st house · leads your current Mahadasha' }, { p: 'Venus', why: 'sits in the 1st house' }, { p: 'Saturn', why: 'rules and sits in the 6th house' } ];
+    const why = { Sun: 'rules the 1st', Jupiter: 'sits in the 1st', Venus: 'sits in the 1st', Saturn: 'rules and sits in the 6th' };
+    const pRow = (cur) => ({ display: 'flex', flexDirection: 'column', gap: '4px', padding: '14px 16px', borderRadius: '12px', border: '1px solid ' + (cur ? 'var(--accent)' : 'var(--line)'), background: cur ? 'var(--soft)' : 'var(--card)' });
+    const ad = (lord, range) => ({ lord, range, why: why[lord] });
+    const periods = [
+      { lord: 'Jupiter', tag: 'Now', range: '11 Oct 2011 – 11 Oct 2027', why: 'Jupiter sits in the 1st house', hasAds: false, ads: [], row: pRow(true) },
+      { lord: 'Saturn', tag: 'Next', range: '11 Oct 2027 – 11 Oct 2046', why: 'Saturn rules and sits in the 6th house', hasAds: true, row: pRow(false),
+        ads: [ ad('Saturn', '11 Oct 2027 – 14 Oct 2030'), ad('Venus', '2 Aug 2034 – 1 Oct 2037'), ad('Sun', '1 Oct 2037 – 13 Sep 2038'), ad('Jupiter', '29 Mar 2044 – 11 Oct 2046') ] } ];
+    const areas = ['Self','Money & family','Communication','Home','Learning','Health','Relationships','Career','Luck','Spirituality'].map((name) => { const on = name === 'Health';
+      return { name, style: { display: 'inline-flex', alignItems: 'center', minHeight: '40px', padding: '0 14px', borderRadius: '999px', fontSize: '13px', textDecoration: 'none', border: '1px solid ' + (on ? 'var(--accent)' : 'var(--fb)'), background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--on)' : 'var(--muted)', fontWeight: on ? 600 : 400 } }; });
+    const data = { links, periods, areas };
+    return { frames: [ { vars: light, frame: frame(390, 28), ...data }, { vars: dark, frame: frame(390, 28), ...data }, { vars: light, frame: frame(1280, 0), ...data } ] };
+  }
+}
+</script>
+</body>
+</html>

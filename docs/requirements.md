@@ -1,6 +1,6 @@
 # JATHAG – REQUIREMENTS DOCUMENT (WEB v1)
 
-Version 1.12 · 2026-11-24 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
+Version 1.13 · 2026-11-26 · Source of truth together with the Product Brief and the Decisions Log. Where this document and the brief disagree, this document wins (it reflects later decisions). Every requirement has an ID (e.g. FR-CALC-03) so handoffs and tests can point to it.
 
 Each requirement is tagged with the milestone that delivers it (see §14). How to read priorities: **"Must"** = required for the v1 beta launch. **"Should"** = wanted in v1, can slip to v1.1 if it blocks launch. **"Later"** = explicitly not in v1.
 
@@ -24,7 +24,7 @@ A free, ad-free, private-by-default web app that turns a person's birth details 
 4. **Honest about uncertainty.** Approximate birth times show what is certain vs uncertain.
 5. **Constructive, never fear-based.** No fear-selling, no remedies, no doom.
 6. **Private by default.** No accounts; nothing about the user stored on our servers.
-7. **Premium and calm.** Minimal, cosmic, gold-on-midnight; no clutter, no ads, no flashing.
+7. **Calm and trustworthy ("Still Water", D-126).** Spacious; warm paper or deep ink blue with one gold accent; no clutter, no ads, no flashing; motion only as feedback. Visual rules live in `docs/design/design-spec.md`.
 
 ---
 
@@ -32,9 +32,9 @@ A free, ad-free, private-by-default web app that turns a person's birth details 
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-IN-01 | Input form: Name (free text, used as profile name), Date of birth, Time of birth, Place of birth. | Must |
+| FR-IN-01 | Input form: Name (optional free text, used as the profile name; left empty, the profile is called "My chart", D-129), Date of birth, Time of birth, Place of birth. | Must |
 | FR-IN-02 | Date range supported: 1 Jan 1800 – 31 Dec 2100. Dates outside are rejected with a clear message. | Must |
-| FR-IN-03 | Time of birth has four modes: (a) **Exact** time (hour, minute; seconds optional in advanced) — the main form asks for this; the approximate modes are offered **under Advanced settings** (D-106, FR-SET-02): (b) **Custom range** (from–to, e.g. 07:00–08:00); (c) **Preset (part of day)** — Morning 6 am–12 noon, Afternoon 12 noon–4 pm, Evening 4 pm–8 pm, Night 8 pm–6 am (next day); whether the presets stay, and the exact placement and wording, are decided with the input details design (v0.4, 0.4.6); (d) **Don't know** (whole day). | Must |
+| FR-IN-03 | Time of birth has four modes: (a) **Exact** time (hour, minute; seconds optional in advanced) — the main form asks for this; the approximate modes are offered **under Advanced settings** (D-106, FR-SET-02): (b) **Custom range** (from–to, e.g. 07:00–08:00); (c) **Preset (part of day)** — Morning 6 am–12 noon, Afternoon 12 noon–4 pm, Evening 4 pm–8 pm, Night 8 pm–6 am (next day); the presets stay as shortcuts inside the range choice (D-129); until 0.8.1 the approximate choices are shown switched off with a "Coming soon" tag (D-132); (d) **Don't know** (whole day). The three choices are worded "I know the exact time" / "I know roughly when" / "I don't know the time", and a "Not sure of the exact time?" link under the time field opens them (D-129). | Must |
 | FR-IN-04 | Place search with type-ahead suggestions, starting at 3 characters. Each suggestion shows "Place, District, State, Country" (e.g. "Kumbakonam, Thanjavur, Tamil Nadu, India") to disambiguate duplicates: plain names without accents, repeats collapsed, the words "District"/"Division" dropped. Suggestions are ordered: places in India first (matched on all names, incl. old names, e.g. "Bombay" → Mumbai), largest population first; then places outside India (matched on their main name only), largest first; ties: cities and city neighbourhoods before villages, then alphabetical (e.g. "che" → Chennai first). (D-087, D-088) | Must |
 | FR-IN-05 | Place coverage: every populated place in India in GeoNames (cities, towns, villages, neighbourhoods, including abandoned and historical places) plus worldwide places with population ≥ 500. Every populated place worldwide does not fit the free plan (D-087). | Must |
 | FR-IN-06 | After a place is chosen, show its latitude, longitude and time zone in small text (expanded in advanced mode) so users can sanity-check. | Should |
@@ -105,7 +105,8 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-SET-01 | Defaults: Vedic, Sidereal, Lahiri, Rasi D1 + Navamsa D9, Vimshottari, Whole sign, Mean node, 365.25-day year. | Must |
-| FR-SET-02 | Advanced toggle (hidden by default) exposes: Ayanamsa (Lahiri, Raman, Krishnamurti — only Lahiri is reference-tested; others marked "not verified"), Node (Mean/True), Dasha year length (365.25 / 360 / 365.2422), seconds in time input, manual coordinates, approximate birth time: custom range, part-of-day presets, don't know (FR-IN-03, D-106; placement decided with the input design). | Must |
+| FR-SET-02 | Advanced toggle (hidden by default) exposes only options we verify (D-131): ayanamsa Lahiri, Mean node and whole-sign houses (shown as fixed values, for transparency); dasha year length 365.25 days (default, reference-tested) with 360 and 365.2422 as choices (marked "not checked against reference charts"); seconds in time input; manual coordinates; approximate birth time (FR-IN-03, D-106, D-129). | Must |
+| FR-SET-04 | **More calculation options (v1.2, D-131):** True node; Raman and Krishnamurti (KP) ayanamsas. Each is reference-tested against JHora before it is offered. | Later (v1.2) |
 | FR-SET-03 | Every chart screen and download shows the settings used in small text. | Must |
 
 ### 5.6 Calculation API
@@ -125,22 +126,27 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-UI-01 | Responsive: works well from 360 px phones to large desktops. Mobile-first layout. | Must |
-| FR-UI-02 | Dark and light mode; default follows the device setting; user can override with the header toggle (remembered). Dark = midnight blue + gold + ivory. Light = warm off-white + deep ink + **darker gold accents** (no blue). | Must |
+| FR-UI-02 | Dark and light mode; default follows the device setting; user can override with the header toggle (remembered). Dark = deep ink blue + soft gold + ivory text. Light = warm paper + near-black ink + deep gold (#76560F) with white text on gold fills (D-127). Theme choices: Light / Dark / Match device. All colours, type, spacing and corners come from the Design System "Still Water" (D-126 to D-128), stored in `docs/design/tokens.json` and specified in `docs/design/design-spec.md`. | Must |
 | FR-UI-03 | "Beta" label visible in the header. | Must |
-| FR-UI-04 | Footer (two lines): About, Disclaimer, Privacy, Sources & credits (GeoNames, Swiss Ephemeris), Source code (AGPL link); and "Made by Adithya" with "Adithya" underlined, linking to https://yoloadithya.com (D-068). | Must |
+| FR-UI-04 | Footer (two lines): About, FAQ, Disclaimer, Privacy, Sources & credits (GeoNames, Swiss Ephemeris), Source code (AGPL link); and "Made by Adithya" with "Adithya" underlined, linking to https://yoloadithya.com (D-068). | Must |
 | FR-UI-05 | Every interpretation block has an "i" button opening a pop-up: which factors produced it (e.g. "Saturn in 7th house · Saturn aspects 7th from 1st"), plus a small "See classical source" link to the Sources screen. | Must |
-| FR-UI-07 | Header (B2): wordmark + Beta badge, Learn link (hidden until v1.4), About, Profile (opens saved profiles), theme toggle. Mobile: Profile and menu buttons. | Must |
+| FR-UI-07 | Header (one line, sticky): wordmark + Beta badge. Desktop: New chart, Saved profiles, About, FAQ, a Settings button and the theme button (Learn hidden until v1.4). Phones: theme and menu buttons; the menu holds the same links and the Light / Dark / Match device choice (design spec §4). | Must |
 | FR-UI-08 | Hover highlight: on pointer devices, the border of every outer card/box turns the accent colour on hover (subtle transition); inner cards don't react; the same highlight appears when keyboard focus is inside the card (D-066). | Must |
 | FR-UI-09 | Minimal numbering: no decorative numbers; hierarchy shown through headings, subheadings, spacing and type; numbers only where meaningful (D-067). | Must |
-| FR-UI-10 | Star-dust dot pattern on the page background in both themes (gold-tinted, low opacity), never behind card text (D-065). | Must |
+| FR-UI-10 | Background stars in both themes: random four-point gold stars at low opacity, behind everything, never behind card text, no clicks, hidden from screen readers (D-065, D-117, D-118). | Must |
 | FR-UI-06 | "Report an issue" link on every reading (opens a simple form or pre-filled email/GitHub issue; no personal data sent unless the user includes it). | Must |
+| FR-UI-11 | **Section navigation** on long pages (the chart page): sticky chips under the header on phones and tablets, a thin dot rail beside the content on desktop; the active section follows the scroll (D-125, D-127). | Must |
+| FR-UI-12 | **Motion as feedback, at most five kinds:** content fades up once as it scrolls into view, hover grow on buttons and chips, sliding fill on toggles, openers with a drawn gold underline, progress bars filling on view; 150–400 ms ease-out, no bounce; everything respects reduced-motion and the page is readable without JavaScript (D-125, D-127). | Must |
+| FR-UI-13 | **One-line "what this is"** under each section heading and for each chart type and Panchanga part: knowledge first, wit second (D-125). | Must |
+| FR-UI-14 | **Section divider:** a hairline with one small gold four-point star between sections, fading in once (D-126, D-127). | Must |
+| FR-UI-15 | **About page and FAQ page** (own pages; About linked from the footer and the menu; FAQ answers collapsible, each question linkable) (D-125). | Must (v0.9) |
 
 ### 6.2 Home page (B2 design, one screen, no onboarding screens)
 
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-HOME-01 | One screen, layout per design "B2 — Split screen" (Decisions D-048): desktop = left hero card + right form card. **Phone order (D-064):** short intro (Indian-language words + tagline) → the birth form → the "What you'll get" cards below the form. (The Coming Soon page, which has no form, shows the hero first.) | Must |
-| FR-HOME-02 | Left hero: Indian-language words for "birth chart" (Hindi, Bengali, Telugu, Tamil, Kannada, Malayalam), the tagline "Know your chart, not just your sign.", a one-sentence intro, and three "What you'll get" cards (Accurate chart · Plain-language explanations · Your life timeline), without decorative numbers (D-067). | Must |
+| FR-HOME-02 | Left hero: Indian-language words for "birth chart" (Hindi, Bengali, Telugu, Tamil, Kannada, Malayalam), the tagline "Know your chart, not just your sign.", a one-sentence intro, and three "What you'll get" items (An accurate chart · Your life timeline · Plain-language explanations), without decorative numbers (D-067). | Must |
 | FR-HOME-03 | Right card "Your birth details — Five questions, about a minute": the birth form (FR-IN-01…10) and a "See my chart" button, with the privacy line "Your details are only used to calculate your chart. Nothing is stored on our servers." under it (D-092; must change when accounts arrive, O-008). | Must |
 | FR-HOME-04 | No separate welcome or chart-style screens (supersedes the earlier onboarding requirements). | Must |
 | FR-HOME-05 | Progress goes live as each step is merged (Decisions D-060). Until the real form exists (v0.2), the right-hand card shows "Coming soon". Until the v1.0 launch: whole site `noindex` + `robots.txt` disallow; from v0.2 a visible "Beta — work in progress" notice on every page. | Must |
@@ -151,9 +157,10 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 |---|---|---|
 | FR-OV-01 | Top: name, birth details, settings summary, certainty notice if time is approximate. | Must |
 | FR-OV-02 | Rasi chart in the chosen style. | Must |
-| FR-OV-03 | "Your chart at a glance": Lagna, Moon sign, Moon nakshatra, Sun sign — each with a one-line meaning. | Must |
+| FR-OV-03 | Three fact tiles under the chart: Lagna (rising sign), Moon sign, birth star (Moon nakshatra and pada), each with an "i" explaining the term; the Moon is not repeated in the chart centre (D-129). | Must |
 | FR-OV-04 | Current Mahadasha / Antardasha / Pratyantardasha with end dates. | Must |
-| FR-OV-05 | Cards linking to each section: Charts, Planets, Life Areas, Timing, Transits. | Must |
+| FR-OV-05 | The section navigation (FR-UI-11) replaces link cards: Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets. | Must |
+| FR-OV-06 | **Section order** on the chart page (its own page, opened by "See my chart"): birth details with Edit and Download → birth chart (with the chart-type chips and South/North toggle, FR-CH-07) → Right now → Dasha periods → Life areas → Sade Sati → Transits → planet positions (D-125, D-126, D-129). | Must |
 
 ### 6.4 Charts
 
@@ -161,10 +168,12 @@ All calculations use Swiss Ephemeris (AGPL). The engine is a standalone TypeScri
 |---|---|---|
 | FR-CH-01 | Rasi (D1) and Navamsa (D9), switchable; North and South Indian styles, switchable. (From step 0.3.2.1 a basic South Indian Rasi chart is already shown on the home page, D-101; replaced in 0.5.2.) | Must |
 | FR-CH-02 | Drawn as SVG by code; crisp at any size; themed for dark/light. | Must |
-| FR-CH-03 | Planet abbreviations; retrograde marked (R); lagna marked. Degrees are not shown inside the chart: the planet table carries them (D-108; decided for the basic chart of 0.3.2.1, the 0.5.2 chart design may revisit). | Must |
+| FR-CH-03 | Planet abbreviations; retrograde marked (R); lagna marked. Degrees are not shown inside the chart: the planet table carries them (D-108, kept in the 0.4.3 design). North Indian charts show short sign names (Ari … Pis) instead of sign numbers (D-130). | Must |
 | FR-CH-04 | Tap/click a planet in the chart → its planet detail page. | Should |
 | FR-CH-05 | **Divisional chart selector (v1.1):** beside the main chart, a list/selector of all 16 divisional charts; selecting one shows it in the chosen style with its short "what this chart is for" note. | Later (v1.1) |
-| FR-CH-06 | Chart style toggle (South/North) on the chart screen; changing it updates the remembered preference. | Must |
+| FR-CH-06 | Chart style toggle (South/North) on the chart screen; changing it updates the remembered preference. One chart is shown at a time (D-125). | Must |
+| FR-CH-07 | **Chart-type buttons directly below the chart** (Rasi D1, Navamsa D9; only charts that exist, the 16 divisional charts join in v1.1); selected = filled gold with on-accent text, hover = border + slight grow (D-125). | Must |
+| FR-CH-08 | **An index under every drawn chart** (South and North, D1 and D9, on every page and in downloads): all twelve sign abbreviations with full names and all planet abbreviations, Lagna and (R) (D-130). | Must |
 
 ### 6.5 Planets
 
@@ -194,7 +203,7 @@ Confirmed by the founder on 2026-11-20:
 |---|---|---|
 | FR-LA-01 | List of life areas, each opening a page. | Must |
 | FR-LA-02 | Each page assembles basic blocks: house sign, house lord and where it sits, planets in the house, aspects on the house, karaka condition — each block with an "i" button. | Must |
-| FR-LA-03 | Life-area timing windows (FR-TIME-07) shown on each page: "Periods that especially activate this area". | Must |
+| FR-LA-03 | Life-area timing windows (FR-TIME-07) shown on each page under "Periods that touch this area": the Mahadashas and the Antardashas inside them whose planet is linked, in the dasha level colours (gold long-term, teal medium-term; levels also told apart by label and bar height); how far ahead the list goes is decided in 0.7.5 (D-130). | Must |
 | FR-LA-04 | Health page carries the wellness disclaimer at the top and avoids medical claims. | Must |
 
 ### 6.7 Timing
@@ -209,6 +218,8 @@ Confirmed by the founder on 2026-11-20:
 | FR-TM-06 | Short interpretation for each Mahadasha (9) and basic one-liners for Antardashas. | Must |
 
 ### 6.8 Transits
+
+Transits and Sade Sati are two sections of the chart page, not separate pages (D-130).
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -282,7 +293,7 @@ Confirmed by the founder on 2026-11-20:
 
 | ID | Requirement | Priority |
 |---|---|---|
-| NFR-ACC-01 | Accessibility: WCAG 2.2 AA colour contrast in both themes (watch gold-on-ivory in light mode); keyboard navigable; charts have text alternatives (the planet table). | Must |
+| NFR-ACC-01 | Accessibility: WCAG 2.2 AA colour contrast in both themes (watch gold-on-ivory in light mode); keyboard navigable with a visible focus ring; touch targets at least 44 × 44 px; reduced-motion respected; charts have text alternatives (the planet table); dasha levels never told apart by colour alone. | Must |
 | NFR-PERF-01 | First screen loads in under 3 seconds on a mid-range phone on 4G. | Should |
 | NFR-BRW-01 | Works on the latest 2 versions of Chrome, Safari (iOS + macOS), Firefox, Edge, Samsung Internet. | Must |
 | NFR-SEC-01 | No secrets (keys, passwords) in the public repository. | Must |
@@ -330,6 +341,7 @@ Reference case coverage (Claude will specify exact births):
   - `data/places` — scripts that turn GeoNames into a compact search index.
   - `tests/reference` — the 25 JHora reference cases and their expected outputs.
   - `docs/` — copies of the brief, requirements, decisions log; `CLAUDE.md` with rules for Claude Code.
+  - `docs/design/` — `design-spec.md` (build rules for every screen), `tokens.json` (design values) and `mockups/` (the approved 0.4.3 mockups, reference only) (0.4.4).
 - **Swiss Ephemeris in TypeScript:** via an existing JavaScript/WebAssembly binding — Claude Code to evaluate candidates in step 0.2.1 and report licence + accuracy before choosing.
 - **Hosting:** Vercel Hobby (non-commercial). Preview link for every change; production on main branch. Each merged step goes live; the whole site is `noindex` until the v1.0 launch (FR-HOME-05, D-060).
 - **Progress tracking:** `PROGRESS.md` at the repo root, updated in every PR (Decisions D-056).
@@ -338,7 +350,7 @@ Reference case coverage (Claude will specify exact births):
 
 ## 12. Out of scope for web v1
 
-Accounts and sync (v1.1) · 16 divisional charts (v1.1) · payments and ads · offline mode · tarot · compatibility (porutham) · AI readings · Indian languages (v1.7–v1.9) · mobile apps (test builds v1.2–v1.3, public v2.0) · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.4–v1.6) · per-planet readings for divisional charts other than D1/D9.
+Accounts and sync (v1.1) · 16 divisional charts (v1.1) · payments and ads · offline mode · tarot · compatibility (porutham) · AI readings · Indian languages (v1.7–v1.9) · mobile apps (test builds v1.2–v1.3, public v2.0) · remedies · other house systems · other dasha systems · transit-combined life-area windows · retrograde station alerts · notifications · Learn section (v1.4–v1.6) · per-planet readings for divisional charts other than D1/D9 · True node and other ayanamsas (v1.2, FR-SET-04).
 
 ## 13. Definition of done for the v1 beta launch
 
@@ -353,18 +365,18 @@ Accounts and sync (v1.1) · 16 divisional charts (v1.1) · payments and ads · o
 
 | Milestone | Delivers | Main requirement IDs |
 |---|---|---|
-| v0.1 Coming soon 🔄 | Live holding page, repo, CI, auto-deploy, docs + progress tracking, B2-styled Coming Soon | NFR-SEC-01, FR-HOME-05 |
+| v0.1 Coming soon | Live holding page, repo, CI, auto-deploy, docs + progress tracking, B2-styled Coming Soon | NFR-SEC-01, FR-HOME-05 |
 | v0.2 First real chart | Engine core matching JHora; place search; calculation API; minimal B2 form + planet table on the live site | FR-CALC-01…09, FR-IN-04…07, FR-API-01…03, TEST-01…04 |
 | v0.3 Timing engine | Dashas (3 levels), transits, Sade Sati, life-area windows, approximate-time scanner | FR-TIME-*, FR-TRAN-*, FR-APX-01…03 |
-| v0.4 Design system + app shell | Approved design system and screen mockups; app shell; full B2 home form; profiles in browser | FR-UI-01…07, FR-HOME-01…04, FR-IN-*, FR-PROF-* |
-| v0.5 Chart screens | Overview; D1/D9 charts in both styles; planets table + detail pages | FR-OV-*, FR-CH-01…04, FR-CH-06, FR-PL-* |
+| v0.4 Design system + app shell | Approved design system and screen mockups; design spec; app shell; full B2 home form; profiles in browser | FR-UI-01…14, FR-HOME-01…04, FR-IN-*, FR-PROF-* |
+| v0.5 Chart screens | Chart page in the new order; D1/D9 charts in both styles with index; planets table + detail pages | FR-OV-*, FR-CH-01…04, FR-CH-06…08, FR-PL-* |
 | v0.6 Timing screens | Timeline, transits, Sade Sati card | FR-TM-*, FR-TR-* |
 | v0.7 Interpretations | Style guide; ~600 approved entries; "i" pop-ups; Sources screen; life-area pages | FR-CONT-*, FR-UI-05, FR-SRC-*, FR-LA-* |
 | v0.8 Approximate time, settings, downloads | Certain/uncertain UX; beginner/advanced settings; PNG/PDF downloads; report-an-issue | FR-APX-04, FR-SET-*, FR-ST-*, FR-DL-*, FR-UI-06 |
-| v0.9 Panchanga + legal | Panchanga calc + card; privacy, disclaimer, about, credits, content licence | FR-CALC-11, FR-PAN-01, NFR-PRIV-*, NFR-LEG-* |
+| v0.9 Panchanga + legal | Panchanga calc + card; privacy, disclaimer, about, FAQ, credits, content licence | FR-CALC-11, FR-PAN-01, FR-UI-15, NFR-PRIV-*, NFR-LEG-* |
 | v1.0 Beta launch | Quality pass; domain; `noindex` removed (public launch, English web app) | NFR-ACC-01, NFR-PERF-01, NFR-BRW-01, §13 |
 | v1.1 | Beta feedback fixes; 16 divisional charts; accounts (sign-in, saved profiles and charts) | FR-CALC-10, FR-CH-05, FR-PROF-05 |
-| v1.2 | Mobile test build (founder's phone); framework decided | — |
+| v1.2 | Mobile test build (founder's phone); framework decided; more calculation options | FR-SET-04 |
 | v1.3 | Mobile test version for a few friends | — |
 | v1.4 | Basic Learn | FR-CONT-08 |
 | v1.5 | Basic Learn, more detail | FR-CONT-08 |

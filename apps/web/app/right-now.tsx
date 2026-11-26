@@ -74,7 +74,7 @@ export function RightNow({ ctx }: { ctx: ListContext }) {
       )}
 
       <div className="mt-8 grid gap-5 md:grid-cols-2">
-        <div className="rounded-2xl border border-line p-5 sm:p-6">
+        <div className="card-inner p-4 sm:p-5">
           <h3 className="right-now-heading">{t.rightNow.comingUp}</h3>
           {now.nothingNext ? (
             <p className="mt-3 text-[16px]">{now.nothingNext}</p>
@@ -93,7 +93,7 @@ export function RightNow({ ctx }: { ctx: ListContext }) {
           )}
         </div>
 
-        <div className="rounded-2xl border border-line p-5 sm:p-6">
+        <div className="card-inner p-4 sm:p-5">
           <h3 className="right-now-heading">{t.sadeSati.title}</h3>
           <div className="text-[16px]">
             <SadeSatiStatusBlock ctx={ctx} view={ss} />

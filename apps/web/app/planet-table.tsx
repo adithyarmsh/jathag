@@ -29,15 +29,15 @@ export const PlanetTable = forwardRef<HTMLHeadingElement, { result: ChartRespons
     return (
       <section
         aria-labelledby="planet-table-title"
-        className="card-outer rounded-[24px] bg-card p-5 shadow-soft sm:p-8 lg:col-span-2"
+        className="card-outer p-4 sm:p-6 lg:col-span-2"
       >
-        <h2 id="planet-table-title" ref={headingRef} tabIndex={-1} className="font-serif text-[28px] leading-tight font-medium">
+        <h2 id="planet-table-title" ref={headingRef} tabIndex={-1} className="type-h2">
           {t.title}
         </h2>
         <p className="mt-1 text-sm text-muted">{summary}</p>
         <p className="mt-3 text-xs text-muted sm:hidden">{t.scrollHint}</p>
         <div className="relative mt-3 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="planet-table-title">
-          <table className="planet-table w-full min-w-[720px] border-collapse text-left text-[15px]">
+          <table className="planet-table w-full min-w-[720px] border-collapse text-left">
             <caption className="sr-only">
               {t.title}: {summary}
             </caption>

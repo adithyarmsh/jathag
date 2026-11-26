@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Planet detail page, Saturn</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+
+<main style="max-width: 760px; margin: 0 auto; padding: 20px 16px 56px; display: flex; flex-direction: column; gap: 24px">
+<a href="#" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--at); text-decoration: none"><span aria-hidden="true">←</span> Meera's chart</a>
+
+<nav aria-label="Planets" style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{f.planets}}" as="p" hint-placeholder-count="9"><a href="#" style="{{p.style}}">{{p.name}}</a></sc-for>
+</nav>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Planet</p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 40px; line-height: 46px">Saturn <span style="font-size: 22px; color: var(--muted)">Shani</span></h1>
+<p style="margin: 0; font-size: 17px; line-height: 27px; color: var(--muted)">The planet of time, effort and patience. It moves slowly and rewards steady work.</p>
+<p style="margin: 4px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 15px; line-height: 24px">In Meera's chart Saturn is in <strong style="font-weight: 600">Capricorn</strong>, its own sign, in the <strong style="font-weight: 600">6th house</strong>, and it was <strong style="font-weight: 600">retrograde</strong> at birth.</p>
+</section>
+
+<section aria-label="Placement" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px">
+<sc-for list="{{f.facts}}" as="x" hint-placeholder-count="8"><div style="padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; color: var(--muted)">{{x.k}}</p><p style="margin: 2px 0 0; font-size: 16px; line-height: 24px; font-weight: 500">{{x.v}}</p><p style="margin: 0; font-size: 12px; line-height: 18px; color: var(--muted)">{{x.s}}</p></div></sc-for>
+</section>
+
+<section style="padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">What this placement means</h2><span style="flex: none; padding: 2px 10px; border-radius: 999px; background: var(--soonB); color: var(--soonT); font-size: 12px; font-weight: 600">Coming soon</span></div>
+<p style="margin: 0; font-size: 15px; line-height: 24px; color: var(--muted)">A short reading of Saturn in the 6th house, in plain language, with an "In a nutshell" line and the classical source behind it. Every reading has an "i" that shows which chart facts produced it.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">Life areas Saturn is linked to</h2>
+<sc-for list="{{f.areas}}" as="a" hint-placeholder-count="3"><a href="#" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; padding: 8px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-decoration: none"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">{{a.name}}</span><span style="font-size: 13px; color: var(--muted)">{{a.why}}</span></span><span aria-hidden="true" style="color: var(--at)">→</span></a></sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">Saturn and your timing</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px">
+<div style="padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t1)">Next Mahadasha</p><p style="margin: 4px 0 0; font-size: 16px; font-weight: 500">11 Oct 2027 – 11 Oct 2046</p><p style="margin: 2px 0 0; font-size: 13px; color: var(--muted)">19 years · starts in about 10 months</p></div>
+<div style="padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">In the sky today</p><p style="margin: 4px 0 0; font-size: 16px; font-weight: 500">Pisces, retrograde</p><p style="margin: 2px 0 0; font-size: 13px; color: var(--muted)">2nd from the Moon · 8th from the Lagna · Sade Sati, setting phase</p></div>
+</div>
+</section>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--t1':'#76560F','--soonT':'#9A3324','--soonB':'#FBEEEA','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--t1':'#D9B566','--soonT':'#F0A596','--soonB':'#3A2024','--shadow':'none'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const planets = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'].map((name) => { const on = name === 'Saturn';
+      return { name, style: { display: 'inline-flex', alignItems: 'center', minHeight: '40px', padding: '0 14px', borderRadius: '999px', fontSize: '13px', textDecoration: 'none', border: '1px solid ' + (on ? 'var(--accent)' : 'var(--fb)'), background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--on)' : 'var(--muted)', fontWeight: on ? 600 : 400 } }; });
+    const facts = [
+      { k: 'Sign', v: 'Capricorn', s: 'Own sign: at home here' },
+      { k: 'Degree', v: '20°52′56″', s: 'within the sign' },
+      { k: 'Nakshatra', v: 'Shravana · pada 4', s: 'ruled by the Moon' },
+      { k: 'House', v: '6th', s: 'daily work, health habits' },
+      { k: 'Retrograde', v: 'Yes', s: 'appeared to move backwards' },
+      { k: 'Navamsa sign', v: 'Cancer', s: 'in the D9 chart' },
+      { k: 'Rules', v: '6th and 7th houses', s: 'Capricorn and Aquarius' },
+      { k: 'Looks at', v: '8th, 12th, 3rd houses', s: 'Saturn’s 3rd, 7th and 10th aspects' } ];
+    const areas = [ { name: 'Health & wellness', why: 'rules and sits in the 6th' }, { name: 'Relationships & marriage', why: 'rules the 7th' }, { name: 'Career & work', why: 'rules and sits in the 6th' } ];
+    const data = { planets, facts, areas };
+    return { frames: [ { vars: light, frame: frame(390, 28), ...data }, { vars: dark, frame: frame(390, 28), ...data }, { vars: light, frame: frame(1280, 0), ...data } ] };
+  }
+}
+</script>
+</body>
+</html>

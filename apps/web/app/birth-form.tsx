@@ -21,6 +21,8 @@ import { shownOffsetSeconds } from "@/lib/place-offset";
 import { listContext } from "@/lib/list-context";
 import { HOURS, MINUTES, to12hText, to24h, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
+import { buttonClass } from "@/components/button";
+import { Divider } from "@/components/divider";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
 import { PlanetTable } from "./planet-table";
@@ -48,7 +50,7 @@ function LockIcon() {
 function ErrorText({ id, text }: { id: string; text?: string }) {
   if (!text) return null;
   return (
-    <p id={id} className="field-error mt-2 text-sm">
+    <p id={id} className="field-error mt-2">
       {text}
     </p>
   );
@@ -250,9 +252,9 @@ export function BirthForm({ t }: { t: Messages }) {
     <>
       <section
         aria-labelledby="birth-form-title"
-        className="card-outer rounded-[24px] bg-card p-6 shadow-soft sm:p-8 lg:p-10"
+        className="card-outer p-4 sm:p-6 lg:p-8"
       >
-        <h2 id="birth-form-title" className="font-serif text-[32px] leading-[1.1] font-medium text-balance">
+        <h2 id="birth-form-title" className="type-h2 text-balance">
           {f.title}
         </h2>
         <p className="mt-2 leading-relaxed text-muted">{f.subtitle}</p>
@@ -282,7 +284,7 @@ export function BirthForm({ t }: { t: Messages }) {
             </div>
             <div className="mt-2 grid grid-cols-[4.5rem_minmax(0,1fr)_4.25rem] gap-2 sm:grid-cols-[5.5rem_minmax(0,1fr)_5.5rem] sm:gap-3">
               <div>
-                <label htmlFor={ids.day} className="block text-sm text-muted">
+                <label htmlFor={ids.day} className="field-label">
                   {f.date.day}
                 </label>
                 <span className="select-wrap mt-1">
@@ -307,7 +309,7 @@ export function BirthForm({ t }: { t: Messages }) {
                 </span>
               </div>
               <div>
-                <label htmlFor={ids.month} className="block text-sm text-muted">
+                <label htmlFor={ids.month} className="field-label">
                   {f.date.month}
                 </label>
                 <span className="select-wrap mt-1">
@@ -332,7 +334,7 @@ export function BirthForm({ t }: { t: Messages }) {
                 </span>
               </div>
               <div>
-                <label htmlFor={ids.year} className="block text-sm text-muted">
+                <label htmlFor={ids.year} className="field-label">
                   {f.date.year}
                 </label>
                 <input
@@ -366,13 +368,13 @@ export function BirthForm({ t }: { t: Messages }) {
             <legend id={ids.timeLegend} className="block font-semibold">
               {f.time.label}
             </legend>
-            <p id={ids.timeHint} className="mt-1 text-sm text-muted">
+            <p id={ids.timeHint} className="field-hint mt-1">
               {f.time.hint}
             </p>
             <div className="mt-2 flex flex-wrap items-end gap-x-3 gap-y-3">
               <div className="flex items-end gap-1.5">
                 <div className="w-[5.25rem] sm:w-[5.5rem]">
-                  <label htmlFor={ids.hour} className="block text-sm text-muted">
+                  <label htmlFor={ids.hour} className="field-label">
                     {f.time.hour}
                   </label>
                   <span className="select-wrap mt-1">
@@ -400,7 +402,7 @@ export function BirthForm({ t }: { t: Messages }) {
                   :
                 </span>
                 <div className="w-[5.25rem] sm:w-[5.5rem]">
-                  <label htmlFor={ids.minute} className="block text-sm text-muted">
+                  <label htmlFor={ids.minute} className="field-label">
                     {f.time.minute}
                   </label>
                   <span className="select-wrap mt-1">
@@ -426,7 +428,7 @@ export function BirthForm({ t }: { t: Messages }) {
                 </div>
               </div>
               <div>
-                <span id={ids.periodLabel} className="block text-sm text-muted">
+                <span id={ids.periodLabel} className="field-label">
                   {f.time.period}
                 </span>
                 <div
@@ -455,7 +457,7 @@ export function BirthForm({ t }: { t: Messages }) {
                 </div>
               </div>
             </div>
-            <p id={ids.periodHint} className="mt-2 text-sm text-muted">
+            <p id={ids.periodHint} className="field-hint mt-2">
               {f.time.periodHint}
             </p>
             <div aria-live="polite">
@@ -468,7 +470,7 @@ export function BirthForm({ t }: { t: Messages }) {
                   id={ids.repeated}
                   role="radiogroup"
                   aria-labelledby={`${ids.repeated}-q`}
-                  className="mt-3 rounded-xl border border-field-border p-4"
+                  className="mt-3 rounded-md border border-line bg-raised p-4"
                 >
                   <p id={`${ids.repeated}-q`} className="text-sm font-semibold">
                     {f.repeatedTime.question}
@@ -483,7 +485,7 @@ export function BirthForm({ t }: { t: Messages }) {
                           checked={repeated === r}
                           disabled={submitting}
                           onChange={() => chooseRepeated(r)}
-                          className="mt-1 accent-[var(--accent-text)]"
+                          className="mt-1 accent-[var(--accent)]"
                         />
                         <span>{f.repeatedTime[r]}</span>
                       </label>
@@ -521,7 +523,7 @@ export function BirthForm({ t }: { t: Messages }) {
               type="submit"
               disabled={submitting}
               aria-describedby={serverErrors.form ? ids.formError : undefined}
-              className="w-full cursor-pointer rounded-full bg-accent-text px-6 py-3.5 text-base font-semibold text-card transition-opacity disabled:cursor-wait disabled:opacity-70"
+              className={buttonClass("primary", true, "btn-busy w-full")}
             >
               {submitting ? f.submitting : f.submit}
             </button>
@@ -537,15 +539,22 @@ export function BirthForm({ t }: { t: Messages }) {
         </p>
       </section>
 
+      {/* The star divider between the big cards (design spec §3.6, step 0.4.5) */}
+      {result && <Divider inGrid className="lg:col-span-2" />}
       {result && <SouthChart ref={resultHeading} result={result.data} birth={result.birth} summary={result.summary} t={t.chart} />}
+      {result && <Divider inGrid className="lg:col-span-2" />}
       {result && <PlanetTable result={result.data} summary={result.summary} t={t.chart} />}
       {/* Step 0.3.7 (D-113): plain lists below the table. Keyed by the calculation moment, so a new
           chart starts with every list closed. */}
       {lists && (
         <>
+          <Divider inGrid className="lg:col-span-2" />
           <RightNow ctx={lists} />
+          <Divider inGrid className="lg:col-span-2" />
           <DashaList key={`d-${lists.result.dashas.asOf}`} ctx={lists} />
+          <Divider inGrid className="lg:col-span-2" />
           <TransitList key={`t-${lists.result.dashas.asOf}`} ctx={lists} />
+          <Divider inGrid className="lg:col-span-2" />
           <LifeAreaList ctx={lists} />
         </>
       )}

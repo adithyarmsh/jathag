@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Downloads</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<div aria-hidden="true" style="{{f.dim}}"></div>
+<section role="dialog" aria-labelledby="dl-title" style="{{f.sheet}}">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+<div><h2 id="dl-title" style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">Download</h2><p style="margin: 4px 0 0; font-size: 13px; line-height: 20px; color: var(--muted)">Made in your browser. Nothing is sent anywhere.</p></div>
+<button aria-label="Close" style="flex: none; width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 6px">
+<legend style="padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--muted)">What to include</legend>
+<sc-for list="{{f.items}}" as="i" hint-placeholder-count="6"><label style="{{i.style}}"><input type="checkbox" checked="{{i.on}}" style="width: 20px; height: 20px; accent-color: var(--accent)"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">{{i.k}}</span><span style="font-size: 12px; color: var(--muted)">{{i.s}}</span></span></label></sc-for>
+</fieldset>
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 13px; color: var(--muted)">Chart style</span><div role="radiogroup" aria-label="Chart style" style="display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--fb); border-radius: 999px"><button role="radio" aria-checked="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 13px; font-weight: 600">South</button><button role="radio" aria-checked="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">North</button></div></div>
+<p style="margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 14px; line-height: 22px"><strong style="font-weight: 600">You'll get:</strong> {{f.result}}</p>
+<button style="height: 50px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 16px; font-weight: 600">{{f.cta}}</button>
+</section>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1250}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A'};
+    const list = [['Birth chart','Rasi (D1), drawn'],['Navamsa chart','D9, drawn'],['Planet positions','The full table'],['Dasha periods','Mahadashas and Antardashas'],['Right now, Sade Sati and transits','As of the download date'],['Life areas','Planets linked to each area']];
+    const items = (onSet) => list.map(([k, s], i) => { const on = onSet.includes(i);
+      return { k, s, on, style: { display: 'flex', gap: '12px', alignItems: 'center', minHeight: '56px', padding: '0 14px', borderRadius: '10px', border: '1px solid ' + (on ? 'var(--accent)' : 'var(--line)'), background: on ? 'var(--soft)' : 'var(--card)' } }; });
+    const phone = { position: 'relative', width: '390px', height: '1000px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: '28px', overflow: 'hidden' };
+    const desk = { position: 'relative', width: '1280px', height: '900px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', overflow: 'hidden' };
+    const dim = { position: 'absolute', inset: 0, background: 'rgba(15,19,34,0.45)' };
+    const sheetP = { position: 'absolute', left: 0, right: 0, bottom: 0, boxSizing: 'border-box', padding: '20px 16px 28px', background: 'var(--card)', borderRadius: '20px 20px 0 0', display: 'flex', flexDirection: 'column', gap: '16px' };
+    const sheetD = { position: 'absolute', left: '50%', top: '80px', transform: 'translateX(-50%)', width: '520px', boxSizing: 'border-box', padding: '28px', background: 'var(--card)', borderRadius: '16px', boxShadow: '0 12px 32px rgba(15,19,34,0.18)', display: 'flex', flexDirection: 'column', gap: '16px' };
+    return { frames: [
+      { vars: light, frame: phone, dim, sheet: sheetP, items: items([0]), result: 'an image of the birth chart (PNG).', cta: 'Download image' },
+      { vars: dark, frame: phone, dim, sheet: sheetP, items: items([0, 2, 3]), result: 'a PDF report with the chart, the planet table and your dasha periods.', cta: 'Download PDF' },
+      { vars: light, frame: desk, dim, sheet: sheetD, items: items([0, 1, 2, 3, 4, 5]), result: 'a PDF report with everything ticked above.', cta: 'Download PDF' } ] };
+  }
+}
+</script>
+</body>
+</html>

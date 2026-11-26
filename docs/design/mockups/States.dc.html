@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Empty and error states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="{{t.vars}}">
+<div style="width: 390px; box-sizing: border-box; padding: 24px 16px 32px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 28px; display: flex; flex-direction: column; gap: 12px">
+
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">A · No saved charts yet</p>
+<section style="padding: 32px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">No saved charts yet</h2>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">Every chart you make is kept here, in this browser only.</p>
+<a href="#" style="margin-top: 6px; display: inline-flex; align-items: center; height: 46px; padding: 0 22px; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 15px; font-weight: 600; text-decoration: none">Make a chart</a>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">B · Calculating</p>
+<section aria-live="polite" style="padding: 24px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 20px">Calculating your chart…</p>
+<div style="height: 4px; border-radius: 999px; background: var(--line); overflow: hidden"><div style="width: 40%; height: 100%; border-radius: 999px; background: var(--accent)"></div></div>
+<p style="margin: 0; font-size: 13px; color: var(--muted)">Usually a second or two.</p>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">C · Could not calculate</p>
+<section role="alert" style="padding: 24px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 20px">We couldn't reach the calculator</p>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">Your connection may have dropped for a moment. Your details are still in the form, so nothing is lost.</p>
+<button style="align-self: flex-start; height: 46px; padding: 0 22px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px; font-weight: 600">Try again</button>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">D · Place not found</p>
+<section style="padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Place of birth<input value="Kumbakonm" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"></label>
+<div style="padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); font-size: 14px; line-height: 22px">No places found. Try another spelling or a nearby town.<br><a href="#" style="color: var(--at); font-weight: 600">Enter coordinates yourself</a></div>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">E · A time that happened twice</p>
+<section style="padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 14px; line-height: 22px">This time happened twice that night: the clocks went back an hour. Which one was it?</p>
+<button style="min-height: 46px; padding: 0 14px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; text-align: left">The first time</button>
+<button style="min-height: 46px; padding: 0 14px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; text-align: left">The second time (after the clocks went back)</button>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">F · A part with no data</p>
+<section style="padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 18px">Panchanga</p>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">Not available for this birth: it falls before the first sunrise our data covers, on 1 Jan 1800. The rest of the chart is complete.</p>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">G · Page not found</p>
+<section style="padding: 32px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px">This page isn't here</h2>
+<p style="margin: 0; font-size: 14px; line-height: 22px; color: var(--muted)">The link may be old or mistyped. Your saved charts are safe.</p>
+<a href="#" style="margin-top: 6px; display: inline-flex; align-items: center; height: 46px; padding: 0 22px; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 15px; font-weight: 600; text-decoration: none">Go to the home page</a>
+</section>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":860,"height":2100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A'};
+    return { themes: [ { vars: light }, { vars: dark } ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Saved profiles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+<main style="max-width: 960px; margin: 0 auto; padding: 28px 16px 56px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap">
+<div><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Saved profiles</p><h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 34px; line-height: 40px">Your charts</h1></div>
+<a href="#" style="display: inline-flex; align-items: center; height: 46px; padding: 0 20px; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 15px; font-weight: 600; text-decoration: none">New chart</a>
+</div>
+<p role="note" style="margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 14px; line-height: 22px">Profiles are saved only in this browser. Clearing browser data removes them.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px">
+<sc-for list="{{f.profiles}}" as="p" hint-placeholder-count="3">
+<article style="padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px">
+<div><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 22px; line-height: 28px">{{p.name}}</h2><p style="margin: 4px 0 0; font-size: 14px; line-height: 22px; color: var(--muted)">{{p.when}}<br>{{p.place}}</p></div>
+<sc-if value="{{p.normal}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; gap: 8px">
+<a href="#" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 44px; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 14px; font-weight: 600; text-decoration: none">Open</a>
+<button style="flex: 1; height: 44px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 600">Edit</button>
+<button style="flex: 1; height: 44px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 600">Delete</button>
+</div>
+</sc-if>
+<sc-if value="{{p.confirm}}" hint-placeholder-val="{{false}}">
+<div role="alertdialog" aria-label="Confirm delete" style="padding: 12px 14px; border: 1px solid var(--fb); border-radius: 12px; background: var(--raised); display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 14px; line-height: 22px"><strong style="font-weight: 600">Delete {{p.name}}'s profile?</strong> It is removed from this browser and can't be brought back.</p>
+<div style="display: flex; gap: 8px"><button style="flex: 1; height: 44px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 600">Keep it</button><button style="flex: 1; height: 44px; border: 1px solid var(--ink); border-radius: 8px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 600">Delete</button></div>
+</div>
+</sc-if>
+</article>
+</sc-for>
+</div>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--shadow':'none'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const profiles = [
+      { name: 'Meera', when: '14 Aug 1992 · 6:45 AM', place: 'Chennai, Tamil Nadu, India', normal: true, confirm: false },
+      { name: 'Arjun', when: '3 Mar 1988 · 11:20 PM', place: 'Pune, Maharashtra, India', normal: false, confirm: true },
+      { name: 'My chart', when: '21 Jan 2001 · 9:05 AM', place: 'London, England, United Kingdom', normal: true, confirm: false } ];
+    return { frames: [ { vars: light, frame: frame(390, 28), profiles }, { vars: dark, frame: frame(390, 28), profiles }, { vars: light, frame: frame(1280, 0), profiles } ] };
+  }
+}
+</script>
+</body>
+</html>

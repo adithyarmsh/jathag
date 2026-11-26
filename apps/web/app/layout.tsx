@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import {
-  Cormorant_Garamond,
+  Fraunces,
   Inter,
   Noto_Serif_Bengali,
   Noto_Serif_Devanagari,
@@ -9,18 +9,35 @@ import {
   Noto_Serif_Tamil,
   Noto_Serif_Telugu,
 } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { getMessages } from "@/lib/i18n";
+import { THEME_COLOR, THEME_SCRIPT } from "@/lib/theme";
 import { StarField } from "./star-field";
 import "./globals.css";
 
 // Fonts are downloaded at build time and served from this site (no calls to Google at runtime).
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+// Fraunces for headings (weight 400 with the optical-size axis; italic for the one emphasised hero
+// phrase) and Inter for everything else (design spec §1.3). next/font only keeps the opsz axis when the
+// weight axis is variable too, so the variable file is used; the site only sets weight 400.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["500", "600"],
+  style: ["normal"],
+  axes: ["opsz"],
   display: "swap",
 });
+// The italic is only used for the one emphasised hero phrase: its own family, not preloaded.
+const frauncesItalic = Fraunces({
+  variable: "--font-fraunces-italic",
+  subsets: ["latin"],
+  style: ["italic"],
+  axes: ["opsz"],
+  display: "swap",
+  preload: false,
+});
 
+// Inter's variable file covers 400, 500 and 600 in one download (the only weights the site uses).
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -54,16 +71,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b1426" },
-    { media: "(prefers-color-scheme: light)", color: "#f9f6f3" },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR.dark },
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR.light },
   ],
 };
 
-// Runs before the page paints so a chosen theme never flashes the wrong colours.
-// The choice is kept only in this browser (localStorage), never sent anywhere.
-const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
-
-const fontVars = [cormorant, inter, devanagari, bengali, telugu, tamil, kannada, malayalam]
+const fontVars = [fraunces, frauncesItalic, inter, devanagari, bengali, telugu, tamil, kannada, malayalam]
   .map((f) => f.variable)
   .join(" ");
 
@@ -71,16 +84,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Runs before the page paints so a chosen theme never flashes the wrong colours (lib/theme.ts).
+            The choice is kept only in this browser (localStorage), never sent anywhere. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col font-sans">
         {/* Random background stars, made in the browser after loading (D-117 item 4) */}
         <StarField />
-        {/* On every page until the v1.0 launch (FR-HOME-05, D-060) */}
-        <p className="beta-notice border-b border-line px-4 py-2 text-center text-xs leading-snug text-muted sm:text-[13px]">
-          {messages.betaNotice}
-        </p>
+        {/* The app shell on every page (design spec §4) */}
+        <SiteHeader t={{ header: messages.header, menu: messages.menu, footer: messages.footer }} />
+        {/* On every page until the v1.0 launch (FR-HOME-05, D-060). Not sticky: it scrolls away (D-095). */}
+        <p className="beta-band px-4 py-2.5 lg:text-center">{messages.betaBand}</p>
         {children}
+        <SiteFooter t={messages.footer} commit={process.env.VERCEL_GIT_COMMIT_SHA} />
       </body>
     </html>
   );

@@ -3,12 +3,35 @@
     "title": "Jathag — Know your chart, not just your sign.",
     "description": "Accurate Vedic birth charts, explained in short, honest, modern language. Free, no account, no ads. Beta, stars are being aligned."
   },
-  "betaNotice": "Jathag Beta — The stars are still aligning. We are actively refining our features and design. Expect occasional shifts as we calibrate the cosmos.",
+  "betaBand": "Jathag Beta. The stars are still aligning: we are actively refining our features and design.",
   "header": {
     "wordmark": "Jathag",
     "beta": "Beta",
-    "tagline": "Vedic birth charts, explained plainly",
-    "themeSwitch": "Dark mode"
+    "homeLabel": "(home page)",
+    "navLabel": "Main",
+    "links": { "newChart": "New chart", "profiles": "Saved profiles", "settings": "Settings", "about": "About", "faq": "FAQ" },
+    "theme": {
+      "switch": "Switch between light and dark",
+      "toDark": "Switch to dark mode",
+      "toLight": "Switch to light mode",
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Match device"
+    }
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "label": "Menu",
+    "subs": {
+      "newChart": "Your birth details",
+      "profiles": "Kept in this browser",
+      "settings": "Chart style, advanced options",
+      "about": "What Jathag is",
+      "faq": "Common questions"
+    },
+    "moreLabel": "More about Jathag"
   },
   "hero": {
     "nativeWordsLabel": "“Birth chart” in Indian languages",
@@ -345,11 +368,71 @@
     }
   },
   "footer": {
-    "text": "Jathag (Beta): free, open source under AGPL-3.0. No ads, no account needed.",
-    "sourceLink": "Source code (AGPL)",
+    "label": "Footer",
+    "links": {
+      "about": "About",
+      "faq": "FAQ",
+      "disclaimer": "Disclaimer",
+      "privacy": "Privacy",
+      "sources": "Sources & credits",
+      "sourceCode": "Source code"
+    },
+    "licence": "Free and open source (AGPL-3.0). No ads, no account needed.",
     "version": "v{step} · {commit}",
     "versionLocal": "v{step}",
     "madeBy": "Made by [Adithya]",
     "newTab": "(opens in a new tab)"
+  },
+  "pages": {
+    "placeholder": { "text": "This page is on its way.", "comingSoon": "Coming soon", "back": "Back to the home page" },
+    "profiles": {
+      "title": "Saved profiles · Jathag",
+      "description": "Your saved birth charts, kept only in this browser. This page is on its way.",
+      "eyebrow": "Saved profiles",
+      "heading": "Your charts"
+    },
+    "settings": {
+      "title": "Settings · Jathag",
+      "description": "Chart style, theme and calculation settings for Jathag. This page is on its way.",
+      "eyebrow": "Settings",
+      "heading": "How Jathag looks and calculates"
+    },
+    "about": {
+      "title": "About · Jathag",
+      "description": "What Jathag is: accurate Vedic birth charts, explained plainly. This page is on its way.",
+      "eyebrow": "About",
+      "heading": "A birth chart, [explained plainly]"
+    },
+    "faq": {
+      "title": "FAQ · Jathag",
+      "description": "Short answers to the questions people ask first about Jathag and Vedic birth charts. This page is on its way.",
+      "eyebrow": "FAQ",
+      "heading": "Questions people ask first"
+    },
+    "disclaimer": {
+      "title": "Disclaimer · Jathag",
+      "description": "What Jathag is and is not. This page is on its way.",
+      "eyebrow": "Disclaimer",
+      "heading": "Disclaimer"
+    },
+    "privacy": {
+      "title": "Privacy · Jathag",
+      "description": "How Jathag treats your details. This page is on its way.",
+      "eyebrow": "Privacy",
+      "heading": "Privacy"
+    },
+    "sources": {
+      "title": "Sources & credits · Jathag",
+      "description": "The data and software Jathag is built on. This page is on its way.",
+      "eyebrow": "Sources & credits",
+      "heading": "Sources & credits"
+    },
+    "notFound": {
+      "title": "Page not found · Jathag",
+      "description": "This page isn't here. The link may be old or mistyped.",
+      "heading": "This page isn't here",
+      "text": "The link may be old or mistyped. Your saved charts are safe.",
+      "button": "Go to the home page"
+    }
   }
 }

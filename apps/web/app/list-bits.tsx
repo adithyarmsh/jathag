@@ -1,12 +1,12 @@
 // Small shared pieces for the step 0.3.7 list cards (D-113): the outer card, the text markers and the
-// opener arrow. Provisional styling (D-093); markers are words, never colour alone (NFR-ACC-01).
+// opener arrow. Provisional layout (D-093), Still Water look since 0.4.5; markers are words, never colour alone (NFR-ACC-01).
 
 import type { ReactNode } from "react";
 
 export function ListCard({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section aria-labelledby={id} className="card-outer rounded-[24px] bg-card p-5 shadow-soft sm:p-8 lg:col-span-2">
-      <h2 id={id} className="font-serif text-[28px] leading-tight font-medium">
+    <section aria-labelledby={id} className="card-outer p-4 sm:p-6 lg:col-span-2">
+      <h2 id={id} className="type-h2">
         {title}
       </h2>
       {children}
