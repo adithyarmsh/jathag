@@ -1052,6 +1052,24 @@ body {
 @media (width >= 64rem) {
   .chart-main { padding-bottom: 64px; }
 }
+/* Desktop (D-139 item 1): the details bar stays fixed under the site header (69 px: 68 + its 1 px
+   line) while the page scrolls; the 24 px gap above it is filled with the page background, so the
+   content scrolls under the gap and the bar and disappears there. With the page's 8 px top padding the
+   bar starts 32 px under the Beta band, as before. Phones and tablets: it scrolls away. The bar's
+   height is measured into --details-h (app/chart-page.tsx), so the contents column sits below it and
+   every jump to a section (scroll-padding-top) lands below it too. */
+@media (width >= 64rem) {
+  .details-sticky {
+    position: sticky;
+    top: 69px;
+    z-index: 30;
+    padding-top: 24px;
+    background-color: var(--bg);
+  }
+  html:has(.details-sticky) {
+    scroll-padding-top: calc(69px + 24px + var(--details-h, 90px) + 32px);
+  }
+}
 .details-bar {
   display: flex;
   flex-direction: column;
@@ -1149,7 +1167,7 @@ body {
 @media (width >= 64rem) {
   .contents-rail {
     position: sticky;
-    top: 92px;
+    top: calc(69px + 24px + var(--details-h, 90px) + 24px);
     display: block;
     align-self: start;
     z-index: 20;
@@ -1180,12 +1198,14 @@ body {
   width: 26px;
   background-color: var(--accent);
 }
+/* The desktop card (D-139 item 3): about 80 % of its first size (216 × ~320 px instead of 240 × ~354):
+   less padding, 14 px items in 40 px rows (each row spans the card, so it stays easy to hit). */
 .contents-card {
   position: absolute;
   top: 0;
   left: calc(100% + 4px);
-  width: 240px;
-  padding: 14px 8px 8px;
+  width: 216px;
+  padding: 12px 6px 6px;
   background-color: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -1221,6 +1241,17 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.contents-card .contents-eyebrow {
+  padding: 0 8px;
+}
+.contents-card .contents-list {
+  margin-top: 6px;
+}
+.contents-card .contents-item {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 14px;
+}
 @media (hover: hover) {
   .contents-item:hover { background-color: var(--raised); }
 }
@@ -1240,18 +1271,17 @@ body {
   right: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 30;
+  /* Icon only, round, 48 px, a 2 px edge so it stands out (D-139 item 3a); named "Contents" */
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid var(--field-border);
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--field-border);
   border-radius: var(--radius-pill);
   background-color: var(--card);
   box-shadow: var(--shadow-pop);
   color: var(--ink);
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
   transition: opacity 200ms var(--ease);
 }
@@ -1310,12 +1340,12 @@ body {
 .info-button[aria-expanded="true"] .info-icon-ring { fill: var(--accent); stroke: var(--accent); }
 .info-button[aria-expanded="true"] .info-icon-dot { fill: var(--on-accent); }
 .info-button[aria-expanded="true"] .info-icon-stem { stroke: var(--on-accent); }
+/* The panel floats above the page (D-139 item 2): fixed, placed under its "i" by lib/info-popup.ts
+   (top, left and width come inline), so it shifts nothing and no card or scroll box clips it. Under
+   the fixed details bar (z 30) and the header (z 40), above everything else. */
 .info-panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 30;
+  position: fixed;
+  z-index: 25;
   overflow: hidden;
   background-color: var(--card);
   border: 1px solid var(--line);
@@ -1332,10 +1362,6 @@ body {
 .info-panel:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
-}
-@media (width >= 40rem) {
-  .info-panel { right: auto; width: 340px; }
-  .info-panel-end { left: auto; right: 0; }
 }
 .info-panel-title {
   padding: 12px 16px;

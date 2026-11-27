@@ -9,7 +9,8 @@
 // is one real button ("Contents", aria-expanded); when it is opened by click or keyboard, focus moves to
 // the current item, and Esc gives it back to the button.
 //
-// Phones and tablets: a small floating "Contents" button in the bottom corner (44 px; hidden while the
+// Phones and tablets: a small round floating button in the bottom corner (48 px, icon only, named
+// "Contents"; three lines of different lengths, not the header's ≡ menu icon; hidden while the
 // footer is on screen, so it never covers it) opens the same list as a bottom panel (spec §3.11 sheet
 // pattern): role="dialog", focus trapped inside, Esc or the scrim closes it, focus back to the button.
 //
@@ -239,16 +240,17 @@ export function PhoneContents({ t, active, initiallyOpen = false }: { t: Text; a
       <button
         ref={buttonRef}
         type="button"
+        aria-label={t.button}
         aria-expanded={open}
         aria-controls={`${id}-sheet`}
         className="contents-fab"
         data-hidden={footerShown && !open ? "true" : undefined}
         onClick={() => setOpen(true)}
       >
-        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-          <path d="M5 7h14M5 12h10M5 17h12" />
+        {/* Three short lines of different lengths, like the desktop dashes (not the header's ≡ menu icon, D-139 3a) */}
+        <svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <path d="M6 7h8M6 12h13M6 17h5" />
         </svg>
-        {t.button}
       </button>
       {open && (
         <div className="contents-scrim" onClick={() => close(true)}>

@@ -2,8 +2,9 @@
 // CHART", the h1 ("Meera's chart" / "Your chart" / "Sample chart"), the one-liner, today's South Indian
 // drawing (re-used as is; the North note stays when North was chosen, until 0.5.2), the "what this is"
 // Rasi notice and three fact tiles (Lagna · Moon sign · Birth star, pada on desktop), each with an "i"
-// that explains the term (spec §3.8). Desktop: the drawing on the left (440 px), everything else on the
-// right. No D1/D9 chips, no South/North toggle and no index yet (0.5.2).
+// that explains the term (spec §3.8; floating, opened by hover or click, D-139). Desktop: the drawing
+// on the left (440 px), everything else on the right. No D1/D9 chips, no South/North toggle and no
+// index yet (0.5.2).
 
 import type { ChartResponse } from "@jathag/api";
 import { fill } from "@/lib/chart-format";

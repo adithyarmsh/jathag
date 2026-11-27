@@ -187,6 +187,21 @@ export function ChartPage({ t }: { t: Messages }) {
     });
   }
 
+  // The fixed bar's height (desktop, D-139): the contents column and section jumps sit below it.
+  const barRef = useRef<HTMLDivElement>(null);
+  const hasBar = shown !== null;
+  useEffect(() => {
+    const bar = barRef.current?.querySelector<HTMLElement>(".details-bar");
+    if (!bar || typeof ResizeObserver === "undefined") return;
+    const root = document.documentElement;
+    const ro = new ResizeObserver(() => root.style.setProperty("--details-h", `${Math.round(bar.getBoundingClientRect().height)}px`));
+    ro.observe(bar);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--details-h");
+    };
+  }, [hasBar]);
+
   const p = t.chartPage;
   const names = owner ? chartHeading(owner, p) : null;
   const shownBirth = shown
@@ -198,39 +213,41 @@ export function ChartPage({ t }: { t: Messages }) {
   const editStart = useMemo(() => (shown ? formFromBirth(shown.birth, shown.name === t.profiles.defaultName ? "" : shown.name) : null), [shown, t.profiles.defaultName]);
 
   return (
-    <main className="chart-main mx-auto w-full max-w-[1168px] flex-1 px-4 py-6 sm:px-6 lg:py-8">
+    <main className="chart-main mx-auto w-full max-w-[1168px] flex-1 px-4 py-6 sm:px-6 lg:pt-2">
       <noscript>
         <p className="card-outer p-4 text-[15px]">{p.noScript}</p>
       </noscript>
 
       {shown && names && (
-        <section aria-label={p.details.label} className="details-bar card-outer">
-          <div className="min-w-0">
-            <p className="font-display text-[22px] leading-7 break-words">{names.barName}</p>
-            <p className="mt-1 text-[14px] leading-[22px] text-muted break-words">
-              {detailsLine(shown.birth, t)}
-              {ready && <span className="hidden lg:inline"> · {coordinatesLine(ready, p)}</span>}
-            </p>
-            {shown.source.kind === "sample" && <p className="mt-1 text-[13px] leading-5 text-muted">{p.details.sampleNote}</p>}
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
-            {shown.source.kind === "sample" ? (
-              <ButtonLink href="/">{p.details.makeOwn}</ButtonLink>
-            ) : (
-              <Button
-                variant="quiet"
-                aria-expanded={editOpen}
-                aria-controls="edit-panel"
-                onClick={() => {
-                  setEditKey((k) => k + 1);
-                  setEditOpen((o) => !o);
-                }}
-              >
-                {p.details.edit}
-              </Button>
-            )}
-          </div>
-        </section>
+        <div ref={barRef} className="details-sticky">
+          <section aria-label={p.details.label} className="details-bar card-outer">
+            <div className="min-w-0">
+              <p className="font-display text-[22px] leading-7 break-words">{names.barName}</p>
+              <p className="mt-1 text-[14px] leading-[22px] text-muted break-words">
+                {detailsLine(shown.birth, t)}
+                {ready && <span className="hidden lg:inline"> · {coordinatesLine(ready, p)}</span>}
+              </p>
+              {shown.source.kind === "sample" && <p className="mt-1 text-[13px] leading-5 text-muted">{p.details.sampleNote}</p>}
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {shown.source.kind === "sample" ? (
+                <ButtonLink href="/">{p.details.makeOwn}</ButtonLink>
+              ) : (
+                <Button
+                  variant="quiet"
+                  aria-expanded={editOpen}
+                  aria-controls="edit-panel"
+                  onClick={() => {
+                    setEditKey((k) => k + 1);
+                    setEditOpen((o) => !o);
+                  }}
+                >
+                  {p.details.edit}
+                </Button>
+              )}
+            </div>
+          </section>
+        </div>
       )}
 
       {/* Edit details in place (D-138 Q4 B): the home page's form, filled with this profile */}

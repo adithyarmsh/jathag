@@ -340,8 +340,18 @@ describe("contents panel (D-138 Q1–Q3)", () => {
     expect(closed).toMatch(/aria-label="Sections" hidden=""/);
   });
 
-  it("phone: the floating button opens a labelled modal bottom panel with a Close button", () => {
-    expect(phone).toMatch(/<button type="button" aria-expanded="true" aria-controls="[^"]+" class="contents-fab">.*Contents<\/button>/);
+  it("phone: an icon-only button named Contents (three lines of different lengths, not the ≡ menu icon) opens a labelled modal bottom panel", () => {
+    const fab = /<button type="button" aria-label="Contents" aria-expanded="true" aria-controls="[^"]+" class="contents-fab">([\s\S]*?)<\/button>/.exec(phone)!;
+    expect(text(fab[1]!)).toBe(""); // no visible words
+    const d = /<path d="([^"]+)"/.exec(fab[1]!)![1]!;
+    const lengths = [...d.matchAll(/h(\d+)/g)].map((m) => Number(m[1]));
+    expect(lengths).toHaveLength(3);
+    expect(new Set(lengths).size).toBe(3);
+    expect(readFileSync(join(WEB, "components/icons.tsx"), "utf8")).not.toContain(d);
+    const css = readFileSync(join(WEB, "app/globals.css"), "utf8");
+    const rule = /\n\.contents-fab \{([^}]*)\}/.exec(css)![1]!;
+    expect(rule).toMatch(/width: 48px;[\s\S]*height: 48px;/);
+    expect(rule).toContain("border: 2px solid var(--field-border)");
     expect(phone).toMatch(/role="dialog" aria-modal="true" aria-labelledby="[^"]+-title" class="contents-sheet"/);
     expect(phone).toContain('aria-label="Close contents"');
   });
@@ -354,6 +364,42 @@ describe("contents panel (D-138 Q1–Q3)", () => {
     expect(activeIndex([], 200, false)).toBe(0);
     expect(sectionFromHash("#sade-sati")).toBe("sade-sati");
     expect(sectionFromHash("#nope")).toBeNull();
+  });
+});
+
+describe("the details bar stays fixed under the header on desktop only (D-139 item 1)", () => {
+  const css = readFileSync(join(WEB, "app/globals.css"), "utf8");
+  const desktop = css.split("@media (width >= 64rem) {").slice(1).map((b) => b.slice(0, b.indexOf("\n}\n")));
+
+  it("sticky at 69 px (the header) with a background-filled gap, only from 1024 px", () => {
+    expect(css).not.toMatch(/\n\.details-sticky \{/); // no rule outside a media query: phones and tablets scroll it away
+    const rule = desktop.map((b) => /\.details-sticky \{([^}]*)\}/.exec(b)?.[1]).find(Boolean)!;
+    expect(rule).toContain("position: sticky;");
+    expect(rule).toContain("top: 69px;");
+    expect(rule).toContain("background-color: var(--bg);");
+    expect(rule).toMatch(/padding-top: \d+px;/);
+  });
+
+  it("jumps land below it and the contents column sits below it (its measured height)", () => {
+    expect(desktop.join("")).toMatch(/html:has\(\.details-sticky\) \{\s*scroll-padding-top: calc\(69px \+ 24px \+ var\(--details-h, 90px\) \+ 32px\);/);
+    expect(desktop.join("")).toMatch(/\.contents-rail \{[^}]*top: calc\(69px \+ 24px \+ var\(--details-h, 90px\) \+ 24px\);/);
+    const page = readFileSync(join(WEB, "app/chart-page.tsx"), "utf8");
+    expect(page).toContain('<div ref={barRef} className="details-sticky">');
+    expect(page).toContain('root.style.setProperty("--details-h"');
+  });
+});
+
+describe("the desktop contents card is about 20 % smaller (D-139 item 3)", () => {
+  const css = readFileSync(join(WEB, "app/globals.css"), "utf8");
+  it("216 px wide, 40 px rows of 14 px text (was 240 px, 44 px, 15 px); the phone panel keeps 44 px rows", () => {
+    expect(/\n\.contents-card \{[^}]*width: 216px;/.test(css)).toBe(true);
+    const item = /\n\.contents-card \.contents-item \{([^}]*)\}/.exec(css)![1]!;
+    expect(item).toContain("min-height: 40px;");
+    expect(Number(/font-size: (\d+)px/.exec(item)![1])).toBeGreaterThanOrEqual(13);
+    expect(/\n\.contents-item \{[^}]*min-height: 44px;/.test(css)).toBe(true);
+    const area = (216 * (12 + 16 + 6 + 7 * 40 + 6)) / (240 * (14 + 16 + 8 + 7 * 44 + 8));
+    expect(area).toBeGreaterThan(0.75);
+    expect(area).toBeLessThan(0.85);
   });
 });
 
@@ -380,7 +426,7 @@ describe("touch targets: every control on the page is at least 44 px", () => {
   const css = readFileSync(join(WEB, "app/globals.css"), "utf8");
   const size = (cls: string, prop: "min-height" | "height" | "width") => Number(new RegExp(`\\n\\.${cls} \\{[^}]*\\n  ${prop}: (\\d+)px`).exec(css)?.[1] ?? 0);
   it.each([
-    ["contents-dashes", "min-height"], ["contents-dashes", "width"], ["contents-item", "min-height"], ["contents-fab", "min-height"],
+    ["contents-dashes", "min-height"], ["contents-dashes", "width"], ["contents-item", "min-height"], ["contents-fab", "height"], ["contents-fab", "width"],
     ["info-button", "height"], ["info-button", "width"], ["opener-button", "min-height"], ["sub-row", "min-height"],
     ["jump-row", "min-height"], ["sample-link", "min-height"], ["btn", "min-height"],
   ] as const)(".%s %s", (cls, prop) => {
@@ -405,7 +451,7 @@ describe("/chart stays within a 360 px screen", () => {
     expect(sections.planets).toContain("min-w-[520px]"); // inside its scroll box only
     const css = readFileSync(join(WEB, "app/globals.css"), "utf8");
     for (const grid of ["right-now-grid", "transit-grid", "fact-tiles"]) expect(new RegExp(`\\n\\.${grid} \\{[^}]*grid-template-columns: minmax\\(0, 1fr\\)`).test(css), grid).toBe(true);
-    expect(/\n\.info-panel \{[^}]*left: 0;\s*right: 0;/.test(css)).toBe(true); // phones: the tile's width
+    expect(/\n\.info-panel \{[^}]*position: fixed;/.test(css)).toBe(true); // floats; its width is capped to the screen (info-popup.test.ts)
     expect(/\n\.contents-sheet \{[^}]*width: 100%;/.test(css)).toBe(true);
   });
 });
