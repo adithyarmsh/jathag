@@ -4,6 +4,8 @@
 // high; the selected option is filled gold and the fill slides (motion 3, 240 ms; instant with reduced
 // motion). role="radiogroup" + role="radio" with arrow keys (one Tab stop, as a radio group).
 // `value` may be null: nothing selected yet (AM / PM, D-094), then there is no fill.
+// For forms (0.4.6): `firstId` names the first option (the focus target for an error), `describedBy`
+// links hints and errors, `invalid` draws the 2 px error edge (spec §3.4).
 
 import { useRef, type KeyboardEvent } from "react";
 
@@ -18,12 +20,18 @@ export function Toggle<V extends string>({
   value,
   onChange,
   className = "",
+  firstId,
+  describedBy,
+  invalid = false,
 }: {
   label: string;
   options: readonly ToggleOption<V>[];
   value: V | null;
   onChange: (v: V) => void;
   className?: string;
+  firstId?: string;
+  describedBy?: string;
+  invalid?: boolean;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const index = options.findIndex((o) => o.value === value);
@@ -39,7 +47,14 @@ export function Toggle<V extends string>({
   }
 
   return (
-    <div role="radiogroup" aria-label={label} className={`toggle ${className}`.trim()}>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      aria-describedby={describedBy || undefined}
+      aria-invalid={invalid || undefined}
+      data-invalid={invalid || undefined}
+      className={`toggle ${className}`.trim()}
+    >
       {index >= 0 && (
         <span
           aria-hidden="true"
@@ -58,6 +73,7 @@ export function Toggle<V extends string>({
             ref={(el) => {
               refs.current[i] = el;
             }}
+            id={i === 0 ? firstId : undefined}
             type="button"
             role="radio"
             aria-checked={on}

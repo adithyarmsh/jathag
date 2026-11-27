@@ -57,3 +57,26 @@ export function checkTime(hour: string, minute: string, period: Period | null, t
   if (!period) return { message: t.missing.period, parts: ["period"], immediate: false };
   return null;
 }
+
+export type ProblemField = DatePart | TimePart | "lat" | "lng" | "place";
+
+/**
+ * Where "See my chart" sends the focus when something is wrong (D-093): the first field to fix, in
+ * the order of the form. With "Enter coordinates yourself" ticked the place search is not used and
+ * the coordinates are checked instead; those live in Advanced settings, which the form then opens.
+ * Null when everything needed is there.
+ */
+export function firstProblem(
+  date: Check<DatePart> | null,
+  time: Check<TimePart> | null,
+  where: { manual: true; latOk: boolean; lngOk: boolean } | { manual: false; placeChosen: boolean },
+): { field: ProblemField; inAdvanced: boolean } | null {
+  if (date) return { field: date.parts[0]!, inAdvanced: false };
+  if (time) return { field: time.parts[0]!, inAdvanced: false };
+  if (where.manual) {
+    if (!where.latOk) return { field: "lat", inAdvanced: true };
+    if (!where.lngOk) return { field: "lng", inAdvanced: true };
+    return null;
+  }
+  return where.placeChosen ? null : { field: "place", inAdvanced: false };
+}

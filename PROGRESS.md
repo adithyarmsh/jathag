@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1–0.4.5 ✅; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.4.6 Full birth form |
+| **Current step** | 0.4.6 Full birth form, in review |
 | **Next step** | 0.4.7 Profiles |
 | **Then** | v0.5 Chart screens (0.5.1 chart page) |
-| **Blocked on** | The Project's 0.4.6 handoff |
+| **Blocked on** | Project review of the 0.4.6 PR |
 | **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.4.5, Light / Dark / Match device, placeholder pages and a 404; birth form, South Indian Rasi chart + planet table; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-27 |
 
@@ -97,7 +97,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.4.3 Mockups, approved in the Project (D-129 to D-131)
 - ✅ 0.4.4 Design handoff: `docs/design/design-spec.md`, `tokens.json`, 18 mockups; Requirements v1.13 (D-132)
 - ✅ 0.4.5 App shell (approved as D-133): Still Water tokens and fonts site-wide, one-line header, phone menu, Beta band, new footer, Light / Dark / Match device, placeholder pages and a 404; the home page keeps its layout in the new look (PR #27)
-- ⏳ 0.4.6 Full B2 form. Carry-over: the home page shows "Coming soon" on all three "What you'll get" tiles, but design spec §5.1 puts it only on "Plain-language explanations"
+- 🔄 0.4.6 Full birth form, in review: B2 home layout (440 / 480 px form column), the quiet form of D-134 (no heading, Name, Date with the old-clock "i", Time, Place with two hints and "also known as", Chart style remembered), Advanced settings inside the card (coordinates, "Which clock?" when it applies, time certainty with two choices switched off, seconds); result still under the form
 - ⏳ 0.4.7 Profiles
 
 ### v0.5 — Chart screens
@@ -142,6 +142,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-27 | 0.4.6 | (this PR) | Full birth form built (D-134, spec §5 v1.2): B2 split from 1024 px (form 440 px / gap 48, from 1200 px 480 / 80), "What you'll get" as three plain items on desktop and three cards below the form on phones, "Coming soon" only on "Plain-language explanations". Form without a visible heading: Name (never sent, shown in the details line), Date with the old-clock "i" (its note now links to the clock choice), Time, Place (two Hyderabad hints, "also known as Bombay" via `matchedName` from the search API, state D link), Chart style South / North remembered in `chartStyle` (North draws South with a note until 0.5.2). Advanced settings opens inside the card: coordinates with a UTC-offset dropdown, "Which clock?" only when it applies (sent only when changed), time certainty with two choices switched off and tagged, seconds. States B, C, D, E. R01 sends exactly main's request and shows Lagna Leo 8°31′13″ Magha 3. Four Project docs committed unchanged. Waiting for Project review. |
 | 2026-11-27 | 0.4.5 | #27 | Reviewed and approved by the Project (D-133): folder checks, preview at 390 and 1280 px in light and dark, menu and Esc, theme, placeholder page and 404, R01 matches the engine exactly. Squash-merged. |
 | 2026-11-27 | 0.4.5 | #27 | App shell built on the design system "Still Water": every colour, spacing, corner and shadow from `docs/design/tokens.json` in both themes (a test fails if they drift apart), Fraunces + Inter (Cormorant removed), shared components in `apps/web/components/`, one-line sticky header, full-screen phone menu (focus trap, Esc, scroll lock), Beta band, two-line footer, Light / Dark / Match device without a flash, placeholder pages (/profiles, /settings, /about, /faq, /disclaimer, /privacy, /sources) and a 404, each with its own title, all still noindex. Home page unchanged in layout and behaviour (R01 checked), restyled, star dividers between the result cards; "What you'll get" tiles stack at 1024–1279 px so nothing sticks out. 1,756 tests green (was 1,567). D-125 to D-132, roadmap, requirements v1.13 and `docs/design/` committed unchanged. Waiting for Project review. |
 | 2026-11-25 | 0.9.1 | #26 | Panchanga calculation built (pulled forward, D-123): sunrise through the adapter (Swiss Ephemeris rise/set, upper limb, refraction), tithi/paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine (`panchangaForChart`, engine 0.6.0) and a `panchanga` section in the chart API. All 29 reference births match JHora exactly on all six fields and within 0.05 points on both "% left"; the hora lord matches with 60-minute horas from sunrise (29/29; day/night split into 12 parts: 23/29). Polar fallback: calendar weekday, flagged. D-123 and roadmap v2.14 committed unchanged. Nothing new on the site except the footer. Approved by the Project (D-124, committed unchanged); squash-merged. |

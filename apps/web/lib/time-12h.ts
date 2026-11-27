@@ -21,9 +21,18 @@ export function to24h(hour: string, minute: string, period: Period | null): stri
   return `${two(h24)}:${two(m)}`;
 }
 
-/** "HH:MM" (24-hour) → "12:30 AM" style, for showing the time back to the user. */
+/** "HH:MM" or "HH:MM:SS" (24-hour) → "12:30 AM" / "12:30:15 AM" style, for showing the time back to the user. */
 export function to12hText(time24: string, am: string, pm: string): string {
-  const [h, m] = time24.split(":").map(Number);
+  const [h, m, s] = time24.split(":").map(Number);
   const hour = h! % 12 === 0 ? 12 : h! % 12;
-  return `${hour}:${two(m!)} ${h! < 12 ? am : pm}`;
+  return `${hour}:${two(m!)}${s === undefined ? "" : `:${two(s)}`} ${h! < 12 ? am : pm}`;
+}
+
+export const SECONDS = MINUTES; // 0 … 59 (Advanced settings → "Add seconds to the time", D-134)
+
+/** "HH:MM" + seconds "0"–"59" → "HH:MM:SS"; null seconds (not asked for) → "HH:MM" unchanged. */
+export function withSeconds(time24: string, seconds: string | null): string {
+  if (seconds === null) return time24;
+  const s = Number(seconds);
+  return Number.isInteger(s) && s >= 0 && s <= 59 ? `${time24}:${two(s)}` : time24;
 }

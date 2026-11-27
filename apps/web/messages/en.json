@@ -40,26 +40,24 @@
     "featuresLabel": "What you'll get",
     "features": [
       {
-        "title": "Accurate chart",
-        "text": "Calculated from your exact birth date, time and place,",
-        "soonText": "drawn in the style you know."
+        "title": "An accurate chart",
+        "text": "From your exact birth date, time and place, drawn in the style you know."
+      },
+      {
+        "title": "Your life timeline",
+        "text": "The chapters of your life, your dasha periods, with where you are today."
       },
       {
         "title": "Plain-language explanations",
         "text": "Short, honest notes on what each part means. No jargon, no fear.",
-        "soon": true
-      },
-      {
-        "title": "Your life timeline",
-        "text": "Your dasha periods, the chapters of your life, laid out as a simple timeline.",
         "soon": true
       }
     ],
     "comingSoon": "Coming soon"
   },
   "form": {
-    "title": "Generate Your Chart",
-    "subtitle": "Date, time and place of birth.",
+    "srTitle": "Your birth details",
+    "name": { "label": "Name" },
     "date": {
       "label": "Date of birth",
       "day": "Day",
@@ -67,29 +65,95 @@
       "month": "Month",
       "monthPlaceholder": "Month",
       "year": "Year",
-      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      "yearPlaceholder": "Year",
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "monthsShort": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     },
     "time": {
       "label": "Time of birth",
-      "hint": "The exact time, in hours and minutes, as written on the birth record.",
+      "hint": "As written on the birth record. 12 AM = midnight · 12 PM = noon.",
       "hour": "Hour",
       "hourPlaceholder": "Hour",
       "minute": "Minute",
       "minutePlaceholder": "Min",
+      "second": "Second",
       "period": "AM or PM",
       "am": "AM",
-      "pm": "PM",
-      "periodHint": "12 AM = midnight · 12 PM = noon"
+      "pm": "PM"
     },
     "place": {
       "label": "Place of birth",
-      "hint": "Type your town or city, e.g. Madurai. To narrow it down, add the state or country after a comma: Madurai, Tamil Nadu.",
+      "hintAbove": "Type your town or city, e.g. Hyderabad.",
+      "hintBelow": "To narrow it down, add the state or country after a comma: Hyderabad, Telangana.",
       "searching": "Searching…",
       "noResults": "No places found. Try another spelling or a nearby town.",
+      "enterCoordinates": "Enter coordinates yourself",
       "resultsCount": "{count} places found. Use the up and down arrow keys to choose one.",
       "resultsCountOne": "1 place found. Use the up and down arrow keys to choose it.",
-      "chosenCoordinates": "Latitude: {lat} · Longitude: {lng}",
-      "chosenTimeZone": "Time zone: {timeZone} ({offset})"
+      "alsoKnownAs": "also known as {name}",
+      "chosen": "{lat} · {lng} · {timeZone} ({offset})",
+      "setAside": "Not used: the coordinates in Advanced settings are used instead."
+    },
+    "chartStyle": {
+      "label": "Chart style",
+      "south": "South Indian",
+      "north": "North Indian",
+      "northNote": "North Indian drawing arrives with the new chart page. Showing South Indian for now."
+    },
+    "advanced": {
+      "toggle": "Advanced settings",
+      "manual": {
+        "checkbox": "Enter coordinates yourself",
+        "hint": "Decimal degrees. Use a minus sign for South or West.",
+        "latitude": "Latitude",
+        "latitudeHint": "e.g. 13.0827",
+        "longitude": "Longitude",
+        "longitudeHint": "e.g. 80.2707",
+        "timeZone": "Time zone",
+        "timeZoneHint": "The UTC offset of the clock the birth time was written on."
+      },
+      "clock": {
+        "legend": "Which clock was the time written on?",
+        "sentences": {
+          "mumbai": "In Mumbai until the 1950s, many families used Bombay time, 39 minutes behind IST. If you're not sure, keep IST.",
+          "westBengal": "In Kolkata and West Bengal until the late 1940s, many families used Calcutta time, 23 minutes 20 seconds ahead of IST. If you're not sure, keep IST.",
+          "warTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST. If you're not sure, keep War Time.",
+          "warTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. If you're not sure, keep IST.",
+          "before1906": "Before 1906, many towns kept their own local time, here about {minutes} minutes {direction} IST. If you're not sure, keep IST.",
+          "before1906OneMinute": "Before 1906, many towns kept their own local time, here about 1 minute {direction} IST. If you're not sure, keep IST.",
+          "before1906Same": "Before 1906, many towns kept their own local time; here it was within a minute of IST. If you're not sure, keep IST.",
+          "mumbaiWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and in Mumbai many families also used Bombay time, 39 minutes behind IST. If you're not sure, keep War Time.",
+          "mumbaiWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Mumbai many families used Bombay time, 39 minutes behind IST. If you're not sure, keep IST.",
+          "westBengalWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and in Kolkata and West Bengal many families also used Calcutta time, 23 minutes 20 seconds ahead of IST. If you're not sure, keep War Time.",
+          "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many families used Calcutta time, 23 minutes 20 seconds ahead of IST. If you're not sure, keep IST."
+        },
+        "labels": { "ist": "IST", "war": "War Time", "bombay": "Bombay local time", "calcutta": "Calcutta local time", "lmt": "The town's own local time" },
+        "notSure": "{label} (or not sure)",
+        "offsetLine": "{offset} · {difference}",
+        "difference": "{amount} {direction} IST",
+        "differenceAbout": "about {amount} {direction} IST",
+        "withinMinute": "within a minute of IST",
+        "ahead": "ahead of",
+        "behind": "behind",
+        "hour": "1 hour",
+        "hours": "{n} hours",
+        "minute": "1 minute",
+        "minutes": "{n} minutes",
+        "second": "1 second",
+        "seconds": "{n} seconds"
+      },
+      "certainty": {
+        "legend": "How sure are you of the birth time?",
+        "exact": "I know the exact time",
+        "rough": "I know roughly when",
+        "unknown": "I don't know the time",
+        "from": "From",
+        "to": "To",
+        "partOfDay": "Or pick a part of the day:",
+        "parts": ["Morning", "Afternoon", "Evening", "Night"],
+        "roughText": "We'll show what stays the same across these two hours and what could differ. A narrow range gives a clearer chart."
+      },
+      "seconds": { "checkbox": "Add seconds to the time" }
     },
     "repeatedTime": {
       "question": "This time happened twice that night: the clocks went back an hour. Which one was it?",
@@ -99,13 +163,20 @@
       "summaryLater": "the second time"
     },
     "submit": "See my chart",
-    "submitting": "Calculating…",
+    "calculating": { "title": "Calculating your chart…", "text": "Usually a second or two." },
+    "unreachable": {
+      "title": "We couldn't reach the calculator",
+      "text": "Your connection may have dropped for a moment. Your details are still in the form, so nothing is lost.",
+      "retry": "Try again"
+    },
     "privacy": "Your details are only used to calculate your chart. Nothing is stored on our servers."
   },
   "missing": {
     "date": "Please enter your date of birth: day, month and year.",
     "time": "Please enter your time of birth.",
-    "place": "Please choose your place of birth from the list.",
+    "place": "Please choose a place from the list.",
+    "latitude": "Please enter a latitude between −90 and 90, e.g. 13.0827.",
+    "longitude": "Please enter a longitude between −180 and 180, e.g. 80.2707.",
     "period": "Please choose AM or PM.",
     "yearDigits": "Please enter the year with all 4 digits, e.g. 1985.",
     "dayTooLarge": "{month} has {days} days.",
@@ -135,25 +206,30 @@
   },
   "clockNote": {
     "buttonLabel": "About the clock used for this date",
-    "mumbai": "In Mumbai until the 1950s, many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If your family used Bombay time, your chart may be different. You'll be able to switch soon.",
-    "westBengal": "In Kolkata and West Bengal until the late 1940s, many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If your family used Calcutta time, your chart may be different. You'll be able to switch soon.",
-    "warTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. If the time was written in IST, your chart may be different. You'll be able to switch soon.",
-    "warTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. We've calculated your chart with IST. If the time was written in War Time, your chart may be different. You'll be able to switch soon.",
-    "before1906": "Before 1906, many towns kept their own local time. Here that was about {minutes} minutes {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon.",
-    "before1906OneMinute": "Before 1906, many towns kept their own local time. Here that was about 1 minute {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon.",
+    "mumbai": "In Mumbai until the 1950s, many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If your family used Bombay time, your chart may be different.",
+    "westBengal": "In Kolkata and West Bengal until the late 1940s, many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If your family used Calcutta time, your chart may be different.",
+    "warTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. If the time was written in IST, your chart may be different.",
+    "warTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. We've calculated your chart with IST. If the time was written in War Time, your chart may be different.",
+    "before1906": "Before 1906, many towns kept their own local time. Here that was about {minutes} minutes {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different.",
+    "before1906OneMinute": "Before 1906, many towns kept their own local time. Here that was about 1 minute {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different.",
     "before1906Same": "Before 1906, many towns kept their own local time. Here it was within a minute of IST, so your chart is very unlikely to change. We've calculated your chart with IST.",
     "behind": "behind",
     "ahead": "ahead of",
-    "mumbaiWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Mumbai, many people also used Bombay time, 39 minutes behind IST. If the time was written in IST or in Bombay time, your chart may be different. You'll be able to switch soon.",
-    "mumbaiWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Mumbai many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If the time was written in War Time or in Bombay time, your chart may be different. You'll be able to switch soon.",
-    "westBengalWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Kolkata and West Bengal, many people also used Calcutta time, 23 minutes 20 seconds ahead of IST. If the time was written in IST or in Calcutta time, your chart may be different. You'll be able to switch soon.",
-    "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If the time was written in War Time or in Calcutta time, your chart may be different. You'll be able to switch soon.",
+    "mumbaiWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Mumbai, many people also used Bombay time, 39 minutes behind IST. If the time was written in IST or in Bombay time, your chart may be different.",
+    "mumbaiWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Mumbai many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If the time was written in War Time or in Bombay time, your chart may be different.",
+    "westBengalWarTime": "From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. In Kolkata and West Bengal, many people also used Calcutta time, 23 minutes 20 seconds ahead of IST. If the time was written in IST or in Calcutta time, your chart may be different.",
+    "westBengalWarTimeEarly": "Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST, and in Kolkata and West Bengal many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If the time was written in War Time or in Calcutta time, your chart may be different.",
     "ifInIndia": "If born in India: {text}",
-    "before1906NoPlace": "Before 1906, many towns kept their own local time, up to about half an hour different from IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon."
+    "changeLink": "Change it in Advanced settings",
+    "choosePlaceFirst": "Once you've chosen the place, you can change the clock in Advanced settings.",
+    "chosen": "You've chosen {clock} ({offset}) in Advanced settings, so your chart will use that clock.",
+    "before1906NoPlace": "Before 1906, many towns kept their own local time, up to about half an hour different from IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different."
   },
   "chart": {
     "title": "Planet positions",
     "summary": "{date} · {time} · {place}",
+    "summaryNamed": "{name} · {date} · {time} · {place}",
+    "manualPlace": "{lat} · {lng}",
     "summaryTime": "{time12} ({time24})",
     "scrollHint": "Swipe sideways to see every column.",
     "columns": {

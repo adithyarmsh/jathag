@@ -278,6 +278,16 @@ describe('place search endpoint', () => {
     expect((await search({ query: 'aurangabad, bihar' })).json.results[0]!.label).toMatch(/Bihar, India$/);
   });
 
+  it('passes the matched old name through (D-091 item 4): "bombay" → Mumbai with matchedName, "mumbai" without', async () => {
+    const old = (await search({ query: 'bombay' })).json.results[0]!;
+    expect(old.label).toBe('Mumbai, Maharashtra, India');
+    expect(old.matchedName).toBe('Bombay');
+    const main = (await search({ query: 'mumbai' })).json.results[0]!;
+    expect(main.label).toBe('Mumbai, Maharashtra, India');
+    expect(main).not.toHaveProperty('matchedName');
+    expect((await search({ query: 'che' })).json.results[0]).not.toHaveProperty('matchedName');
+  });
+
   it('under 3 characters: empty list', async () => {
     for (const query of ['', 'c', 'ch', '  ch  ']) expect((await search({ query })).json).toEqual({ results: [] });
   });
