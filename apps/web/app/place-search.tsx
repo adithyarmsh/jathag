@@ -60,7 +60,7 @@ export function PlaceSearch({
   const asideId = `${id}-aside`;
   const chosenId = `${id}-chosen`;
 
-  const [text, setText] = useState("");
+  const [text, setText] = useState(place?.label ?? ""); // a saved profile comes with its place (0.4.7)
   const [results, setResults] = useState<PlaceSearchResult[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [open, setOpen] = useState(false);

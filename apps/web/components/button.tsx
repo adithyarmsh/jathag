@@ -24,19 +24,21 @@ export function Button({
 /** A link that looks like a button (navigation, e.g. "Go to the home page"). */
 export function ButtonLink({
   href,
+  id,
   variant = "primary",
   main = false,
   className = "",
   children,
 }: {
   href: string;
+  id?: string;
   variant?: ButtonVariant;
   main?: boolean;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={buttonClass(variant, main, className)}>
+    <Link href={href} id={id} className={buttonClass(variant, main, className)}>
       {children}
     </Link>
   );

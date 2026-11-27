@@ -99,7 +99,7 @@ describe("new pages and the open phone menu stay within a 360 / 390 px screen (0
   });
 
   const t = { header: en.header, menu: en.menu, footer: en.footer };
-  const pages: PlaceholderKey[] = ["profiles", "settings", "about", "faq", "disclaimer", "privacy", "sources"];
+  const pages: PlaceholderKey[] = ["settings", "about", "faq", "disclaimer", "privacy", "sources"];
   const screens: [string, string][] = [
     ["header + open menu", renderToStaticMarkup(createElement(HeaderBar, { t, current: "about", open: true })) + renderToStaticMarkup(createElement(PhoneMenu, { t, current: "about" }))],
     ["footer", renderToStaticMarkup(createElement(SiteFooter, { t: en.footer, commit: "7e5a8dc" }))],

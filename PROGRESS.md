@@ -8,10 +8,10 @@
 | | |
 |---|---|
 | **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1–0.4.6 ✅; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.4.7 Profiles |
+| **Current step** | 0.4.7 Saved profiles, in review |
 | **Next step** | 0.5.1 Chart page |
 | **Then** | v0.5 Chart screens (0.5.1 chart page) |
-| **Blocked on** | The Project's 0.4.7 handoff |
+| **Blocked on** | Project review of the 0.4.7 PR |
 | **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.4.6, Light / Dark / Match device, placeholder pages and a 404; full birth form with Advanced settings (D-134), South Indian Rasi chart + planet table; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-27 |
 
@@ -98,7 +98,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.4.4 Design handoff: `docs/design/design-spec.md`, `tokens.json`, 18 mockups; Requirements v1.13 (D-132)
 - ✅ 0.4.5 App shell (approved as D-133): Still Water tokens and fonts site-wide, one-line header, phone menu, Beta band, new footer, Light / Dark / Match device, placeholder pages and a 404; the home page keeps its layout in the new look (PR #27)
 - ✅ 0.4.6 Full birth form (PR #28, D-135): B2 home layout (440 / 480 px form column), the quiet form of D-134 (no heading, Name, Date with the old-clock "i", Time, Place with two hints and "also known as", Chart style remembered), Advanced settings inside the card (coordinates, "Which clock?" when it applies, time certainty with two choices switched off, seconds); result still under the form
-- ⏳ 0.4.7 Profiles
+- 🔄 0.4.7 Saved profiles (PR #29, in review): every successful chart is kept in this browser (inputs only, no duplicates), /profiles "Your charts" with Open, Edit and Delete, phone menu count
 
 ### v0.5 — Chart screens
 - ⏳ 0.5.1 Overview · ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
@@ -142,6 +142,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-27 | 0.4.7 | #29 | Saved profiles built (D-136, spec §11): every successful "See my chart" keeps the form inputs in localStorage `profiles` (version 1, never results; identical details update the same profile, empty name = "My chart"); /profiles "Your charts" with the FR-PROF-03 notice, cards (most recently used first) with Open (fills the form and calculates), Edit (fills the form, "Editing …" line, next calculation updates that profile) and Delete (asked inside the card), empty state A; phone menu shows "3 in this browser". Only the profile id travels in the address. R01 opened from a profile sends main's exact request and shows Lagna Leo 8°31′13″ Magha 3. Two Project docs committed unchanged. Waiting for Project review. |
 | 2026-11-27 | 0.4.6 | #28 | Reviewed and approved by the Project (D-135): folder checks, preview at 390 and 1280 px, R01 and Mumbai 1940 Bombay time checked. Squash-merged. |
 | 2026-11-27 | 0.4.6 | #28 | Full birth form built (D-134, spec §5 v1.2): B2 split from 1024 px (form 440 px / gap 48, from 1200 px 480 / 80), "What you'll get" as three plain items on desktop and three cards below the form on phones, "Coming soon" only on "Plain-language explanations". Form without a visible heading: Name (never sent, shown in the details line), Date with the old-clock "i" (its note now links to the clock choice), Time, Place (two Hyderabad hints, "also known as Bombay" via `matchedName` from the search API, state D link), Chart style South / North remembered in `chartStyle` (North draws South with a note until 0.5.2). Advanced settings opens inside the card: coordinates with a UTC-offset dropdown, "Which clock?" only when it applies (sent only when changed), time certainty with two choices switched off and tagged, seconds. States B, C, D, E. R01 sends exactly main's request and shows Lagna Leo 8°31′13″ Magha 3. Four Project docs committed unchanged. Waiting for Project review. |
 | 2026-11-27 | 0.4.5 | #27 | Reviewed and approved by the Project (D-133): folder checks, preview at 390 and 1280 px in light and dark, menu and Esc, theme, placeholder page and 404, R01 matches the engine exactly. Squash-merged. |

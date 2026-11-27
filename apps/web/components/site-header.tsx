@@ -13,7 +13,9 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 import type { Messages } from "@/lib/i18n";
 import { currentPage, DESKTOP_LINKS, FOOTER_HREF, MENU_FOOT_LINKS, MENU_ROWS, SHELL_HREF, trapFocusIndex, type ShellPage } from "@/lib/shell";
+import { profilesMenuSub } from "@/lib/profiles-view";
 import { CloseIcon, MenuIcon, SettingsIcon } from "./icons";
+import { useProfileCount } from "./profiles-store";
 import { ThemeButton } from "./theme-button";
 import { setThemeChoice, useThemeChoice } from "./theme-store";
 import { Toggle } from "./toggle";
@@ -148,9 +150,24 @@ export function HeaderBar({
   );
 }
 
-/** The full-screen phone menu (exported for the render tests). A followed link closes it. */
-export function PhoneMenu({ t, current, onNavigate }: { t: ShellText; current: ShellPage | null; onNavigate?: () => void }) {
+/**
+ * The full-screen phone menu (exported for the render tests). A followed link closes it. The "Saved
+ * profiles" row says how many are kept in this browser (0.4.7); `profileCount` is for the tests.
+ */
+export function PhoneMenu({
+  t,
+  current,
+  onNavigate,
+  profileCount,
+}: {
+  t: ShellText;
+  current: ShellPage | null;
+  onNavigate?: () => void;
+  profileCount?: number | null;
+}) {
   const choice = useThemeChoice();
+  const storedCount = useProfileCount();
+  const count = profileCount === undefined ? storedCount : profileCount;
   const th = t.header.theme;
   return (
     <div id={MENU_ID} className="site-menu lg:hidden">
@@ -158,7 +175,7 @@ export function PhoneMenu({ t, current, onNavigate }: { t: ShellText; current: S
         {MENU_ROWS.map((p) => (
           <Link key={p} href={SHELL_HREF[p]} aria-current={current === p ? "page" : undefined} onClick={onNavigate} className="menu-row">
             <span>{t.header.links[p]}</span>
-            <span className="menu-row-sub">{t.menu.subs[p]}</span>
+            <span className="menu-row-sub">{p === "profiles" ? profilesMenuSub(count, t.menu) : t.menu.subs[p]}</span>
           </Link>
         ))}
       </nav>

@@ -8,10 +8,15 @@
 // certainty (two choices switched off) · seconds.
 //
 // "See my chart" sends the details to POST /api/chart (lib/chart-request.ts) and shows the result
-// below the form, as before (until the chart page, 0.5.1). Nothing about the birth is stored in the
-// browser: it lives only in this component's memory (NFR-PRIV-01). The NAME is never sent to the
-// server (it only appears in the result cards' details line). The only thing remembered is the
-// chart style, under localStorage "chartStyle" (FR-IN-10).
+// below the form, as before (until the chart page, 0.5.1). The NAME is never sent to the server (it
+// only appears in the result cards' details line). Remembered in this browser only (NFR-PRIV-01): the
+// chart style, under localStorage "chartStyle" (FR-IN-10), and, from step 0.4.7 (D-136), the inputs
+// of every successful chart as a saved profile (components/profiles-store.ts; never the results).
+//
+// Saved profiles come back through the URL with only their id: "/?profile=<id>" (Open: filled and
+// calculated at once) and "/?edit=<id>" (Edit: filled, not calculated, with an "Editing …" line; the
+// next successful "See my chart" updates that profile). The id is taken out of the address bar again
+// as soon as the profile is loaded.
 //
 // Checks show as the user goes (once the date is complete or a field is left), and "See my chart"
 // never calculates while something is wrong: it moves focus to the first field to fix instead,
@@ -21,22 +26,24 @@ import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type
 import type { ChartResponse, PlaceSuggestion } from "@jathag/api";
 import { errorFor, type FieldError, type FormField } from "@/lib/api-errors";
 import { earlyClockNote } from "@/lib/clock-note";
-import { chosenClockNote, clockChoiceView, clockToSend, effectiveClock } from "@/lib/clock-choice";
+import { chosenClockNote, clockChoiceView, effectiveClock } from "@/lib/clock-choice";
 import type { ClockId } from "@/lib/clock-rule";
 import { birthDate, daysInMonth, isUsableDate, usableYear } from "@/lib/birth-date";
 import { birthSummary } from "@/lib/birth-summary";
-import { buildChartRequest, type RepeatedTime } from "@/lib/chart-request";
+import type { RepeatedTime } from "@/lib/chart-request";
+import { birthFromForm, EMPTY_FORM, formFromBirth, requestFromForm, type FormValues } from "@/lib/form-values";
 import { readChartStyle, saveChartStyle, type ChartStyle } from "@/lib/chart-style";
 import { fill, formatUtcOffset } from "@/lib/chart-format";
 import { formatCoordinateShort, parseCoordinate } from "@/lib/coordinates";
 import { checkDate, checkTime, firstProblem, type DatePart, type TimePart } from "@/lib/form-checks";
 import { shownOffsetSeconds } from "@/lib/place-offset";
 import { listContext } from "@/lib/list-context";
-import { DEFAULT_UTC_OFFSET } from "@/lib/utc-offsets";
+import { profileFromUrl } from "@/lib/profile-link";
 import { HOURS, MINUTES, SECONDS, to24h, withSeconds, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
 import { Button, buttonClass } from "@/components/button";
 import { Divider } from "@/components/divider";
+import { findProfile, markOpened, saveFromForm } from "@/components/profiles-store";
 import { Toggle } from "@/components/toggle";
 import { AdvancedSettings } from "./advanced-settings";
 import { ChartStyleChoice } from "./chart-style-choice";
@@ -104,7 +111,54 @@ interface Result {
   style: ChartStyle;
 }
 
+/** What the form starts with: empty, or a saved profile (Open or Edit). */
+interface Start {
+  /** A new key starts the form afresh (Cancel, or a profile loaded after the page came up). */
+  key: number;
+  values: FormValues;
+  repeatedTime: RepeatedTime | null;
+  /** Edit: the profile the next successful "See my chart" updates. */
+  editing: { id: string; name: string } | null;
+  /** Open: calculate as soon as the form is filled. */
+  calculate: boolean;
+}
+
+const EMPTY_START: Start = { key: 0, values: EMPTY_FORM, repeatedTime: null, editing: null, calculate: false };
+
 export function BirthForm({ t }: { t: Messages }) {
+  const [start, setStart] = useState<Start>(EMPTY_START);
+
+  // A profile from /profiles: "?profile=<id>" or "?edit=<id>" (read once the page is in the browser;
+  // the server always draws the empty form).
+  useEffect(() => {
+    const link = profileFromUrl(window.location.search);
+    if (!link) return;
+    window.history.replaceState(window.history.state, "", window.location.pathname);
+    const profile = findProfile(link.id);
+    if (!profile) return;
+    const { values, repeatedTime } = formFromBirth(profile.birth, profile.name);
+    if (link.mode === "open") markOpened(profile.id);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loaded from storage, which only exists in the browser
+    setStart({
+      key: 1,
+      values,
+      repeatedTime,
+      editing: link.mode === "edit" ? { id: profile.id, name: profile.name } : null,
+      calculate: link.mode === "open",
+    });
+  }, []);
+
+  return (
+    <BirthFormBody
+      key={start.key}
+      t={t}
+      start={start}
+      onCancelEdit={() => setStart((s) => ({ ...EMPTY_START, key: s.key + 1 }))}
+    />
+  );
+}
+
+function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; onCancelEdit: () => void }) {
   const f = t.form;
   const a = f.advanced;
   const id = useId();
@@ -139,31 +193,34 @@ export function BirthForm({ t }: { t: Messages }) {
     clockPrefix: `${id}-clock-opt`,
     seconds: `${id}-seconds`,
   };
+  const init = start.values;
 
   const desktop = useDesktop();
   const storedStyle = useStoredChartStyle();
 
-  const [name, setName] = useState("");
-  const [day, setDay] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-  const [hour, setHour] = useState("");
-  const [minute, setMinute] = useState("");
-  const [second, setSecond] = useState("0");
-  const [period, setPeriod] = useState<Period | null>(null);
-  const [place, setPlace] = useState<PlaceSuggestion | null>(null);
+  const [name, setName] = useState(init.name);
+  const [day, setDay] = useState(init.day);
+  const [month, setMonth] = useState(init.month);
+  const [year, setYear] = useState(init.year);
+  const [hour, setHour] = useState(init.hour);
+  const [minute, setMinute] = useState(init.minute);
+  const [second, setSecond] = useState(init.second);
+  const [period, setPeriod] = useState<Period | null>(init.period);
+  const [place, setPlace] = useState<PlaceSuggestion | null>(init.place);
+  /** Edit mode (D-136 item 3): the profile the next successful "See my chart" updates. */
+  const [editing, setEditing] = useState(start.editing);
   /** The user's own pick; null = the remembered one (South the first time). */
   const [styleChoice, setStyleChoice] = useState<ChartStyle | null>(null);
   const chartStyle = styleChoice ?? storedStyle;
   // Advanced settings
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [manualOn, setManualOn] = useState(false);
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const [utcOffset, setUtcOffset] = useState(DEFAULT_UTC_OFFSET);
+  const [manualOn, setManualOn] = useState(init.manualOn);
+  const [lat, setLat] = useState(init.lat);
+  const [lng, setLng] = useState(init.lng);
+  const [utcOffset, setUtcOffset] = useState(init.utcOffset);
   /** The "Which clock?" pick; null = the default. Reset when the date or the place changes. */
-  const [clockChoice, setClockChoice] = useState<ClockId | null>(null);
-  const [secondsOn, setSecondsOn] = useState(false);
+  const [clockChoice, setClockChoice] = useState<ClockId | null>(init.clockChoice);
+  const [secondsOn, setSecondsOn] = useState(init.secondsOn);
 
   const [ambiguous, setAmbiguous] = useState(false);
   /** Messages from the API (by field). */
@@ -174,7 +231,7 @@ export function BirthForm({ t }: { t: Messages }) {
   /** State C: the request did not reach the server (or no answer came back). */
   const [unreachable, setUnreachable] = useState(false);
   /** The repeated-time choice of the last attempt, for "Try again". */
-  const lastRepeated = useRef<RepeatedTime | null>(null);
+  const lastRepeated = useRef<RepeatedTime | null>(start.repeatedTime);
   const [result, setResult] = useState<Result | null>(null);
   /** Heading of the chart (the first result card): the page scrolls there after calculating. */
   const resultHeading = useRef<HTMLHeadingElement>(null);
@@ -303,16 +360,8 @@ export function BirthForm({ t }: { t: Messages }) {
     setSubmitting(true);
     lastRepeated.current = repeatedTime;
     const fullTime = withSeconds(time, secondsOn ? second : null);
-    const body = buildChartRequest({
-      date,
-      time: fullTime,
-      where:
-        manualOn && latValue !== null && lngValue !== null
-          ? { kind: "manual", manual: { lat: latValue, lng: lngValue, utcOffsetSeconds: utcOffset } }
-          : { kind: "place", place: place! },
-      clock: clockToSend(clockView, clockChoice),
-      repeatedTime,
-    });
+    const values: FormValues = { name, day, month, year, hour, minute, second, period, secondsOn, place, manualOn, lat, lng, utcOffset, clockChoice };
+    const body = requestFromForm(values, clockView, repeatedTime)!;
     const placeLabel =
       manualOn && latValue !== null && lngValue !== null
         ? fill(t.chart.manualPlace, { lat: formatCoordinateShort(latValue, "lat"), lng: formatCoordinateShort(lngValue, "lng") })
@@ -331,6 +380,10 @@ export function BirthForm({ t }: { t: Messages }) {
         const shownBirth = birthSummary({ name, date, time: fullTime, place: placeLabel, repeatedTime }, t);
         setResult({ data: data as ChartResponse, summary: shownBirth.summary, birth: shownBirth.birth, style: chartStyle });
         saveChartStyle(window.localStorage, chartStyle);
+        // Kept as a saved profile, in this browser only (D-136): the inputs, never the results.
+        const birth = birthFromForm(values, clockView, repeatedTime);
+        if (birth) saveFromForm(birth, name, editing?.id ?? null, t.profiles.defaultName);
+        setEditing(null);
         setAmbiguous(false);
       } else {
         problem = errorFor(data?.error?.code, t.errors);
@@ -354,6 +407,15 @@ export function BirthForm({ t }: { t: Messages }) {
       }
     }
   }
+
+  // Open (D-136 item 2): calculate at once with the saved details (once, also in React's dev double run).
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!start.calculate || autoStarted.current) return;
+    autoStarted.current = true;
+    void calculate(start.repeatedTime);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only once, with the values the form started with
+  }, []);
 
   const dateDescribedBy = dateMessage ? ids.dateError : undefined;
   const timeDescribedBy = [ids.timeHint, timeMessage ? ids.timeError : null, ambiguous ? ids.repeated : null].filter(Boolean).join(" ");
@@ -417,6 +479,16 @@ export function BirthForm({ t }: { t: Messages }) {
             void calculate(null);
           }}
         >
+          {/* Edit mode (D-136 item 3): one small line above the fields, with a quiet way out */}
+          {editing && (
+            <div className="notice flex items-center justify-between gap-3 py-1 pr-2 text-[13px] leading-5">
+              <p className="py-2">{fill(f.editing.line, { name: editing.name })}</p>
+              <button type="button" className="editing-cancel shrink-0 px-2" onClick={onCancelEdit}>
+                {f.editing.cancel}
+              </button>
+            </div>
+          )}
+
           {/* Name: not required, never sent (D-134 item 2) */}
           <div>
             <label htmlFor={ids.name} className="form-label">
