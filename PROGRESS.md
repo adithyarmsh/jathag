@@ -7,12 +7,11 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.5 Chart screens 🔄 (0.5.1 in review). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.5.1 Chart page, in review |
-| **Next step** | 0.5.2 Charts (D1 + D9, South + North) |
-| **Then** | 0.5.3 Planet pages |
-| **Blocked on** | Project review of the 0.5.1 PR |
-| **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.4.7, Light / Dark / Match device, placeholder pages and a 404; full birth form with Advanced settings (D-134); saved profiles kept in this browser (every chart saved automatically, "Your charts" page with Open / Edit / Delete, count in the phone menu, D-136); South Indian Rasi chart + planet table; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
+| **Milestone** | v0.5 Chart screens 🔄 (0.5.1 ✅, D-138 to D-141). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
+| **Current step** | 0.5.2 Charts (D1 + D9, South + North) |
+| **Next step** | 0.5.3 Planet pages |
+| **Blocked on** | The Project's 0.5.2 handoff |
+| **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.5.1, Light / Dark / Match device, placeholder pages and a 404; home page = welcome + full birth form with Advanced settings (D-134) and a "See a sample chart" link; saved profiles kept in this browser (every chart saved automatically, "Your charts" page with Open / Edit / Delete, count in the phone menu, D-136); the chart page /chart (D-138 to D-140: details bar fixed on desktop with Edit details in place, contents panel, sections Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets, South Indian Rasi chart with three fact tiles and "i" pop-ups; /chart?sample shows a made-up sample chart); `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-27 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -101,7 +100,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.4.7 Saved profiles (PR #29, D-137): every successful chart is kept in this browser (inputs only, no duplicates), /profiles "Your charts" with Open, Edit and Delete, phone menu count
 
 ### v0.5 — Chart screens
-- 🔄 0.5.1 Chart page, in review (PR #30, D-138): the chart on its own page /chart (only the profile id or "sample" in the address), seven sections in the D-129 order with a contents panel, Edit details in place with the home form, a sample chart, the first "i" pop-ups; the home page keeps only the welcome and the form; first-look changes D-139 (fixed details bar on desktop, hover pop-ups, smaller contents card, icon-only phone button); second polish round D-140 (one right edge, stars in the desktop gap, 38 stars per tile and a lighter light-mode star gold, hover grow on every clickable thing, the Pratyantardasha line). Done when the founder has compared with JHora.
+- ✅ 0.5.1 Chart page (PR #30, D-138 to D-141): the chart on its own page /chart (only the profile id or "sample" in the address), seven sections in the D-129 order with a contents panel, Edit details in place with the home form, a sample chart, the first "i" pop-ups; the home page keeps only the welcome and the form; first-look changes D-139 (fixed details bar on desktop, hover pop-ups, smaller contents card, icon-only phone button); second polish round D-140 (one right edge, stars in the desktop gap, 38 stars per tile and a lighter light-mode star gold, hover grow on every clickable thing, the Pratyantardasha line); approved D-141. Done when: founder compares one chart with JHora (pending).
 - ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
 
 ### v0.6 — Timing screens
@@ -143,6 +142,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-27 | 0.5.1 | #30 | Reviewed and approved by the Project (D-141) after two founder preview rounds (D-139, D-140) and one bug fix. Squash-merged. |
 | 2026-11-27 | 0.5.1 | #30 | Founder's second polish round (D-140): the page column is now centred on a whole pixel (header, chart page, home, footer), so the fixed details bar and every block below it end on the same pixel (1280 px window: 1192 instead of 1192.5; 1440 px: 1272 instead of 1272.5; 1024 px: 985, unchanged); the background stars now show in the gap above the fixed bar on desktop (a clipped copy of the same stars, content still disappears there), 38 stars per 320 × 320 px (was 28), light mode uses a lighter star gold `--star-colour` #C49A3A at strength 0.6 (dark unchanged); one shared hover-grow rule (buttons ×1.02, small controls ×1.03, big rows and cards ×1.01; not when disabled, not links inside sentences, off with reduced motion); under an opened Mahadasha's Antardashas a line names the Pratyantardashas. D-140 committed unchanged. |
 | 2026-11-27 | 0.5.1 | #30 | Fix (founder's screen recording): after choosing a section in the contents card the previous one stayed highlighted. Cause: the "current section" line sat at 30 % of the screen height and ignored the fixed details bar (D-139), so on shorter screens a section landing under the bar never counted. Now the line is where jumps land (the page's scroll-padding-top, incl. the bar) + 16 px, recomputed on scroll, resize and page-height changes; a chosen section (or the #address on load) is current at once and stays so until the reader scrolls. |
 | 2026-11-27 | 0.5.1 | #30 | Founder's first-look changes (D-139): on desktop the details bar stays fixed under the header (the gap keeps the page background; the contents column and section jumps sit below it), phones unchanged; the "i" pop-ups open on hover as well as click/tap and float above the page; the desktop contents card about 20 % smaller; the phone contents button is icon-only (three lines of different lengths, 2 px edge, named "Contents"). D-139 committed unchanged. |
