@@ -7,6 +7,10 @@
 //   2. the real planet table and transit list, rendered for a reference birth, put their hidden
 //      texts inside a scroll box that is `relative`.
 // The page width itself was measured in the browser (see the 0.3.7.3 PR report).
+import { vi } from "vitest";
+
+// The home form uses the app router (to open /chart); these server renders have none, so a stand-in.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: () => {}, replace: () => {} }), usePathname: () => "/" }));
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createElement } from "react";
@@ -61,7 +65,7 @@ describe("scroll boxes are positioning containers (D-119)", () => {
   }
 
   it("the planet table's hidden texts sit inside a relative scroll box", () => {
-    const html = renderToStaticMarkup(createElement(PlanetTable, { result: res, summary: "R01", t: en.chart }));
+    const html = renderToStaticMarkup(createElement(PlanetTable, { result: res, t: en, labelledBy: "planets-title" }));
     const r = regions(html);
     expect(r).toHaveLength(1);
     expect(r[0]!.inner).toContain('class="sr-only"'); // Rahu/Ketu retrograde, the Sun's combust …

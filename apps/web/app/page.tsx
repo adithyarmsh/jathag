@@ -18,7 +18,7 @@ const nativeWords = [
 /**
  * "What you'll get" (rendered once, D-094 item 10a; spec §5.1). Desktop: three plain items under a
  * short star divider in the left column (h3 + one line, no cards). Phones and tablets: after a divider,
- * three inner cards below the form (and below the result, D-064). The "Coming soon" tag is only on
+ * three inner cards below the form (D-064). The "Coming soon" tag is only on
  * "Plain-language explanations" (D-133): next to its heading on desktop, under its text on phones.
  */
 function Features({ t }: { t: Messages }) {
@@ -64,7 +64,8 @@ export default function Home() {
   return (
     <>
       {/* B2 split from 1024 px (spec §1.5): form column 440 px with a 48 px gap, from 1200 px 480 px and
-          80 px. Below 1024 px one column: words + heading + intro → form → (result) → What you'll get. */}
+          80 px. Below 1024 px one column: words + heading + intro → form → What you'll get. The chart
+          itself opens on its own page, /chart (step 0.5.1, D-138). */}
       <main className="home-grid mx-auto grid w-full max-w-[1168px] flex-1 grid-cols-1 items-start gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:py-16">
         {/* Left on desktop. On phones and tablets the hero box itself dissolves (CSS) so the intro comes
             first and "What you'll get" goes last (D-064). Solid background: no star behind the text. */}
@@ -103,7 +104,7 @@ export default function Home() {
           <Features t={t} />
         </section>
 
-        {/* Right on desktop: the birth form; the result appears below both columns */}
+        {/* Right on desktop: the birth form; "See my chart" opens /chart */}
         <BirthForm t={t} />
       </main>
     </>

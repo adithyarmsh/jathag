@@ -10,6 +10,18 @@ export const DEFAULT_CHART_STYLE: ChartStyle = "south";
 
 type Store = Pick<Storage, "getItem" | "setItem">;
 
+/**
+ * The browser's localStorage, or null where it is blocked: with site data blocked, merely reading
+ * window.localStorage throws (step 0.5.1; the form then still works, nothing is remembered).
+ */
+export function browserStore(): Store | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 /** The stored style, or South when nothing (or something unknown) is stored or storage is blocked. */
 export function readChartStyle(store: Store | null | undefined): ChartStyle {
   try {

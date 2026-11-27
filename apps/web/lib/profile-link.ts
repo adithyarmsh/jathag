@@ -1,6 +1,9 @@
-// How a saved profile travels from /profiles to the home form (step 0.4.7, D-136 items 2 and 3): only
-// its id, in the address, never a birth detail. "/?profile=<id>" opens it (filled and calculated),
-// "/?edit=<id>" fills the form for editing. The form takes the id out of the address once loaded.
+// How a saved profile travels between pages (step 0.4.7, D-136 items 2 and 3; step 0.5.1, D-138): only
+// its id, in the address, never a birth detail. Since 0.5.1 both go to the chart page:
+// "/chart?profile=<id>" opens it, "/chart?profile=<id>&edit" opens it with the edit panel open.
+// The 0.4.7 home-form links ("/?profile=<id>", "/?edit=<id>") are still read, and sent on to /chart.
+
+import { chartHref } from "./chart-page";
 
 export type ProfileLinkMode = "open" | "edit";
 
@@ -8,10 +11,10 @@ export type ProfileLinkMode = "open" | "edit";
 const ID = /^[A-Za-z0-9-]{1,64}$/;
 
 export function profileHref(mode: ProfileLinkMode, id: string): string {
-  return `/?${mode === "open" ? "profile" : "edit"}=${encodeURIComponent(id)}`;
+  return chartHref(id, mode === "edit");
 }
 
-/** The profile asked for by the address ("?profile=…" or "?edit=…"), or null. */
+/** An old home-form link ("?profile=…" or "?edit=…"), or null. */
 export function profileFromUrl(search: string): { mode: ProfileLinkMode; id: string } | null {
   const q = new URLSearchParams(search);
   const open = q.get("profile");

@@ -2,6 +2,10 @@
 // markup (no browser here): what the face of the form shows and in which order, the hidden heading,
 // Advanced settings (order, switched-off choices, coordinates, clock section), and the "Coming soon"
 // tag on the home page. Keyboard, focus and the opening motion were checked in the browser (PR report).
+import { vi } from "vitest";
+
+// The home form uses the app router (to open /chart); these server renders have none, so a stand-in.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: () => {}, replace: () => {} }), usePathname: () => "/" }));
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createElement } from "react";

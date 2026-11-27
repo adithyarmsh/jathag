@@ -1,47 +1,19 @@
 "use client";
 
-// "Dasha periods" (step 0.3.7, D-113 item 2, FR-TM-01…04): the Mahadashas from birth; each opens to its
-// Antardashas, each of those to its Pratyantardashas. Sub-rows are only put on the page when opened
-// (up to 729 Pratyantardashas otherwise). Openers are buttons with aria-expanded. The current period at
-// each level says "You are here"; the one running at birth shows its true start and "Began before birth";
-// periods that ended before birth are not shown (D-113 item 3). 0.3.7.2 (D-117 item 3): each row has a
-// left rule in its level's colour, the same tokens as the "Right now" tiers (--tier-1/2/3).
+// "Dasha periods" on the chart page (step 0.5.1, design spec §6.5; from the 0.3.7 list, D-113, FR-TM-01…04):
+// "Your life in nine chapters". One opener row per Mahadasha from birth (spec §3.9): planet, years
+// ("2011 – 2027"), length ("16 yrs") and a bar whose length is years / 20 (gold for the current one). The
+// current row is highlighted with "You are here"; the one running at birth says "Began before birth, on
+// <date>"; periods that ended before birth are not shown (D-113 item 3). A row opens to its Antardashas
+// (start dates; the current one "· now"), and each Antardasha to its Pratyantardashas. Sub-rows are only
+// put on the page when opened (up to 729 Pratyantardashas otherwise). No link to the timeline page yet (0.6.1).
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { fill } from "@/lib/chart-format";
-import { antardashaRows, mahadashaRows, pratyantardashaRows, type PeriodRow } from "@/lib/dasha-view";
+import { mahaRowViews } from "@/lib/chart-sections";
+import { antardashaRows, pratyantardashaRows, type PeriodRow } from "@/lib/dasha-view";
 import type { DashaLevel, ListContext } from "@/lib/list-context";
-import { Chevron, ListCard, Marker, Sep } from "./list-bits";
-
-function RowText({ row, ctx }: { row: PeriodRow; ctx: ListContext }) {
-  const t = ctx.t.lists;
-  return (
-    <span className="dasha-row-text">
-      <span className="dasha-lord">{row.lordName}</span>
-      <Sep />
-      <span className="tabular-nums">{row.range}</span>
-      {(row.current || row.beganBeforeBirth) && (
-        <span className="flex flex-wrap gap-1.5">
-          {row.current && (
-            <>
-              <Sep />
-              <Marker strong>{t.youAreHere}</Marker>
-            </>
-          )}
-          {row.beganBeforeBirth && (
-            <>
-              <Sep />
-              <Marker>{t.beganBeforeBirth}</Marker>
-            </>
-          )}
-        </span>
-      )}
-    </span>
-  );
-}
-
-const pluralLabel = (level: DashaLevel, ctx: ListContext) =>
-  fill(ctx.t.lists.levelLabel, { level: ctx.t.lists.levelsPlural[level], term: ctx.t.lists.terms[level] });
+import { ChartSection, Chevron, Marker, Sep } from "./list-bits";
 
 /** "Antardashas (medium-term) in the Venus Mahadasha" */
 function subLabel(child: DashaLevel, parent: PeriodRow, ctx: ListContext) {
@@ -49,22 +21,10 @@ function subLabel(child: DashaLevel, parent: PeriodRow, ctx: ListContext) {
   return fill(t.subListLabel, { levels: t.levelsPlural[child], term: t.terms[child], lord: parent.lordName, level: t.levels[parent.level] });
 }
 
-function SubList({ id, label, rows, render }: { id: string; label: string; rows: PeriodRow[]; render: (r: PeriodRow) => ReactNode }) {
-  return (
-    <div id={id} className="dasha-sub">
-      <p id={`${id}-label`} className="text-sm font-semibold text-muted">
-        {label}
-      </p>
-      <ol aria-labelledby={`${id}-label`} className="mt-1">
-        {rows.map(render)}
-      </ol>
-    </div>
-  );
-}
-
 export function DashaList({ ctx }: { ctx: ListContext }) {
   const t = ctx.t.lists;
-  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const d = ctx.t.chartPage.dashas;
+  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   const toggle = (key: string) =>
     setOpen((s) => {
       const n = new Set(s);
@@ -73,68 +33,119 @@ export function DashaList({ ctx }: { ctx: ListContext }) {
       return n;
     });
 
-  // A plain function, not a component: a component defined here would be re-created on every render,
-  // and the button would lose keyboard focus when it is pressed.
-  function opener(row: PeriodRow, child: DashaLevel, levelClass: string) {
-    const isOpen = open.has(row.key);
-    const subId = `dasha-sub-${row.key}`;
+  const opensLabel = (row: PeriodRow, child: DashaLevel) => fill(t.opensLabel, { levels: t.levelsPlural[child], lord: row.lordName, level: t.levels[row.level] });
+
+  /** A shorter period: planet + start date (true start when it began before birth), "· now" when current. */
+  function shortRow(r: PeriodRow) {
     return (
-      <button
-        type="button"
-        className={`dasha-opener dasha-row ${levelClass}`}
-        aria-expanded={isOpen}
-        aria-controls={isOpen ? subId : undefined}
-        onClick={() => toggle(row.key)}
-      >
-        <Chevron open={isOpen} />
-        <RowText row={row} ctx={ctx} />
-        <span className="sr-only">
-          {" "}
-          ({fill(t.opensLabel, { levels: t.levelsPlural[child], lord: row.lordName, level: t.levels[row.level] })})
+      <span className="sub-row-text">
+        <span className="sub-row-lord">{r.lordName}</span>
+        <Sep />
+        <span className="tabular-nums">
+          {r.start}
+          {r.current && <span className="font-semibold">{d.nowSuffix}</span>}
         </span>
-      </button>
+        {r.beganBeforeBirth && (
+          <>
+            <Sep />
+            <Marker>{t.beganBeforeBirth}</Marker>
+          </>
+        )}
+        {r.current && <span className="sr-only">, {t.youAreHere}</span>}
+      </span>
     );
   }
 
   const renderPratyantar = (r: PeriodRow) => (
-    <li key={r.key} className="dasha-leaf dasha-row dasha-row-3">
-      <RowText row={r} ctx={ctx} />
+    <li key={r.key} className={r.current ? "sub-row sub-row-current sub-row-3" : "sub-row sub-row-3"}>
+      {shortRow(r)}
     </li>
   );
 
-  const renderAntar = (r: PeriodRow) => (
-    <li key={r.key}>
-      {opener(r, "pratyantardasha", "dasha-row-2")}
-      {open.has(r.key) && (
-        <SubList
-          id={`dasha-sub-${r.key}`}
-          label={subLabel("pratyantardasha", r, ctx)}
-          rows={pratyantardashaRows(ctx, r.path[0]!, r.path[1]!)}
-          render={renderPratyantar}
-        />
-      )}
-    </li>
-  );
-
-  const renderMaha = (r: PeriodRow) => (
-    <li key={r.key}>
-      {opener(r, "antardasha", "dasha-row-1")}
-      {open.has(r.key) && (
-        <SubList id={`dasha-sub-${r.key}`} label={subLabel("antardasha", r, ctx)} rows={antardashaRows(ctx, r.path[0]!)} render={renderAntar} />
-      )}
-    </li>
-  );
+  const renderAntar = (r: PeriodRow) => {
+    const isOpen = open.has(r.key);
+    const subId = `dasha-sub-${r.key}`;
+    return (
+      <li key={r.key}>
+        <button
+          type="button"
+          className={r.current ? "sub-row sub-row-opener sub-row-current sub-row-2" : "sub-row sub-row-opener sub-row-2"}
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? subId : undefined}
+          onClick={() => toggle(r.key)}
+        >
+          {shortRow(r)}
+          <span className="sr-only"> ({opensLabel(r, "pratyantardasha")})</span>
+          <Chevron open={isOpen} />
+        </button>
+        {isOpen && (
+          <div id={subId} className="opener-body">
+            <p id={`${subId}-label`} className="sr-only">
+              {subLabel("pratyantardasha", r, ctx)}
+            </p>
+            <ol aria-labelledby={`${subId}-label`}>{pratyantardashaRows(ctx, r.path[0]!, r.path[1]!).map(renderPratyantar)}</ol>
+          </div>
+        )}
+      </li>
+    );
+  };
 
   return (
-    <ListCard id="dasha-list-title" title={t.dashas.title}>
-      <p className="mt-1 text-sm text-muted">{t.dashas.intro}</p>
-      <p className="mt-1 text-sm text-muted">{fill(t.clockNote, { offset: ctx.offset })}</p>
-      <h3 id="dasha-maha-label" className="list-subheading mt-5">
-        {pluralLabel("mahadasha", ctx)}
-      </h3>
-      <ol aria-labelledby="dasha-maha-label" className="mt-2">
-        {mahadashaRows(ctx).map(renderMaha)}
+    <ChartSection id="dashas" eyebrow={d.eyebrow} heading={d.heading} intro={d.oneLiner}>
+      <p id="dasha-maha-label" className="sr-only">
+        {fill(t.levelLabel, { level: t.levelsPlural.mahadasha, term: t.terms.mahadasha })}
+      </p>
+      <ol aria-labelledby="dasha-maha-label" className="mt-6 flex flex-col gap-2">
+        {mahaRowViews(ctx).map((m) => {
+          const r = m.row;
+          const isOpen = open.has(r.key);
+          const subId = `dasha-sub-${r.key}`;
+          return (
+            <li key={r.key} className={r.current ? "opener opener-current" : "opener"}>
+              <button
+                type="button"
+                className="opener-button maha-row"
+                aria-expanded={isOpen}
+                aria-controls={isOpen ? subId : undefined}
+                onClick={() => toggle(r.key)}
+              >
+                <span className="maha-lord">{r.lordName}</span>
+                <Sep />
+                <span className="maha-years tabular-nums">
+                  {m.years}
+                  <span className="sr-only">
+                    {" "}
+                    ({r.range})
+                  </span>
+                </span>
+                <span aria-hidden="true" className="maha-bar">
+                  <span className={r.current ? "maha-bar-fill maha-bar-current" : "maha-bar-fill"} style={{ width: `${m.barFraction * 100}%` }} />
+                </span>
+                <Sep />
+                <span className="maha-length tabular-nums">{m.length}</span>
+                {m.note && (
+                  <>
+                    <Sep />
+                    <span className={r.current ? "maha-note maha-note-current" : "maha-note"}>{m.note}</span>
+                  </>
+                )}
+                <span className="sr-only"> ({opensLabel(r, "antardasha")})</span>
+                <Chevron open={isOpen} />
+              </button>
+              {isOpen && (
+                <div id={subId} className="opener-body">
+                  <p id={`${subId}-label`} className="sub-list-label">
+                    {subLabel("antardasha", r, ctx)}
+                  </p>
+                  <ol aria-labelledby={`${subId}-label`} className="antar-grid">
+                    {antardashaRows(ctx, r.path[0]!).map(renderAntar)}
+                  </ol>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ol>
-    </ListCard>
+    </ChartSection>
   );
 }

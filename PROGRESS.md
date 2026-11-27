@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.5 Chart screens ⏳ (next). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.5.1 Chart page |
+| **Milestone** | v0.5 Chart screens 🔄 (0.5.1 in review). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
+| **Current step** | 0.5.1 Chart page, in review |
 | **Next step** | 0.5.2 Charts (D1 + D9, South + North) |
-| **Then** | v0.5 Chart screens (0.5.1 chart page) |
-| **Blocked on** | The Project's 0.5.1 handoff |
+| **Then** | 0.5.3 Planet pages |
+| **Blocked on** | Project review of the 0.5.1 PR |
 | **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.4.7, Light / Dark / Match device, placeholder pages and a 404; full birth form with Advanced settings (D-134); saved profiles kept in this browser (every chart saved automatically, "Your charts" page with Open / Edit / Delete, count in the phone menu, D-136); South Indian Rasi chart + planet table; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-27 |
 
@@ -27,7 +27,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 | v0.2 First real chart | ✅ |
 | v0.3 Timing engine | ✅ |
 | v0.4 Design system + app shell | ✅ |
-| v0.5 Chart screens | ⏳ |
+| v0.5 Chart screens | 🔄 |
 | v0.6 Timing screens | ⏳ |
 | v0.7 Interpretations | ⏳ |
 | v0.8 Approximate time, settings, downloads | ⏳ |
@@ -101,7 +101,8 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.4.7 Saved profiles (PR #29, D-137): every successful chart is kept in this browser (inputs only, no duplicates), /profiles "Your charts" with Open, Edit and Delete, phone menu count
 
 ### v0.5 — Chart screens
-- ⏳ 0.5.1 Overview · ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
+- 🔄 0.5.1 Chart page, in review (PR #PRNUM, D-138): the chart on its own page /chart (only the profile id or "sample" in the address), seven sections in the D-129 order with a contents panel, Edit details in place with the home form, a sample chart, the first "i" pop-ups; the home page keeps only the welcome and the form. Done when the founder has compared with JHora.
+- ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
 
 ### v0.6 — Timing screens
 - ⏳ 0.6.1 Dasha timeline · ⏳ 0.6.2 Transits + Sade Sati
@@ -142,6 +143,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-27 | 0.5.1 | #PRNUM | Chart page built (D-138, spec §6): "See my chart" saves the profile and opens /chart?profile=<id> with the result handed over in the page's memory (one request per visit; also works once when the browser blocks storage); /chart?sample shows the made-up R01; no profile or an unknown id goes home. Details bar, Edit details in place (the same form, "Update chart", updates the same profile), contents panel (dash column + card on desktop, floating button + bottom panel on phones), sections Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets restyled to the boards (no left-border rules), three fact tiles with "i" pop-ups. Fixed on the way: the form crashed when the browser blocks storage entirely. R01 shows the same numbers (Lagna Leo 8° 31′ 13″ Magha 3). Two Project docs committed unchanged. Waiting for Project review. |
 | 2026-11-27 | 0.4.7 | #29 | Reviewed and approved by the Project (D-137): folder checks, stored format and dedupe rule checked; edge cases accepted. Squash-merged. |
 | 2026-11-27 | 0.4.7 | #29 | Saved profiles built (D-136, spec §11): every successful "See my chart" keeps the form inputs in localStorage `profiles` (version 1, never results; identical details update the same profile, empty name = "My chart"); /profiles "Your charts" with the FR-PROF-03 notice, cards (most recently used first) with Open (fills the form and calculates), Edit (fills the form, "Editing …" line, next calculation updates that profile) and Delete (asked inside the card), empty state A; phone menu shows "3 in this browser". Only the profile id travels in the address. R01 opened from a profile sends main's exact request and shows Lagna Leo 8°31′13″ Magha 3. Two Project docs committed unchanged. Waiting for Project review. |
 | 2026-11-27 | 0.4.6 | #28 | Reviewed and approved by the Project (D-135): folder checks, preview at 390 and 1280 px, R01 and Mumbai 1940 Bombay time checked. Squash-merged. |
