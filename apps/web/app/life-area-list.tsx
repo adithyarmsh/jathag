@@ -13,7 +13,7 @@ export function LifeAreaList({ ctx }: { ctx: ListContext }) {
       <p className="mt-1 text-sm text-muted">{t.intro}</p>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         {lifeAreaViews(ctx).map((a) => (
-          <div key={a.area} className="rounded-xl border border-line p-4">
+          <div key={a.area} className="card-inner p-4">
             <h3 id={`life-area-${a.area}`} className="font-semibold">
               {a.name}
             </h3>

@@ -22,7 +22,8 @@ export const contrast = (a: string, b: string) => {
 describe("Coming soon tag colours", () => {
   const text = values("soon-text");
   const bg = values("soon-bg");
-  const cardBg = values("bg"); // the inner card behind the tag
+  // The surfaces the tag sits on since 0.4.5: the home page's raised tiles and the placeholder cards
+  const surfaces = [values("raised"), values("card")];
 
   it("has one light and one dark shade (dark repeated for the switch)", () => {
     expect(text).toHaveLength(3);
@@ -35,9 +36,9 @@ describe("Coming soon tag colours", () => {
   it.each([
     ["light", 0],
     ["dark", 1],
-  ] as const)("%s: text ≥ 4.5:1 on the tag background and on the card", (_name, i) => {
+  ] as const)("%s: text ≥ 4.5:1 on the tag background and on the surfaces around it", (_name, i) => {
     expect(contrast(text[i]!, bg[i]!)).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(text[i]!, cardBg[i]!)).toBeGreaterThanOrEqual(4.5);
+    for (const s of surfaces) expect(contrast(text[i]!, s[i]!)).toBeGreaterThanOrEqual(4.5);
   });
 
   it("is a red (red channel clearly highest)", () => {

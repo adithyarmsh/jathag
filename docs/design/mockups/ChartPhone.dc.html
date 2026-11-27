@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chart page, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="{{t.vars}}">
+<div style="position: relative; width: 390px; background: var(--bg); color: var(--ink); overflow: hidden; border-radius: 28px; border: 1px solid var(--line)">
+
+<header style="display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 16px; border-bottom: 1px solid var(--line)">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<div style="display: flex"><button aria-label="Switch theme" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg></button><button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
+</header>
+
+<nav aria-label="Sections" style="display: flex; gap: 8px; padding: 8px 16px; overflow: hidden; white-space: nowrap; background: var(--bg); border-bottom: 1px solid var(--line)">
+<sc-for list="{{t.nav}}" as="n" hint-placeholder-count="7"><a href="#" style="{{n.style}}">{{n.label}}</a></sc-for>
+</nav>
+
+<section style="margin: 16px 12px 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px">
+<div><p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 22px; line-height: 28px">Meera</p><p style="margin: 2px 0 0; color: var(--muted); font-size: 13px; line-height: 20px">14 Aug 1992 · 6:45 AM · Chennai, Tamil Nadu, India</p></div>
+<div style="display: flex; gap: 8px"><button style="flex: 1; height: 44px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 600">Edit details</button><button style="flex: 1; height: 44px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 600">Download</button></div>
+</section>
+
+<section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Birth chart</p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 32px; line-height: 38px">Meera's chart</h1>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">A map of the sky at the moment of birth, seen from Chennai. Each box is a sign; the numbers count houses from the Lagna.</p>
+<dc-import name="SouthChart" hint-size="100%,358px"></dc-import>
+<div role="group" aria-label="Chart type" style="display: flex; gap: 8px"><button aria-pressed="true" style="min-height: 44px; padding: 0 16px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent); color: var(--on); font-size: 13px; font-weight: 600">Rasi (D1)</button><button aria-pressed="false" style="min-height: 44px; padding: 0 16px; border: 1px solid var(--fb); border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">Navamsa (D9)</button></div>
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; color: var(--muted)">Chart style</span><div role="radiogroup" aria-label="Chart style" style="display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--fb); border-radius: 999px"><button role="radio" aria-checked="true" style="min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 13px; font-weight: 600">South</button><button role="radio" aria-checked="false" style="min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">North</button></div></div>
+<p style="margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 14px; line-height: 22px"><strong style="font-weight: 600">Rasi, the main chart.</strong> Where each planet stood at birth. Most readings start here.</p>
+<div style="padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Index</p>
+<p style="margin: 0; font-size: 12px; font-weight: 600; color: var(--muted)">Signs</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 10px; font-size: 12px; line-height: 18px"><sc-for list="{{t.index.signs}}" as="g" hint-placeholder-count="12"><span><strong style="font-weight: 600">{{g.a}}</strong> <span style="color: var(--muted)">{{g.n}}</span></span></sc-for></div>
+<p style="margin: 4px 0 0; font-size: 12px; font-weight: 600; color: var(--muted)">Planets</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 10px; font-size: 12px; line-height: 18px"><sc-for list="{{t.index.planets}}" as="g" hint-placeholder-count="11"><span><strong style="font-weight: 600">{{g.a}}</strong> <span style="color: var(--muted)">{{g.n}}</span></span></sc-for></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{t.facts}}" as="f" hint-placeholder-count="3"><div style="padding: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; color: var(--muted)">{{f.k}}</p><p style="margin: 2px 0 0; font-family: Fraunces, Georgia, serif; font-size: 18px; line-height: 24px">{{f.v}}</p></div></sc-for>
+</div>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Right now · 26 Nov 2026</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">You are in Jupiter's Mahadasha</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">Life runs in nested periods, each led by a planet: a long chapter, a medium one inside it, and a short one inside that.</p>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 18px">
+<sc-for list="{{t.tiers}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<p style="{{r.labelStyle}}">{{r.level}}</p>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="{{r.nameStyle}}">{{r.lord}}</span><span style="font-size: 13px; color: var(--muted)">{{r.left}}</span></div>
+<div style="{{r.barStyle}}"><div style="{{r.fillStyle}}"></div></div>
+<span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums">{{r.dates}}</span>
+</div>
+</sc-for>
+</div>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 13px; font-weight: 600">Coming up</p>
+<sc-for list="{{t.coming}}" as="c" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 14px; line-height: 22px"><span style="color: var(--muted); font-variant-numeric: tabular-nums">{{c.date}}</span><span>{{c.text}}</span></div></sc-for>
+</div>
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; font-size: 14px"><span><strong style="font-weight: 600">Sade Sati:</strong> setting phase, until 23 Feb 2028</span><span aria-hidden="true" style="color: var(--at)">↓</span></a>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Dasha periods</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">Your life in nine chapters</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">The Vimshottari cycle: 120 years of planetary periods, starting from the Moon's birth star. Bar length shows how long each chapter lasts.</p>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{t.md}}" as="m" hint-placeholder-count="9">
+<div style="{{m.rowStyle}}">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 600">{{m.lord}}</span><span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums">{{m.range}} · {{m.years}}</span></div>
+<div style="height: 4px; margin-top: 6px; border-radius: 999px; background: var(--line)"><div style="{{m.barStyle}}"></div></div>
+<sc-if value="{{m.note}}" hint-placeholder-val="{{false}}"><p style="{{m.noteStyle}}">{{m.note}}</p></sc-if>
+<sc-if value="{{m.cur}}" hint-placeholder-val="{{false}}">
+<div style="margin-top: 10px; margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{t.ads}}" as="a" hint-placeholder-count="9"><div style="{{a.style}}"><span>{{a.lord}}</span><span style="font-variant-numeric: tabular-nums">{{a.start}}</span></div></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Life areas</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">Which planets touch which part of life</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">A planet is linked to a life area when it rules or sits in that area's houses. Marked areas are active in your current periods.</p>
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden">
+<sc-for list="{{t.areas}}" as="l" hint-placeholder-count="10">
+<div style="padding: 12px 14px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 15px; font-weight: 600">{{l.name}}</span><sc-if value="{{l.active}}" hint-placeholder-val="{{false}}"><span style="flex: none; padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--at); font-size: 12px; font-weight: 600">Active now</span></sc-if></div>
+<span style="font-size: 13px; line-height: 20px; color: var(--muted)">{{l.planets}}</span>
+<sc-if value="{{l.note}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; line-height: 18px; color: var(--muted); font-style: italic">{{l.note}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Sade Sati</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">The last stretch of a slow phase</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">About seven and a half years while Saturn passes the sign before your Moon sign, the Moon sign itself, and the sign after. A time for patience and steady effort.</p>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: Fraunces, Georgia, serif; font-size: 20px">Setting phase</span><span style="font-size: 13px; color: var(--muted)">ends 23 Feb 2028</span></div>
+<div style="position: relative; padding-top: 22px">
+<span style="position: absolute; left: 84.6%; top: 0; transform: translateX(-50%); font-size: 11px; font-weight: 600; color: var(--at)">Today</span>
+<div style="display: flex; gap: 3px; height: 10px"><div style="width: 28%; border-radius: 999px 0 0 999px; background: var(--line)"></div><div style="width: 36%; background: var(--line)"></div><div style="width: 36%; border-radius: 0 999px 999px 0; background: var(--accent)"></div></div>
+<span style="position: absolute; left: 84.6%; top: 17px; width: 2px; height: 20px; background: var(--ink); transform: translateX(-1px)"></span>
+</div>
+<div style="display: flex; gap: 3px; font-size: 12px; line-height: 16px; color: var(--muted)"><span style="width: 28%">Rising<br>Jan 2020</span><span style="width: 36%">Peak<br>Apr 2022</span><span style="width: 36%; color: var(--ink); font-weight: 600">Setting<br>Mar 2025</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 20px; color: var(--muted)">Saturn touches Aries on 3 Jun 2027, steps back into Pisces on 20 Oct 2027, and leaves for good on 23 Feb 2028.</p>
+</div>
+<p style="margin: 6px 0 0; font-size: 13px; font-weight: 600">Every Sade Sati, birth to 120 years: 5 periods</p>
+<sc-for list="{{t.ss}}" as="s" hint-placeholder-count="5"><button aria-expanded="false" style="{{s.style}}"><span>{{s.range}}</span><span style="font-size: 12px; color: var(--muted)">{{s.note}}</span></button></sc-for>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Transits</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">Where the planets are today</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">Today's sky laid over your chart, counted from your Moon sign and from your Lagna.</p>
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px">
+<thead><tr style="color: var(--muted); font-size: 12px; text-align: left"><th style="padding: 10px 12px; font-weight: 600">Planet</th><th style="padding: 10px 6px; font-weight: 600">Sign</th><th style="padding: 10px 6px; font-weight: 600; text-align: right">From Moon</th><th style="padding: 10px 12px; font-weight: 600; text-align: right">From Lagna</th></tr></thead>
+<tbody><sc-for list="{{t.tr}}" as="x" hint-placeholder-count="9"><tr style="border-top: 1px solid var(--line)"><td style="padding: 9px 12px; font-weight: 500">{{x.p}}</td><td style="padding: 9px 6px">{{x.sign}}</td><td style="padding: 9px 6px; text-align: right; font-variant-numeric: tabular-nums">{{x.moon}}</td><td style="padding: 9px 12px; text-align: right; font-variant-numeric: tabular-nums">{{x.lagna}}</td></tr></sc-for></tbody>
+</table>
+</div>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 13px; font-weight: 600">Next sign changes</p>
+<sc-for list="{{t.sc}}" as="c" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 14px; line-height: 22px"><span style="color: var(--muted); font-variant-numeric: tabular-nums">{{c.date}}</span><span>{{c.text}}</span></div></sc-for>
+<a href="#" style="margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--at)">All sign changes, next 10 years</a>
+</div>
+</section>
+
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Planet positions</p>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">The exact numbers</h2>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">Everything the chart is drawn from. Swipe the table sideways for house and dignity.</p>
+<div style="position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: 16px">
+<table style="width: 560px; border-collapse: collapse; font-size: 14px; line-height: 20px">
+<thead><tr style="color: var(--muted); font-size: 12px; text-align: left"><th style="padding: 10px 12px; font-weight: 600">Planet</th><th style="padding: 10px 6px; font-weight: 600">Sign</th><th style="padding: 10px 6px; font-weight: 600">Degree</th><th style="padding: 10px 6px; font-weight: 600">Nakshatra</th><th style="padding: 10px 6px; font-weight: 600">House</th><th style="padding: 10px 6px; font-weight: 600">Dignity</th></tr></thead>
+<tbody><sc-for list="{{t.pl}}" as="x" hint-placeholder-count="10"><tr style="border-top: 1px solid var(--line)"><td style="padding: 9px 12px; font-weight: 500">{{x.p}}</td><td style="padding: 9px 6px">{{x.sign}}</td><td style="padding: 9px 6px; font-variant-numeric: tabular-nums; white-space: nowrap">{{x.deg}}</td><td style="padding: 9px 6px; white-space: nowrap">{{x.nak}}</td><td style="padding: 9px 6px; font-variant-numeric: tabular-nums">{{x.house}}</td><td style="padding: 9px 6px">{{x.dig}}</td></tr></sc-for></tbody>
+</table>
+</div>
+<p style="margin: 0; color: var(--muted); font-size: 12px; line-height: 18px">Sidereal zodiac · Lahiri ayanamsa · Swiss Ephemeris · verified against independent reference charts · 13° 05′ N, 80° 17′ E · UTC+5:30</p>
+</section>
+
+<footer style="margin-top: 56px; padding: 24px 16px 28px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 20px; color: var(--muted)">
+<nav aria-label="Footer" style="display: flex; flex-wrap: wrap; gap: 4px 16px"><a href="#" style="color: var(--ink)">About</a><a href="#" style="color: var(--ink)">FAQ</a><a href="#" style="color: var(--ink)">Disclaimer</a><a href="#" style="color: var(--ink)">Privacy</a><a href="#" style="color: var(--ink)">Sources &amp; credits</a><a href="#" style="color: var(--ink)">Source code</a></nav>
+<p style="margin: 0">v0.4.x · abc1234 · Made by <a href="#">Adithya</a></p>
+</footer>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":860,"height":7420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--t1':'#76560F','--t2':'#23666F','--t3':'#6B4A96','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--t1':'#D9B566','--t2':'#7FC6CF','--t3':'#BCA6E6','--shadow':'none'};
+    const chip = (on) => ({ display: 'inline-flex', alignItems: 'center', minHeight: '40px', padding: '0 14px', borderRadius: '999px', fontSize: '13px', textDecoration: 'none', border: '1px solid ' + (on ? 'var(--accent)' : 'var(--fb)'), background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--on)' : 'var(--muted)', fontWeight: on ? 600 : 400, flex: 'none' });
+    const nav = ['Chart','Right now','Dashas','Life areas','Sade Sati','Transits','Planets'].map((label, i) => ({ label, style: chip(i === 0) }));
+    const tier = (level, lord, left, pct, dates, c, h, size) => ({ level, lord, left, dates,
+      labelStyle: { margin: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(' + c + ')' },
+      nameStyle: { fontFamily: 'Fraunces, Georgia, serif', fontSize: size + 'px', lineHeight: '1.25' },
+      barStyle: { height: h + 'px', borderRadius: '999px', background: 'var(--line)', overflow: 'hidden' },
+      fillStyle: { width: pct + '%', height: '100%', borderRadius: '999px', background: 'var(' + c + ')' } });
+    const tiers = [
+      tier('Long-term · Mahadasha', 'Jupiter', '95% · about 10 months left', 95, '11 Oct 2011 – 11 Oct 2027 · 16 years', '--t1', 8, 24),
+      tier('Medium-term · Antardasha', 'Rahu', '64% · about 10 months left', 64, '17 May 2025 – 11 Oct 2027', '--t2', 6, 21),
+      tier('Short-term · Pratyantardasha', 'Ketu', '91% · 5 days left', 91, '11 Oct 2026 – 1 Dec 2026', '--t3', 4, 18) ];
+    const coming = [ { date: '1 Dec 2026', text: 'Venus short-term period begins' }, { date: '11 Oct 2027', text: 'Saturn Mahadasha begins, 19 years' } ];
+    const mdRaw = [['Mars','1986 – 1993',7,'Began before birth, on 11 Oct 1986'],['Rahu','1993 – 2011',18],['Jupiter','2011 – 2027',16,'You are here',true],['Saturn','2027 – 2046',19],['Mercury','2046 – 2063',17],['Ketu','2063 – 2070',7],['Venus','2070 – 2090',20],['Sun','2090 – 2096',6],['Moon','2096 – 2106',10]];
+    const md = mdRaw.map(([lord, range, y, note, cur]) => ({ lord, range, years: y + ' yrs', note: note || '', cur: !!cur,
+      rowStyle: { padding: '12px 14px', borderRadius: '12px', border: '1px solid ' + (cur ? 'var(--accent)' : 'var(--line)'), background: cur ? 'var(--soft)' : 'var(--card)' },
+      barStyle: { width: (y / 20 * 100) + '%', height: '100%', borderRadius: '999px', background: cur ? 'var(--t1)' : 'var(--fb)' },
+      noteStyle: { margin: '6px 0 0', fontSize: '12px', fontWeight: cur ? 600 : 400, color: cur ? 'var(--at)' : 'var(--muted)' } }));
+    const ads = [['Jupiter','11 Oct 2011'],['Saturn','28 Nov 2013'],['Mercury','10 Jun 2016'],['Ketu','16 Sep 2018'],['Venus','23 Aug 2019'],['Sun','23 Apr 2022'],['Moon','9 Feb 2023'],['Mars','10 Jun 2024'],['Rahu','17 May 2025 · now',true]].map(([lord, start, cur]) => ({ lord, start,
+      style: { display: 'flex', justifyContent: 'space-between', minHeight: '30px', alignItems: 'center', padding: '0 8px', borderRadius: '6px', fontSize: '13px', background: cur ? 'var(--card)' : 'transparent', color: cur ? 'var(--t2)' : 'var(--muted)', fontWeight: cur ? 600 : 400 } }));
+    const areas = [
+      ['Personality & self','Sun rules the 1st · Jupiter and Venus sit in the 1st',true],
+      ['Money & family','Mercury rules the 2nd and 11th · Ketu sits in the 11th',true],
+      ['Communication, courage & siblings','Venus rules the 3rd'],
+      ['Home, mother & inner peace','Mars rules the 4th'],
+      ['Learning, creativity & children','Jupiter rules the 5th · Rahu sits in the 5th',true],
+      ['Health & wellness','Sun rules the 1st · Jupiter and Venus sit in the 1st · Saturn rules and sits in the 6th',true,'General wellness only, not medical advice.'],
+      ['Relationships & marriage','Saturn rules the 7th · Moon sits in the 7th'],
+      ['Career & work','Venus rules the 10th · Mars sits in the 10th · Saturn rules and sits in the 6th'],
+      ['Luck, beliefs & mentors','Mars rules the 9th'],
+      ['Spirituality, rest & letting go','Moon rules the 12th · Jupiter rules the 8th · Sun and Mercury sit in the 12th',true]
+    ].map(([name, planets, active, note]) => ({ name, planets, active: !!active, note: note || '' }));
+    const ss = [['Mar 1990 – Apr 1998','Running at birth'],['Jan 2020 – Feb 2028','Now',true],['Mar 2049 – Apr 2057',''],['Jan 2079 – Feb 2087',''],['Feb 2108 – Mar 2116','']].map(([range, note, cur]) => ({ range, note,
+      style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '46px', padding: '0 14px', border: '1px solid ' + (cur ? 'var(--accent)' : 'var(--line)'), borderRadius: '8px', background: cur ? 'var(--soft)' : 'var(--card)', color: 'var(--ink)', fontSize: '15px', fontWeight: cur ? 600 : 500, textAlign: 'left' } }));
+    const tr = [['Sun','Scorpio','10th','4th'],['Moon','Gemini','5th','11th'],['Mars','Leo','7th','1st'],['Mercury','Libra','9th','3rd'],['Jupiter','Leo','7th','1st'],['Venus','Libra','9th','3rd'],['Saturn','Pisces (R)','2nd','8th'],['Rahu','Aquarius','1st','7th'],['Ketu','Leo','7th','1st']].map(([p, sign, moon, lagna]) => ({ p, sign, moon, lagna }));
+    const sc = [ { date: '5 Dec 2026', text: 'Rahu moves into Capricorn, Ketu into Cancer' }, { date: '25 Jan 2027', text: 'Jupiter moves back into Cancer' }, { date: '3 Jun 2027', text: 'Saturn moves into Aries' } ];
+    const pl = [['Lagna','Leo','8°31′27″','Magha 3','1','—'],['Sun','Cancer','27°44′48″','Ashlesha 4','12','Friend'],['Moon','Aquarius','4°27′44″','Dhanishta 4','7','Neutral'],['Mars','Taurus','18°22′49″','Rohini 3','10','Neutral'],['Mercury','Cancer','12°15′34″','Pushya 3','12','Enemy'],['Jupiter','Leo','23°58′31″','Purva Phalguni 4','1','Friend'],['Venus','Leo','14°35′04″','Purva Phalguni 1','1','Enemy'],['Saturn (R)','Capricorn','20°52′56″','Shravana 4','6','Own sign'],['Rahu','Sagittarius','4°04′39″','Mula 2','5','—'],['Ketu','Gemini','4°04′39″','Mrigashira 4','11','—']].map(([p, sign, deg, nak, house, dig]) => ({ p, sign, deg, nak, house, dig }));
+    const facts = [ { k: 'Lagna', v: 'Leo' }, { k: 'Moon sign', v: 'Aquarius' }, { k: 'Birth star', v: 'Dhanishta' } ];
+    const IDX = { signs: [['Ari','Aries'],['Tau','Taurus'],['Gem','Gemini'],['Can','Cancer'],['Leo','Leo'],['Vir','Virgo'],['Lib','Libra'],['Sco','Scorpio'],['Sag','Sagittarius'],['Cap','Capricorn'],['Aqu','Aquarius'],['Pis','Pisces']].map(([a, n]) => ({ a, n })),
+      planets: [['La','Lagna, rising sign'],['Su','Sun'],['Mo','Moon'],['Ma','Mars'],['Me','Mercury'],['Ju','Jupiter'],['Ve','Venus'],['Sa','Saturn'],['Ra','Rahu'],['Ke','Ketu'],['(R)','retrograde']].map(([a, n]) => ({ a, n })) };
+    const data = { index: IDX, nav, tiers, coming, md, ads, areas, ss, tr, sc, pl, facts };
+    return { themes: [ { vars: light, ...data }, { vars: dark, ...data } ] };
+  }
+}
+</script>
+</body>
+</html>

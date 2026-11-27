@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dasha timeline with you are here</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+
+<main style="max-width: 760px; margin: 0 auto; padding: 20px 16px 56px; display: flex; flex-direction: column; gap: 22px">
+<a href="#" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--at); text-decoration: none"><span aria-hidden="true">←</span> Meera's chart</a>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Dasha periods</p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 36px; line-height: 42px">Your timeline</h1>
+<p style="margin: 0; font-size: 16px; line-height: 26px; color: var(--muted)">Nine planetary chapters across 120 years. Each one holds nine smaller periods, and each of those nine shorter ones.</p>
+</section>
+
+<section aria-label="Whole life overview" style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px">
+<div style="position: relative; padding-top: 24px">
+<span style="position: absolute; left: 30%; top: 0; transform: translateX(-50%); font-size: 11px; font-weight: 600; white-space: nowrap; color: var(--at)">You are here</span>
+<div style="display: flex; gap: 2px; height: 28px">
+<sc-for list="{{f.strip}}" as="s" hint-placeholder-count="9"><div style="{{s.style}}" title="{{s.title}}">{{s.label}}</div></sc-for>
+</div>
+<span style="position: absolute; left: 30%; top: 18px; width: 2px; height: 40px; background: var(--ink); transform: translateX(-1px)"></span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums"><span>Birth · 1992</span><span>Today · 2026</span><span>2106</span></div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted)">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 8px; border-radius: 999px; background: var(--t1)"></span>Long-term · Mahadasha</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 6px; border-radius: 999px; background: var(--t2)"></span>Medium-term · Antardasha</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 4px; border-radius: 999px; background: var(--t3)"></span>Short-term · Pratyantardasha</span>
+</div>
+
+<ol aria-label="Mahadashas" style="list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--line); display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{f.md}}" as="m" hint-placeholder-count="9">
+<li style="position: relative">
+<span style="{{m.dot}}"></span>
+<button aria-expanded="{{m.open}}" style="{{m.row}}"><span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 16px; font-weight: 600">{{m.lord}}</span><span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums">{{m.range}}</span></span><span style="{{m.tagStyle}}">{{m.tag}}</span></button>
+<sc-if value="{{m.cur}}" hint-placeholder-val="{{false}}">
+<ol aria-label="Antardashas in Jupiter" style="list-style: none; margin: 10px 0 0 12px; padding: 0 0 0 14px; border-left: 2px solid var(--t2); display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{f.ads}}" as="a" hint-placeholder-count="9">
+<li>
+<div style="{{a.row}}"><span>{{a.lord}}</span><span style="font-variant-numeric: tabular-nums">{{a.range}}</span></div>
+<sc-if value="{{a.cur}}" hint-placeholder-val="{{false}}">
+<ol aria-label="Pratyantardashas in Rahu" style="list-style: none; margin: 6px 0 8px 10px; padding: 0 0 0 12px; border-left: 2px solid var(--t3); display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{f.pds}}" as="p" hint-placeholder-count="9">
+<li style="{{p.row}}"><span style="display: flex; justify-content: space-between"><span>{{p.lord}}</span><span style="font-variant-numeric: tabular-nums">{{p.range}}</span></span>
+<sc-if value="{{p.cur}}" hint-placeholder-val="{{false}}"><span style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px"><span style="height: 4px; border-radius: 999px; background: var(--line)"><span style="display: block; width: 91%; height: 100%; border-radius: 999px; background: var(--t3)"></span></span><span style="font-size: 12px; font-weight: 600; color: var(--at)">You are here · 26 Nov 2026 · 5 days left</span></span></sc-if>
+</li>
+</sc-for>
+</ol>
+</sc-if>
+</li>
+</sc-for>
+</ol>
+</sc-if>
+</li>
+</sc-for>
+</ol>
+
+<section style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 13px; font-weight: 600">Coming up</p>
+<div style="display: grid; grid-template-columns: 100px 1fr; gap: 6px 10px; font-size: 14px; line-height: 22px"><span style="color: var(--muted)">1 Dec 2026</span><span>Venus short-term period, until 26 Apr 2027</span><span style="color: var(--muted)">11 Oct 2027</span><span>Saturn Mahadasha begins, 19 years, starting with Saturn's own Antardasha</span></div>
+</section>
+<p style="margin: 0; font-size: 12px; line-height: 18px; color: var(--muted)">Dates are shown on the clock used at birth (UTC+5:30 for this chart). Periods before birth are left out; Mars, running at birth, began on 11 Oct 1986.</p>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":2400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--t1':'#76560F','--t2':'#23666F','--t3':'#6B4A96','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--t1':'#D9B566','--t2':'#7FC6CF','--t3':'#BCA6E6','--shadow':'none'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const stripRaw = [['Ma',1.16,'past'],['Ra',18,'past'],['Ju',16,'cur'],['Sa',19],['Me',17],['Ke',7],['Ve',20],['Su',6],['Mo',10]];
+    const strip = stripRaw.map(([label, y, st]) => ({ label: y > 5 ? label : '', title: label + ', ' + y + ' years',
+      style: { width: (y / 114.16 * 100) + '%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 600, borderRadius: '4px', overflow: 'hidden',
+        background: st === 'cur' ? 'var(--t1)' : st === 'past' ? 'var(--line)' : 'var(--raised)', color: st === 'cur' ? 'var(--on)' : 'var(--muted)', border: st ? '0' : '1px solid var(--line)' } }));
+    const mdRaw = [['Mars','11 Oct 1986 – 10 Oct 1993','Running at birth','past'],['Rahu','10 Oct 1993 – 11 Oct 2011','18 years','past'],['Jupiter','11 Oct 2011 – 11 Oct 2027','Now · 95%','cur'],['Saturn','11 Oct 2027 – 11 Oct 2046','19 years'],['Mercury','11 Oct 2046 – 11 Oct 2063','17 years'],['Ketu','11 Oct 2063 – 11 Oct 2070','7 years'],['Venus','11 Oct 2070 – 11 Oct 2090','20 years'],['Sun','11 Oct 2090 – 10 Oct 2096','6 years'],['Moon','10 Oct 2096 – 12 Oct 2106','10 years']];
+    const md = mdRaw.map(([lord, range, tag, st]) => { const cur = st === 'cur', past = st === 'past';
+      return { lord, range, tag, cur, open: cur ? 'true' : 'false',
+        dot: { position: 'absolute', left: cur ? '-26px' : '-24px', top: '18px', width: cur ? '14px' : '10px', height: cur ? '14px' : '10px', borderRadius: '999px', background: cur ? 'var(--t1)' : past ? 'var(--line)' : 'var(--bg)', border: cur ? '0' : '2px solid ' + (past ? 'var(--line)' : 'var(--fb)'), boxSizing: 'border-box' },
+        row: { width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', minHeight: '56px', padding: '8px 14px', border: '1px solid ' + (cur ? 'var(--accent)' : 'var(--line)'), borderRadius: '12px', background: cur ? 'var(--soft)' : 'var(--card)', color: past ? 'var(--muted)' : 'var(--ink)', textAlign: 'left', cursor: 'pointer' },
+        tagStyle: { flex: 'none', fontSize: '12px', fontWeight: cur ? 600 : 400, color: cur ? 'var(--at)' : 'var(--muted)' } }; });
+    const sub = (cur, past, c) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '34px', padding: '0 10px', borderRadius: '8px', fontSize: '14px', background: cur ? 'var(--card)' : 'transparent', border: cur ? '1px solid var(--line)' : '1px solid transparent', color: cur ? c : past ? 'var(--muted)' : 'var(--ink)', fontWeight: cur ? 600 : 400 });
+    const adRaw = [['Jupiter','11 Oct 2011 – 28 Nov 2013','past'],['Saturn','28 Nov 2013 – 10 Jun 2016','past'],['Mercury','10 Jun 2016 – 16 Sep 2018','past'],['Ketu','16 Sep 2018 – 23 Aug 2019','past'],['Venus','23 Aug 2019 – 23 Apr 2022','past'],['Sun','23 Apr 2022 – 9 Feb 2023','past'],['Moon','9 Feb 2023 – 10 Jun 2024','past'],['Mars','10 Jun 2024 – 17 May 2025','past'],['Rahu','17 May 2025 – 11 Oct 2027','cur']];
+    const ads = adRaw.map(([lord, range, st]) => ({ lord, range, cur: st === 'cur', row: sub(st === 'cur', st === 'past', 'var(--t2)') }));
+    const pdRaw = [['Rahu','17 May – 26 Sep 2025','past'],['Jupiter','26 Sep 2025 – 21 Jan 2026','past'],['Saturn','21 Jan – 9 Jun 2026','past'],['Mercury','9 Jun – 11 Oct 2026','past'],['Ketu','11 Oct – 1 Dec 2026','cur'],['Venus','1 Dec 2026 – 26 Apr 2027'],['Sun','26 Apr – 9 Jun 2027'],['Moon','9 Jun – 21 Aug 2027'],['Mars','21 Aug – 11 Oct 2027']];
+    const pds = pdRaw.map(([lord, range, st]) => { const r = sub(st === 'cur', st === 'past', 'var(--t3)'); return { lord, range, cur: st === 'cur', row: { ...r, display: 'block', padding: '7px 10px', fontSize: '13px' } }; });
+    const data = { strip, md, ads, pds };
+    return { frames: [ { vars: light, frame: frame(390, 28), ...data }, { vars: dark, frame: frame(390, 28), ...data }, { vars: light, frame: frame(1280, 0), ...data } ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.14 · 2026-11-25 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.18 · 2026-11-26 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -49,12 +49,12 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started. Every step table be
 | **v0.1 Coming soon** | Live holding page; repo, CI, auto-deploy; docs + progress tracking; B2-styled Coming Soon | ✅ |
 | **v0.2 First real chart** | On the live site: enter real birth details, see planet positions that match JHora | ✅ |
 | **v0.3 Timing engine** | Dashas (3 levels), transits, Sade Sati, approximate-time results (as plain lists on the live site) | ✅ |
-| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | 🔄 (0.4.1: your references) |
+| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | 🔄 (0.4.1 ✅, 0.4.2 ✅, 0.4.3 ✅, 0.4.4 ✅; next 0.4.5 app shell) |
 | **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | ⏳ |
 | **v0.6 Timing screens** | Timeline with "you are here", transits, Sade Sati card | ⏳ |
 | **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
 | **v0.8 Approx. time, settings, downloads** | Certain/uncertain markers, settings, PNG/PDF downloads, report-an-issue | ⏳ |
-| **v0.9 Panchanga + legal** | Panchanga card; privacy, disclaimer, about, credits pages | 🔄 (0.9.1 pulled forward) |
+| **v0.9 Panchanga + legal** | Panchanga card; privacy, disclaimer, about, credits pages | 🔄 (0.9.1 ✅, pulled forward) |
 | **v1.0 Beta launch** | Quality pass; domain; Jathag (English web app) goes public | ⏳ |
 | v1.1 | Beta feedback fixes; 16 divisional charts; accounts (sign in, save profiles and charts) | ⏳ |
 | v1.2 | Mobile test build on your own phone | ⏳ |
@@ -127,10 +127,10 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 
 | Step | Who | What | Done when | Status |
 |---|---|---|---|---|
-| 0.4.1 | YOU | References for the remaining screens (O-001); can start any time | Sent | 🔄 |
-| 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve | ⏳ |
-| 0.4.3 | PROJECT | Mockups (phone + desktop): overview (the separate chart page, see 0.5.1), charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states | You approve | ⏳ |
-| 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs) | Given | ⏳ |
+| 0.4.1 | YOU | References for the remaining screens (O-001); can start any time | Sent | ✅ |
+| 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve | ✅ |
+| 0.4.3 | PROJECT | Mockups (phone + desktop): overview (the separate chart page, see 0.5.1), charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states; also the chart-type button row under the chart, the section navigation, and the About and FAQ pages (D-125) | You approve | ✅ |
+| 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs): `docs/design/design-spec.md`, `tokens.json`, `mockups/`; Requirements v1.13 (D-132) | Given | ✅ |
 | 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged | ⏳ |
 | 0.4.6 | CODE | Full B2 birth form: exact time on the main form, the approximate-time modes (custom range, part-of-day presets, don't know) under Advanced settings (D-106; placement decided in the input design), place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged | ⏳ |
 | 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged | ⏳ |
@@ -139,7 +139,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 
 | Step | Who | What | Done when | Status |
 |---|---|---|---|---|
-| 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below. Until then (v0.2–v0.4) the table appears under the form on the home page | You compare with JHora | ⏳ |
+| 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below, in this order (D-129): chart (one style at a time, chart-type chips, South / North toggle), Right now, Dasha periods, Life areas, Sade Sati, Transits, planet positions. Until then (v0.2–v0.4) the table appears under the form on the home page | You compare with JHora | ⏳ |
 | 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle (replaces the basic chart from 0.3.2.1) | Visual match with JHora | ⏳ |
 | 0.5.3 | CODE | Planets table + planet detail pages (numbers; text placeholders until v0.7) | Merged | ⏳ |
 
@@ -174,11 +174,11 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 
 | Step | Who | What | Done when | Status |
 |---|---|---|---|---|
-| 0.9.1 | CODE | Panchanga at birth (tithi, vara, nakshatra, yoga, karana); pulled forward to run alongside the v0.4 design work (D-123): engine + chart API, no screen | Matches JHora exports | 🔄 |
+| 0.9.1 | CODE | Panchanga at birth (tithi, vara, nakshatra, yoga, karana); pulled forward to run alongside the v0.4 design work (D-123): engine + chart API, no screen | Matches JHora exports | ✅ |
 | 0.9.2 | PROJECT | Five short "what this part means" explanations | You approve | ⏳ |
 | 0.9.3 | CODE | Panchanga card | Merged | ⏳ |
-| 0.9.4 | PROJECT | Privacy, Disclaimer, About, Credits pages + content licence options (O-003) | You decide | ⏳ |
-| 0.9.5 | CODE | Legal pages live | Merged | ⏳ |
+| 0.9.4 | PROJECT | Privacy, Disclaimer, About, FAQ, Credits pages + content licence options (O-003); FAQ added by D-125 | You decide | ⏳ |
+| 0.9.5 | CODE | Legal, About and FAQ pages live | Merged | ⏳ |
 | 0.9.6 | YOU | Decide analytics (O-005) | Logged | ⏳ |
 
 ## v1.0 — Beta launch
@@ -211,7 +211,7 @@ Marketing of the English web app may start any time after 1.0.5 (D-084). SEO/AEO
 
 | Milestone | What | Rough steps | Status |
 |---|---|---|---|
-| **v1.2** | Mobile test build | Decide framework (D-045, prototype comparison) → engine runs on the phone (offline) → install a test build on your own phone. A free Android test install is possible; iPhone test builds via TestFlight need the Apple Developer account (US$99/yr) | ⏳ |
+| **v1.2** | Mobile test build | Decide framework (D-045, prototype comparison) → engine runs on the phone (offline) → install a test build on your own phone. A free Android test install is possible; iPhone test builds via TestFlight need the Apple Developer account (US$99/yr). Also: the extra calculation options moved out of v1 (D-131): True node, Raman and KP ayanamsas, each reference-tested before it is offered | ⏳ |
 | **v1.3** | Mobile test version for friends | Core screens on mobile → share test builds with a few friends → fix | ⏳ |
 | **v1.4** | Basic Learn | Scope (decided after v1.1) → write → build, on web and mobile | ⏳ |
 | **v1.5** | Basic Learn, more detail | Every chart term and detail: what it means and how it is calculated | ⏳ |

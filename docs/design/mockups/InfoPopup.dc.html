@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The i pop-up in context</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 28px 16px 40px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">{{f.caption}}</p>
+
+<sc-if value="{{f.term}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="position: relative; padding: 10px; background: var(--card); border: 1px solid var(--accent); border-radius: 12px"><p style="margin: 0; font-size: 12px; color: var(--muted)">Lagna</p><p style="margin: 2px 0 0; font-family: Fraunces, Georgia, serif; font-size: 18px">Leo</p>
+<button aria-label="What is the Lagna?" aria-expanded="true" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 20px; height: 20px; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">i</span></button></div>
+<div style="position: relative; padding: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; color: var(--muted)">Moon sign</p><p style="margin: 2px 0 0; font-family: Fraunces, Georgia, serif; font-size: 18px">Aquarius</p><span aria-hidden="true" style="position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid var(--at); color: var(--at); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-sizing: border-box">i</span></div>
+<div style="position: relative; padding: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px"><p style="margin: 0; font-size: 12px; color: var(--muted)">Birth star</p><p style="margin: 2px 0 0; font-family: Fraunces, Georgia, serif; font-size: 18px">Dhanishta</p><span aria-hidden="true" style="position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid var(--at); color: var(--at); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-sizing: border-box">i</span></div>
+</div>
+<div role="dialog" aria-label="Lagna (rising sign)" style="{{f.pop}}">
+<p style="margin: 0; padding: 10px 16px; background: var(--soft); font-family: Fraunces, Georgia, serif; font-size: 20px; line-height: 28px">Lagna, the rising sign</p>
+<p style="margin: 0; padding: 12px 16px 4px; font-size: 15px; line-height: 24px">The sign rising on the eastern horizon at the moment of birth. It becomes your 1st house, and every other house is counted from it.</p>
+<p style="margin: 0; padding: 4px 16px 4px; font-size: 14px; line-height: 22px; color: var(--muted)">It changes about every two hours, which is why the exact birth time matters.</p>
+<a href="#" style="display: inline-block; padding: 6px 16px 14px; font-size: 13px; font-weight: 600; color: var(--at)">More in the FAQ</a>
+</div>
+</sc-if>
+
+<sc-if value="{{f.why}}" hint-placeholder-val="{{false}}">
+<div style="padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 15px; font-weight: 600">Health &amp; wellness</span><span style="display: inline-flex; align-items: center; gap: 4px"><span style="padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--at); font-size: 12px; font-weight: 600">Active now</span><button aria-label="Why is this area active?" aria-expanded="true" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 20px; height: 20px; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">i</span></button></span></div>
+<span style="font-size: 13px; line-height: 20px; color: var(--muted)">Sun rules the 1st · Jupiter and Venus sit in the 1st · Saturn rules and sits in the 6th</span>
+</div>
+<div role="dialog" aria-label="Why is this area active?" style="{{f.pop}}">
+<p style="margin: 0; padding: 10px 16px; background: var(--soft); font-family: Fraunces, Georgia, serif; font-size: 20px; line-height: 28px">Why this is active now</p>
+<ul style="margin: 0; padding: 12px 16px 4px 34px; font-size: 15px; line-height: 24px">
+<li>Jupiter leads your current Mahadasha, until 11 Oct 2027.</li>
+<li>Jupiter sits in your 1st house, Leo.</li>
+<li>The 1st house is one of the two houses of Health &amp; wellness.</li>
+</ul>
+<p style="margin: 0; padding: 6px 16px 16px; font-size: 13px; line-height: 20px; color: var(--muted)">Every highlight follows this one rule: a period's planet rules or sits in the area's houses.</p>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1050}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A'};
+    const frame = (w, r) => ({ width: w + 'px', minHeight: '700px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const pop = (w) => ({ maxWidth: w + 'px', background: 'var(--card)', border: '1px solid var(--line)', borderRadius: '12px', boxShadow: '0 12px 32px rgba(15,19,34,0.18)', overflow: 'hidden' });
+    return { frames: [
+      { vars: light, frame: frame(390, 28), term: true, why: false, pop: pop(358), caption: 'A term, explained · chart page tiles' },
+      { vars: dark, frame: frame(390, 28), term: false, why: true, pop: pop(358), caption: 'Why something is shown · life areas' },
+      { vars: light, frame: frame(1280, 0), term: true, why: false, pop: pop(360), caption: 'Desktop · the pop-up opens under its "i" and closes with Esc or a tap outside' } ] };
+  }
+}
+</script>
+</body>
+</html>

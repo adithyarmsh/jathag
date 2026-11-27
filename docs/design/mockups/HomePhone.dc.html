@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home and birth form, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+select,input,button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="{{t.vars}}">
+<div style="position: relative; width: 390px; background: var(--bg); color: var(--ink); overflow: hidden; border-radius: 28px; border: 1px solid var(--line)">
+
+<sc-for list="{{t.stars}}" as="s">
+<svg aria-hidden="true" viewBox="0 0 24 24" style="{{s.style}}"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg>
+</sc-for>
+
+<header style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 16px; background: var(--bg); border-bottom: 1px solid var(--line)">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none">
+<span style="font-family: Fraunces, Georgia, serif; font-size: 24px; line-height: 28px">Jathag</span>
+<span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span>
+</a>
+<div style="display: flex; gap: 4px">
+<button aria-label="Switch theme" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg></button>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div>
+</header>
+
+<p style="position: relative; margin: 0; padding: 10px 16px; background: var(--soft); color: var(--ink); font-size: 13px; line-height: 20px">Jathag Beta. The stars are still aligning: we are refining features and design.</p>
+
+<section style="position: relative; padding: 32px 16px 24px; display: flex; flex-direction: column; gap: 16px">
+<p lang="mul" aria-label="Birth chart in Indian languages" style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 14px; line-height: 22px"><span lang="hi">कुंडली</span><span lang="bn">কোষ্ঠী</span><span lang="te">జాతకం</span><span lang="ta">ஜாதகம்</span><span lang="kn">ಜಾತಕ</span><span lang="ml">ജാതകം</span></p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 36px; line-height: 40px">Know your chart, <em style="color: var(--at)">not just your sign.</em></h1>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">Jathag turns your birth details into an accurate Vedic birth chart, and explains it in short, honest, modern language.</p>
+</section>
+
+<section aria-labelledby="form-title" style="position: relative; margin: 0 12px; padding: 20px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 20px">
+<div>
+<h2 id="form-title" style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 26px; line-height: 32px">Your birth details</h2>
+<p style="margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 20px">Five questions, about a minute.</p>
+</div>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted)"><span>Name <span style="font-weight: 400">(optional)</span></span>
+<input value="Meera" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px">
+<span style="font-weight: 400">Names this chart in your saved profiles. Left empty, it's called "My chart".</span>
+</label>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 6px">
+<legend style="padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Date of birth</legend>
+<div style="display: grid; grid-template-columns: 76px 1fr 88px; gap: 8px">
+<select aria-label="Day" style="height: 44px; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>14</option></select>
+<select aria-label="Month" style="height: 44px; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>August</option></select>
+<input aria-label="Year" value="1992" inputmode="numeric" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px; font-variant-numeric: tabular-nums">
+</div>
+</fieldset>
+
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 6px">
+<legend style="padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Time of birth</legend>
+<div style="display: flex; gap: 8px; align-items: center">
+<select aria-label="Hour" style="width: 72px; height: 44px; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>6</option></select>
+<span aria-hidden="true" style="color: var(--muted)">:</span>
+<select aria-label="Minute" style="width: 72px; height: 44px; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>45</option></select>
+<div role="radiogroup" aria-label="AM or PM" style="margin-left: auto; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--fb); border-radius: 999px">
+<button role="radio" aria-checked="true" style="min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 13px; font-weight: 600">AM</button>
+<button role="radio" aria-checked="false" style="min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 500">PM</button>
+</div>
+</div>
+<p style="margin: 0; color: var(--muted); font-size: 13px; line-height: 20px">As written on the birth record. 12 AM = midnight · 12 PM = noon.</p>
+<p style="margin: 0; font-size: 13px; line-height: 20px"><a href="#" style="color: var(--at); font-weight: 600">Not sure of the exact time?</a></p>
+</fieldset>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Place of birth
+<input value="Chennai, Tamil Nadu, India" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px">
+<span style="font-weight: 400; font-variant-numeric: tabular-nums">13° 05′ N · 80° 17′ E · Asia/Kolkata (UTC+5:30)</span>
+</label>
+
+<fieldset style="margin: 0; padding: 0; border: 0">
+<legend style="padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: var(--muted)">Which chart style did you grow up with?</legend>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+<label style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 12px; border: 2px solid var(--accent); border-radius: 12px; background: var(--soft); font-size: 14px; font-weight: 600">
+<input type="radio" name="style" checked style="position: absolute; opacity: 0; width: 1px; height: 1px">
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--at)" stroke-width="1.3" aria-hidden="true"><rect x="1" y="1" width="26" height="26"></rect><path d="M1 7.5h26M1 20.5h26M7.5 1v26M20.5 1v26"></path><rect x="7.5" y="7.5" width="13" height="13" fill="var(--soft)"></rect></svg>South Indian</label>
+<label style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 12px; font-size: 14px; font-weight: 500; color: var(--muted)">
+<input type="radio" name="style" style="position: absolute; opacity: 0; width: 1px; height: 1px">
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="1" y="1" width="26" height="26"></rect><path d="M1 1l26 26M27 1L1 27M14 1L27 14L14 27L1 14Z"></path></svg>North Indian</label>
+</div>
+</fieldset>
+
+<button aria-expanded="false" style="display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); text-align: left">
+<span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">Advanced settings</span><span style="font-size: 12px; color: var(--muted)">Approximate time · coordinates · seconds</span></span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<button style="height: 50px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 16px; font-weight: 600">See my chart</button>
+<p style="margin: 0; text-align: center; color: var(--muted); font-size: 12px; line-height: 18px">Your details are only used to calculate your chart. Nothing is stored on our servers.</p>
+</div>
+</section>
+
+<div aria-hidden="true" style="position: relative; display: flex; align-items: center; gap: 16px; padding: 44px 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+
+<section style="position: relative; padding: 0 16px; display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">What you'll get</p>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px">
+<h3 style="margin: 0 0 4px; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 20px; line-height: 28px">An accurate chart</h3>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">From your exact birth date, time and place, drawn in the style you know.</p>
+</div>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px">
+<h3 style="margin: 0 0 4px; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 20px; line-height: 28px">Your life timeline</h3>
+<p style="margin: 0; color: var(--muted); font-size: 15px; line-height: 24px">The chapters of your life, your dasha periods, with where you are today.</p>
+</div>
+<div style="padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px">
+<h3 style="margin: 0 0 4px; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 20px; line-height: 28px">Plain-language explanations</h3>
+<p style="margin: 0 0 10px; color: var(--muted); font-size: 15px; line-height: 24px">Short, honest notes on what each part means. No jargon, no fear.</p>
+<span style="display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--soonB); color: var(--soonT); font-size: 12px; font-weight: 600">Coming soon</span>
+</div>
+</section>
+
+<footer style="position: relative; margin-top: 48px; padding: 24px 16px 28px; border-top: 1px solid var(--line); background: var(--bg); display: flex; flex-direction: column; gap: 12px; font-size: 13px; line-height: 20px; color: var(--muted)">
+<nav aria-label="Footer" style="display: flex; flex-wrap: wrap; gap: 4px 16px"><a href="#" style="color: var(--ink)">About</a><a href="#" style="color: var(--ink)">FAQ</a><a href="#" style="color: var(--ink)">Disclaimer</a><a href="#" style="color: var(--ink)">Privacy</a><a href="#" style="color: var(--ink)">Sources &amp; credits</a><a href="#" style="color: var(--ink)">Source code</a></nav>
+<p style="margin: 0">Free and open source (AGPL-3.0). No ads, no account needed.</p>
+<p style="margin: 0">v0.4.x · abc1234 · Made by <a href="#">Adithya</a></p>
+</footer>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":860,"height":2080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = { position: 'absolute', pointerEvents: 'none' };
+    const pts = [[22,96,7,.8],[340,140,5,.6],[300,330,6,.9],[18,470,4,.5],[360,620,5,.7],[8,980,6,.8],[372,1240,4,.5],[20,1560,7,.9],[350,1720,5,.6],[190,1500,4,.5]];
+    const stars = (k) => pts.map(([x,y,s,o]) => ({ style: { ...base, left: x + 'px', top: y + 'px', width: s + 'px', height: s + 'px', opacity: o * k } }));
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--t1':'#76560F','--t2':'#23666F','--t3':'#6B4A96','--err':'#A3341F','--soonT':'#9A3324','--soonB':'#FBEEEA','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--t1':'#D9B566','--t2':'#7FC6CF','--t3':'#BCA6E6','--err':'#F1A08C','--soonT':'#F0A596','--soonB':'#3A2024','--shadow':'none'};
+    return { themes: [ { vars: light, stars: stars(0.3) }, { vars: dark, stars: stars(0.38) } ] };
+  }
+}
+</script>
+</body>
+</html>

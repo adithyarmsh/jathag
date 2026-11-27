@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+<main style="max-width: 680px; margin: 0 auto; padding: 48px 16px 64px; display: flex; flex-direction: column; gap: 28px">
+<section style="display: flex; flex-direction: column; gap: 14px; text-align: center; align-items: center">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">About</p>
+<h1 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 38px; line-height: 44px">A birth chart, <em style="color: var(--at)">explained plainly</em></h1>
+<p style="margin: 0; font-size: 17px; line-height: 27px; color: var(--muted)">Jathag turns your date, time and place of birth into an accurate Vedic birth chart, and explains it in short, honest, modern language. It is made for people who are curious but new to charts.</p>
+</section>
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 16px; padding: 0 48px"><span style="flex: 1; height: 1px; background: var(--line)"></span><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z" fill="var(--accent)"></path></svg><span style="flex: 1; height: 1px; background: var(--line)"></span></div>
+<sc-for list="{{f.parts}}" as="p" hint-placeholder-count="5">
+<section style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 24px; line-height: 30px">{{p.h}}</h2>
+<p style="margin: 0; font-size: 16px; line-height: 26px; color: var(--muted)">{{p.t}}</p>
+</section>
+</sc-for>
+<section style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 24px; line-height: 30px">Who makes it</h2>
+<p style="margin: 0; font-size: 16px; line-height: 26px; color: var(--muted)">Jathag is made by <a href="#" style="color: var(--ink)">Adithya</a>. Spotted a mistake? Every reading will have a "Report an issue" link.</p>
+</section>
+<p style="margin: 0; padding: 14px 16px; border-radius: 12px; background: var(--soft); font-size: 14px; line-height: 22px">Jathag is for curiosity and reflection. It is not medical, legal or financial advice. <a href="#" style="color: var(--at); font-weight: 600">Read the disclaimer</a></p>
+<a href="#" style="align-self: center; display: inline-flex; align-items: center; height: 50px; padding: 0 26px; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 16px; font-weight: 600; text-decoration: none">Make your chart</a>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1850}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const parts = [
+      { h: 'Accurate first', t: 'Planet positions come from Swiss Ephemeris, the standard astronomy library, using the sidereal zodiac and the Lahiri ayanamsa. Every update is tested against independent reference charts, to within a few seconds of arc.' },
+      { h: 'Honest, never fear-based', t: 'No doom, no scare words, no remedies to buy. Harder periods are described as phases, with something useful to do.' },
+      { h: 'Private by default', t: 'Your birth details are only used to calculate your chart. Nothing is stored on our servers. Saved profiles stay in your own browser.' },
+      { h: 'Free and open', t: 'No ads, no account, no payments. The code is open source under the AGPL-3.0 licence, so anyone can check how it works.' } ];
+    return { frames: [ { vars: light, frame: frame(390, 28), parts }, { vars: dark, frame: frame(390, 28), parts }, { vars: light, frame: frame(1280, 0), parts } ] };
+  }
+}
+</script>
+</body>
+</html>

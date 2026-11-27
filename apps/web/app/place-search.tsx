@@ -157,7 +157,7 @@ export function PlaceSearch({
       <label htmlFor={inputId} className="block font-semibold">
         {t.label}
       </label>
-      <p id={hintId} className="mt-1 text-sm text-muted">
+      <p id={hintId} className="field-hint mt-1">
         {t.hint}
       </p>
       <input
@@ -190,7 +190,7 @@ export function PlaceSearch({
         role="listbox"
         aria-label={t.label}
         hidden={!showList}
-        className="absolute right-0 left-0 z-40 mt-1 max-h-72 overflow-y-auto rounded-xl border border-line bg-card py-1 shadow-soft"
+        className="absolute right-0 left-0 z-40 mt-1 max-h-72 overflow-y-auto rounded-md border border-line bg-card py-1 shadow-[var(--shadow-pop)]"
       >
         {results.map((r, i) => (
           <li

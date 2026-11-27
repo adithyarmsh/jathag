@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Birth form states, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+select,input,button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<div style="{{t.vars}}">
+<div style="width: 390px; box-sizing: border-box; padding: 24px 16px 32px; background: var(--bg); color: var(--ink); border-radius: 28px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px">
+
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">A · Which clock? (old births only)</p>
+<section style="padding: 20px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Place of birth
+<input value="Mumbai, Maharashtra, India" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px">
+<span style="font-weight: 400">Born 3 Mar 1948 · 19° 04′ N · 72° 53′ E</span>
+</label>
+<fieldset style="margin: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--raised); display: flex; flex-direction: column; gap: 10px">
+<legend style="padding: 0 4px; font-family: Fraunces, Georgia, serif; font-size: 18px; line-height: 26px; color: var(--ink)">Which clock was the time written on?</legend>
+<p style="margin: 0; color: var(--muted); font-size: 13px; line-height: 20px">In Mumbai until the 1950s, many families used Bombay time, 39 minutes behind IST. If you're not sure, keep IST.</p>
+<label style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border: 2px solid var(--accent); border-radius: 8px; background: var(--card)"><input type="radio" name="clk" checked style="margin: 3px 0 0; accent-color: var(--accent); width: 18px; height: 18px"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">IST (or not sure)</span><span style="font-size: 13px; color: var(--muted)">UTC+5:30</span></span></label>
+<label style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card)"><input type="radio" name="clk" style="margin: 3px 0 0; width: 18px; height: 18px"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 500">Bombay local time</span><span style="font-size: 13px; color: var(--muted)">UTC+4:51 · 39 minutes behind IST</span></span></label>
+</fieldset>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">B · Advanced settings, opened</p>
+<section style="padding: 20px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px">
+<button aria-expanded="true" style="display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); color: var(--ink); text-align: left"><span style="font-size: 15px; font-weight: 500; border-bottom: 2px solid var(--accent); padding-bottom: 2px">Advanced settings</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="padding: 0; margin-bottom: 4px; font-size: 13px; font-weight: 500; color: var(--muted)">How sure are you of the birth time?</legend>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; font-size: 15px"><input type="radio" name="tm" style="width: 18px; height: 18px">I know the exact time</label>
+<div style="border: 2px solid var(--accent); border-radius: 8px; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; gap: 10px; align-items: center; font-size: 15px; font-weight: 600"><input type="radio" name="tm" checked style="width: 18px; height: 18px; accent-color: var(--accent)">I know roughly when</label>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted)">From<input value="6:00 AM" style="height: 44px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted)">To<input value="8:00 AM" style="height: 44px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"></label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="font-size: 12px; color: var(--muted); width: 100%">Or pick a part of the day:</span>
+<button style="min-height: 36px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">Morning</button>
+<button style="min-height: 36px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">Afternoon</button>
+<button style="min-height: 36px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">Evening</button>
+<button style="min-height: 36px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">Night</button>
+</div>
+<p style="margin: 0; color: var(--muted); font-size: 13px; line-height: 20px">We'll show what stays the same across these two hours and what could differ. A narrow range gives a clearer chart.</p>
+</div>
+<label style="display: flex; gap: 10px; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; font-size: 15px"><input type="radio" name="tm" style="width: 18px; height: 18px">I don't know the time</label>
+</fieldset>
+<div style="height: 1px; background: var(--line)"></div>
+<label style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 15px">Add seconds to the time<input type="checkbox" style="width: 20px; height: 20px"></label>
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 15px; text-decoration: none">Enter coordinates yourself<span style="font-size: 13px; color: var(--muted)">latitude · longitude · UTC offset</span></a>
+</section>
+
+<p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">C · A mistake, explained</p>
+<section style="padding: 20px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px">
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 6px">
+<legend style="padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Date of birth</legend>
+<div style="display: grid; grid-template-columns: 76px 1fr 88px; gap: 8px">
+<select aria-label="Day" aria-invalid="true" style="height: 44px; padding: 0 10px; border: 2px solid var(--err); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>29</option></select>
+<select aria-label="Month" style="height: 44px; padding: 0 10px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px"><option>February</option></select>
+<input aria-label="Year" value="1993" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--fb); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px">
+</div>
+<p role="alert" style="margin: 0; color: var(--err); font-size: 13px; line-height: 20px; font-weight: 500">February 1993 has 28 days.</p>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--muted)">Place of birth
+<input value="Madurai" aria-invalid="true" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 2px solid var(--err); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 15px">
+<span style="color: var(--err); font-weight: 500">Please choose a place from the list.</span>
+</label>
+<button style="height: 50px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on); font-size: 16px; font-weight: 600">See my chart</button>
+</section>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":860,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--err':'#A3341F','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--err':'#F1A08C','--shadow':'none'};
+    return { themes: [ { vars: light }, { vars: dark } ] };
+  }
+}
+</script>
+</body>
+</html>

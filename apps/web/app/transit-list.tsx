@@ -48,7 +48,7 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
       <p className="text-sm text-muted">{fill(tr.positionsCaption, { date: ctx.date(ctx.result.transits.asOf) })}</p>
       <p className="mt-2 text-xs text-muted sm:hidden">{ctx.t.chart.scrollHint}</p>
       <div className="relative mt-2 overflow-x-auto" tabIndex={0} role="region" aria-labelledby="transit-positions-title">
-        <table className="planet-table list-table w-full min-w-[440px] border-collapse text-left text-[15px]">
+        <table className="planet-table list-table w-full min-w-[440px] border-collapse text-left">
           <caption className="sr-only">{fill(tr.positionsCaption, { date: ctx.date(ctx.result.transits.asOf) })}</caption>
           <thead>
             <tr>
@@ -87,7 +87,7 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
           const isOpen = signsOpen.has(g.planet);
           const subId = `sign-changes-${g.planet}`;
           return (
-            <li key={g.planet} className="rounded-xl border border-line">
+            <li key={g.planet} className="card-inner">
               <button
                 type="button"
                 className="dasha-opener planet-opener"
@@ -125,7 +125,7 @@ export function TransitList({ ctx }: { ctx: ListContext }) {
 
       {/* Sade Sati (FR-TR-02, FR-TRAN-04): the status stays visible; all periods collapsed (D-115 item 6) */}
       <h3 className="list-subheading mt-8">{t.sadeSati.title}</h3>
-      <div className="mt-2 rounded-xl border border-line p-4">
+      <div className="card-inner mt-2 p-4">
         <SadeSatiStatusBlock ctx={ctx} view={sadeSatiStatus(ctx)} />
       </div>
 

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings, beginner and advanced</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button,select{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+<main style="max-width: 680px; margin: 0 auto; padding: 28px 16px 56px; display: flex; flex-direction: column; gap: 18px">
+<div><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Settings</p><h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 34px; line-height: 40px">How Jathag looks and calculates</h1><p style="margin: 6px 0 0; font-size: 14px; color: var(--muted)">Saved in this browser.</p></div>
+
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line)"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Chart style</span><span style="font-size: 13px; color: var(--muted)">The one you grew up with</span></span>
+<div role="radiogroup" aria-label="Chart style" style="display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--fb); border-radius: 999px"><button role="radio" aria-checked="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on); font-size: 13px; font-weight: 600">South</button><button role="radio" aria-checked="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 13px">North</button></div></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 18px; border-bottom: 1px solid var(--line)"><span style="font-size: 15px; font-weight: 600">Theme</span>
+<div role="radiogroup" aria-label="Theme" style="display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--fb); border-radius: 999px"><sc-for list="{{f.themes}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" style="{{o.style}}">{{o.label}}</button></sc-for></div></div>
+<label style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Show advanced options</span><span style="font-size: 13px; color: var(--muted)">Calculation settings and extra detail, for people who know charts</span></span>
+<span role="switch" aria-checked="{{f.advA}}" style="{{f.sw}}"><span style="{{f.knob}}"></span></span></label>
+</section>
+
+<sc-if value="{{f.adv}}" hint-placeholder-val="{{false}}">
+<section aria-label="Advanced" style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden">
+<p style="margin: 0; padding: 14px 18px 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">Advanced</p>
+<sc-for list="{{f.advRows}}" as="r" hint-placeholder-count="5">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line)"><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 15px; font-weight: 600">{{r.k}}</span><span style="font-size: 13px; color: var(--muted)">{{r.s}}</span></span><span style="flex: none; padding: 8px 12px; border: 1px solid var(--fb); border-radius: 8px; font-size: 14px">{{r.v}}</span></div>
+</sc-for>
+<label style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Seconds in the birth time</span><span style="font-size: 13px; color: var(--muted)">Adds a seconds box to the form</span></span><input type="checkbox" style="width: 20px; height: 20px"></label>
+</section>
+</sc-if>
+
+<button style="align-self: flex-start; height: 44px; padding: 0 18px; border: 1px solid var(--fb); border-radius: 8px; background: transparent; color: var(--ink); font-size: 14px; font-weight: 600">Reset all settings</button>
+<p style="margin: 0; font-size: 13px; line-height: 20px; color: var(--muted)">Dates are always shown on the clock used at birth, so they match what your family's records say.</p>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2','--shadow':'0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06)'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A','--shadow':'none'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const themes = (cur) => ['Light','Dark','Match device'].map((label) => { const on = label === cur;
+      return { label, on: on ? 'true' : 'false', style: { minHeight: '38px', padding: '0 12px', border: 0, borderRadius: '999px', fontSize: '13px', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--on)' : 'var(--muted)', fontWeight: on ? 600 : 400 } }; });
+    const sw = (on) => ({ sw: { flex: 'none', position: 'relative', width: '48px', height: '28px', borderRadius: '999px', background: on ? 'var(--accent)' : 'transparent', border: '1px solid ' + (on ? 'var(--accent)' : 'var(--fb)'), boxSizing: 'border-box' },
+      knob: { position: 'absolute', top: '3px', left: on ? '23px' : '3px', width: '20px', height: '20px', borderRadius: '999px', background: on ? 'var(--on)' : 'var(--fb)' }, adv: on, advA: on ? 'true' : 'false' });
+    const advRows = [
+      { k: 'Ayanamsa', s: 'Lahiri is the one we verify against reference charts', v: 'Lahiri' },
+      { k: 'Rahu and Ketu', s: 'How the lunar nodes are calculated', v: 'Mean node' },
+      { k: 'Houses', s: 'Each sign is one house', v: 'Whole sign' },
+      { k: 'Dasha year', s: 'Length of a year in dasha periods', v: '365.25 days' } ];
+    return { frames: [
+      { vars: light, frame: frame(390, 28), themes: themes('Light'), advRows, ...sw(false) },
+      { vars: dark, frame: frame(390, 28), themes: themes('Dark'), advRows, ...sw(true) },
+      { vars: light, frame: frame(1280, 0), themes: themes('Light'), advRows, ...sw(true) } ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FAQ page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="display: flex; gap: 80px; align-items: flex-start; font-family: Inter, system-ui, sans-serif">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+<div style="{{f.vars}}">
+<div style="{{f.frame}}">
+<header style="border-bottom: 1px solid var(--line)"><div style="max-width: 1120px; margin: 0 auto; height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><span style="font-family: Fraunces, Georgia, serif; font-size: 24px">Jathag</span><span style="font-size: 11px; font-weight: 600; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--fb); color: var(--muted)">BETA</span></a>
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div></header>
+<main style="max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; display: flex; flex-direction: column; gap: 20px">
+<div><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--at)">FAQ</p><h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 36px; line-height: 42px">Questions people ask first</h1><p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: var(--muted)">Short answers. No question is too basic.</p></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{f.qs}}" as="q" hint-placeholder-count="10">
+<div style="{{q.box}}">
+<button aria-expanded="{{q.exp}}" style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; border: 0; background: transparent; color: var(--ink); text-align: left; font-size: 16px; font-weight: 500"><span style="{{q.qStyle}}">{{q.q}}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="{{q.chev}}"><path d="M6 9l6 6 6-6"></path></svg></button>
+<sc-if value="{{q.open}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 0 16px 16px; font-size: 15px; line-height: 24px; color: var(--muted)">{{q.a}}</p></sc-if>
+</div>
+</sc-for>
+</div>
+<p style="margin: 8px 0 0; font-size: 14px; line-height: 22px; color: var(--muted)">Something missing? <a href="#" style="color: var(--at); font-weight: 600">Ask or report an issue</a></p>
+</main>
+</div>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2220,"height":1450}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = {'--bg':'#F8F4EB','--card':'#FFFFFF','--raised':'#FCFAF5','--ink':'#231F1A','--muted':'#665F54','--line':'#E3DBC9','--fb':'#8C8270','--accent':'#76560F','--at':'#76560F','--on':'#FFFFFF','--soft':'#F4EAD2'};
+    const dark = {'--bg':'#0F1322','--card':'#171C30','--raised':'#1E2440','--ink':'#EDE8DC','--muted':'#A9ADBD','--line':'#2A3050','--fb':'#6E7696','--accent':'#D4AE5A','--at':'#D9B566','--on':'#1B1405','--soft':'#262A3A'};
+    const frame = (w, r) => ({ width: w + 'px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--line)', borderRadius: r + 'px', overflow: 'hidden' });
+    const QA = [
+      ['What is a Vedic birth chart?', 'A map of the sky at the moment you were born, seen from your birthplace. Vedic astrology (Jyotish) measures it against the fixed stars, using the sidereal zodiac.'],
+      ['Why is my sign different from the one in magazines?', 'Most Western horoscopes use the tropical zodiac, tied to the seasons. The sidereal zodiac is about 24 degrees behind it today, so many people find their sign moves back by one.'],
+      ['Why does the exact birth time matter?', 'The Lagna, your rising sign, changes about every two hours, and every house is counted from it. A few minutes can also move your dasha dates by days.'],
+      ['I don’t know my birth time. What can I do?', 'Choose "Not sure of the exact time?" under the time field. You can give a range or a part of the day, and Jathag shows what stays the same and what could differ.'],
+      ['What is a dasha?', 'A planetary period. Your life is divided into nine long chapters, each led by a planet, with shorter periods inside each one. Jathag shows where you are today.'],
+      ['Is Sade Sati something to fear?', 'No. It is about seven and a half years while Saturn passes near your Moon sign. Jathag describes it as a slow phase that asks for patience, not as bad luck.'],
+      ['South or North Indian chart: which should I choose?', 'The one your family uses. Both show the same chart, drawn differently. You can switch at any time.'],
+      ['Are my details stored?', 'No. They are only used to calculate your chart and are not stored on our servers. Saved profiles stay in your own browser.'],
+      ['Is this medical or financial advice?', 'No. Jathag is for curiosity and reflection. Health notes are general wellness only. For real decisions, please talk to a professional.'] ];
+    const qs = (openIdx) => QA.map(([q, a], i) => { const open = i === openIdx;
+      return { q, a, open, exp: open ? 'true' : 'false',
+        box: { background: open ? 'var(--raised)' : 'var(--card)', border: '1px solid var(--line)', borderRadius: '12px' },
+        qStyle: { paddingBottom: '2px', borderBottom: open ? '2px solid var(--accent)' : '2px solid transparent' },
+        chev: { flex: 'none', transform: open ? 'rotate(180deg)' : 'none', color: open ? 'var(--at)' : 'var(--muted)' } }; });
+    return { frames: [ { vars: light, frame: frame(390, 28), qs: qs(0) }, { vars: dark, frame: frame(390, 28), qs: qs(3) }, { vars: light, frame: frame(1280, 0), qs: qs(1) } ] };
+  }
+}
+</script>
+</body>
+</html>
