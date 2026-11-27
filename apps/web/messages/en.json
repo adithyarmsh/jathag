@@ -59,7 +59,7 @@
   },
   "form": {
     "srTitle": "Your birth details",
-    "editing": { "line": "Editing {name}. See my chart saves your changes.", "cancel": "Cancel" },
+    "editing": { "submit": "Update chart", "cancel": "Cancel" },
     "name": { "label": "Name" },
     "date": {
       "label": "Date of birth",
@@ -166,6 +166,7 @@
       "summaryLater": "the second time"
     },
     "submit": "See my chart",
+    "sampleLink": "See a sample chart",
     "calculating": { "title": "Calculating your chart…", "text": "Usually a second or two." },
     "unreachable": {
       "title": "We couldn't reach the calculator",
@@ -444,6 +445,175 @@
       "noPlanet": "No planet linked",
       "healthNote": "This is general wellness information, not medical advice.",
       "currentMark": "current {level}"
+    }
+  },
+  "chartPage": {
+    "titleNamed": "{name}'s chart · Jathag",
+    "titleOwn": "Your chart · Jathag",
+    "titleSample": "Sample chart · Jathag",
+    "description": "A Vedic birth chart: the chart itself, the periods running now, life areas, Sade Sati, today's transits and the exact planet positions.",
+    "noScript": "Your chart is worked out from details kept in this browser, so this page needs JavaScript.",
+    "unreachableText": "Your connection may have dropped for a moment. Your details are saved, so nothing is lost.",
+    "details": {
+      "label": "Birth details",
+      "line": "{date} · {time} · {place}",
+      "coordinates": "{lat}, {lng}",
+      "edit": "Edit details",
+      "makeOwn": "Make your own chart",
+      "sampleName": "Sample chart",
+      "sampleNote": "A made-up birth, so you can look around before entering your own."
+    },
+    "edit": {
+      "heading": "Edit details",
+      "text": "Change anything and press Update chart. This chart is updated in this browser."
+    },
+    "contents": {
+      "button": "Contents",
+      "title": "Contents",
+      "label": "Sections",
+      "close": "Close contents",
+      "items": {
+        "chart": "Chart",
+        "right-now": "Right now",
+        "dashas": "Dashas",
+        "life-areas": "Life areas",
+        "sade-sati": "Sade Sati",
+        "transits": "Transits",
+        "planets": "Planets"
+      }
+    },
+    "chart": {
+      "eyebrow": "Birth chart",
+      "headingNamed": "{name}'s chart",
+      "headingOwn": "Your chart",
+      "headingSample": "Sample chart",
+      "oneLiner": "A map of the sky at the moment of birth, seen from {place}. Each box is a sign; the numbers count houses from the Lagna.",
+      "rasiNotice": "[Rasi, the main chart.] Where each planet stood at birth. Most readings start here.",
+      "facts": {
+        "lagna": "Lagna (rising sign)",
+        "moon": "Moon sign",
+        "star": "Birth star"
+      },
+      "info": {
+        "lagna": {
+          "label": "What is the Lagna?",
+          "title": "Lagna, the rising sign",
+          "body": "The sign rising on the eastern horizon at the moment of birth. It becomes your 1st house, and every other house is counted from it.",
+          "more": "It changes about every two hours, which is why the exact birth time matters."
+        },
+        "moon": {
+          "label": "What is the Moon sign?",
+          "title": "Moon sign, your Rasi",
+          "body": "The sign the Moon was in at the moment of birth. In Indian astrology it is often called your sign, and many forecasts start from it.",
+          "more": "Sade Sati and the transits on this page are counted from it."
+        },
+        "star": {
+          "label": "What is the birth star?",
+          "title": "Birth star, the nakshatra",
+          "body": "The sky is divided into 27 stars, or nakshatras. Your birth star is the one the Moon was in at birth; each has four quarters called padas.",
+          "more": "It decides where your dasha periods begin."
+        }
+      }
+    },
+    "rightNow": {
+      "eyebrow": "Right now · {date}",
+      "heading": "You are in {planet}'s Mahadasha",
+      "headingNone": "Your periods",
+      "oneLiner": "Life runs in nested periods, each led by a planet: a long chapter, a medium one inside it, and a short one inside that.",
+      "progressLeft": "{percent}% through · {left}",
+      "left": {
+        "day": "1 day left",
+        "days": "{n} days left",
+        "months": "about {n} months left",
+        "years": "about {n} years left"
+      },
+      "nextPeriod": {
+        "antardasha": "{planet} medium-term period begins",
+        "pratyantardasha": "{planet} short-term period begins"
+      },
+      "nextMaha": "{planet} Mahadasha begins, {years} years",
+      "sadeSatiLink": "Sade Sati: {status}, until {date}",
+      "sadeSatiNone": "Sade Sati: not running now. {next}",
+      "lifeAreasLink": "Active life areas: {areas}"
+    },
+    "dashas": {
+      "eyebrow": "Dasha periods",
+      "heading": "Your life in nine chapters",
+      "oneLiner": "The Vimshottari cycle: 120 years of planetary periods, starting from the Moon's birth star. Bar length shows how long each chapter lasts.",
+      "length": "{n} yrs",
+      "beganOn": "Began before birth, on {date}",
+      "nowSuffix": " · now",
+      "antarNote": "Each one holds nine short-term periods, the Pratyantardashas. Open one to see them."
+    },
+    "lifeAreas": {
+      "eyebrow": "Life areas",
+      "heading": "Which planets touch which part of life",
+      "oneLiner": "A planet is linked to a life area when it rules or sits in that area's houses. Marked areas are active in your current periods.",
+      "activeNow": "Active now",
+      "through": "Through your {periods}",
+      "period": "{planet} {level}",
+      "rules": "{planet} rules the {houses}",
+      "rulesAndSits": "{planet} rules the {houses} and sits in the {house}",
+      "rulesAndSitsSame": "{planet} rules and sits in the {house}",
+      "sits": "{planets} sits in the {house}",
+      "sit": "{planets} sit in the {house}",
+      "and": " and ",
+      "separator": " · ",
+      "healthNote": "General wellness only, not medical advice.",
+      "short": {
+        "self": "self",
+        "money": "money",
+        "communication": "communication",
+        "home": "home",
+        "learning": "learning",
+        "health": "health",
+        "relationships": "relationships",
+        "career": "career",
+        "luck": "luck",
+        "spirituality": "spirituality"
+      }
+    },
+    "sadeSati": {
+      "eyebrow": "Sade Sati",
+      "headings": {
+        "none": "No Sade Sati right now",
+        "rising": "The start of a slow phase",
+        "peak": "The middle of a slow phase",
+        "setting": "The last stretch of a slow phase"
+      },
+      "oneLiner": "About seven and a half years while Saturn passes the sign before your Moon sign, the Moon sign itself, and the sign after. A time for patience and steady effort.",
+      "inline": {
+        "rising": "rising phase",
+        "peak": "peak phase",
+        "setting": "setting phase"
+      },
+      "noneTitle": "No Sade Sati now",
+      "until": "until {date}",
+      "today": "Today",
+      "phaseLabel": "{phase} · {date}",
+      "phasesLabel": "Phases of the Sade Sati running now",
+      "backAndForth": "Saturn touches {sign} on {first}, steps back into {back} on {backDate}, and enters {sign} for good on {again}.",
+      "allTitle": "Every Sade Sati, birth to 120 years: {count} periods",
+      "allTitleOne": "Every Sade Sati, birth to 120 years: 1 period",
+      "nowMark": "Now",
+      "atBirth": "Running at birth"
+    },
+    "transits": {
+      "eyebrow": "Transits",
+      "heading": "Where the planets are today",
+      "oneLiner": "Today's sky laid over your chart, counted from your Moon sign and from your Lagna.",
+      "fromMoon": "From Moon",
+      "fromLagna": "From Lagna",
+      "nextTitle": "Next sign changes",
+      "allTitle": "All sign changes, next 10 years",
+      "joiner": ", "
+    },
+    "planets": {
+      "eyebrow": "Planet positions",
+      "heading": "The exact numbers",
+      "oneLiner": "Everything the chart is drawn from, to the second.",
+      "nakshatraPada": "Nakshatra · pada",
+      "combustMark": " · combust"
     }
   },
   "profiles": {

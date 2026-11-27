@@ -108,7 +108,7 @@ export function HeaderBar({
 }) {
   const h = t.header;
   return (
-    <div className="mx-auto flex h-[60px] max-w-[1168px] items-center justify-between gap-4 px-4 sm:px-6 lg:h-[68px]">
+    <div className="page-frame flex h-[60px] max-w-[1168px] items-center justify-between gap-4 px-4 sm:px-6 lg:h-[68px]">
       <Link href="/" className="flex min-h-11 items-center gap-2 text-ink no-underline lg:gap-2.5">
         <span className="font-display text-[24px] leading-7 lg:text-[26px] lg:leading-[30px]">{h.wordmark}</span>
         <span className="tag tag-beta uppercase">{h.beta}</span>

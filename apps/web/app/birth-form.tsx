@@ -7,21 +7,23 @@
 // (advanced-settings.tsx): coordinates · "Which clock?" (only when it applies) · birth-time
 // certainty (two choices switched off) · seconds.
 //
-// "See my chart" sends the details to POST /api/chart (lib/chart-request.ts) and shows the result
-// below the form, as before (until the chart page, 0.5.1). The NAME is never sent to the server (it
-// only appears in the result cards' details line). Remembered in this browser only (NFR-PRIV-01): the
-// chart style, under localStorage "chartStyle" (FR-IN-10), and, from step 0.4.7 (D-136), the inputs
-// of every successful chart as a saved profile (components/profiles-store.ts; never the results).
+// One component, two places (step 0.5.1, D-138 Q4 B): the home page (BirthForm) and the "Edit details"
+// panel of the chart page (BirthFormCard in edit mode, filled with a profile). "See my chart" sends the
+// details to POST /api/chart (lib/chart-request.ts); the NAME is never sent to the server. On success the
+// inputs are kept as a saved profile (D-136; components/profiles-store.ts, never the results) and the
+// chart style under localStorage "chartStyle" (FR-IN-10), then `onDone` gets the result:
+// - home: the result goes to /chart?profile=<id> in this page's memory (components/chart-handoff.ts);
+// - edit: the chart page shows the new result in place and closes the panel.
+// Errors (states C and E, the API's field messages) stay in the form, as before.
 //
-// Saved profiles come back through the URL with only their id: "/?profile=<id>" (Open: filled and
-// calculated at once) and "/?edit=<id>" (Edit: filled, not calculated, with an "Editing …" line; the
-// next successful "See my chart" updates that profile). The id is taken out of the address bar again
-// as soon as the profile is loaded.
+// Old links "/?profile=<id>" and "/?edit=<id>" (0.4.7) are sent on to /chart (replace, so Back does not loop).
 //
 // Checks show as the user goes (once the date is complete or a field is left), and "See my chart"
 // never calculates while something is wrong: it moves focus to the first field to fix instead,
 // opening Advanced settings when that field is inside it.
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type FocusEvent } from "react";
 import type { ChartResponse, PlaceSuggestion } from "@jathag/api";
 import { errorFor, type FieldError, type FormField } from "@/lib/api-errors";
@@ -29,32 +31,26 @@ import { earlyClockNote } from "@/lib/clock-note";
 import { chosenClockNote, clockChoiceView, effectiveClock } from "@/lib/clock-choice";
 import type { ClockId } from "@/lib/clock-rule";
 import { birthDate, daysInMonth, isUsableDate, usableYear } from "@/lib/birth-date";
-import { birthSummary } from "@/lib/birth-summary";
 import type { RepeatedTime } from "@/lib/chart-request";
-import { birthFromForm, EMPTY_FORM, formFromBirth, requestFromForm, type FormValues } from "@/lib/form-values";
-import { readChartStyle, saveChartStyle, type ChartStyle } from "@/lib/chart-style";
-import { fill, formatUtcOffset } from "@/lib/chart-format";
-import { formatCoordinateShort, parseCoordinate } from "@/lib/coordinates";
+import { chartHref, SAMPLE_HREF } from "@/lib/chart-page";
+import { birthFromForm, EMPTY_FORM, requestFromForm, type FormValues } from "@/lib/form-values";
+import { browserStore, readChartStyle, saveChartStyle, type ChartStyle } from "@/lib/chart-style";
+import { formatUtcOffset } from "@/lib/chart-format";
+import { parseCoordinate } from "@/lib/coordinates";
 import { checkDate, checkTime, firstProblem, type DatePart, type TimePart } from "@/lib/form-checks";
 import { shownOffsetSeconds } from "@/lib/place-offset";
-import { listContext } from "@/lib/list-context";
 import { profileFromUrl } from "@/lib/profile-link";
-import { HOURS, MINUTES, SECONDS, to24h, withSeconds, type Period } from "@/lib/time-12h";
+import type { BirthInputs } from "@/lib/profiles";
+import { HOURS, MINUTES, SECONDS, to24h, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
 import { Button, buttonClass } from "@/components/button";
-import { Divider } from "@/components/divider";
-import { findProfile, markOpened, saveFromForm } from "@/components/profiles-store";
+import { leaveHandoff } from "@/components/chart-handoff";
+import { saveFromForm } from "@/components/profiles-store";
 import { Toggle } from "@/components/toggle";
 import { AdvancedSettings } from "./advanced-settings";
 import { ChartStyleChoice } from "./chart-style-choice";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
-import { PlanetTable } from "./planet-table";
-import { DashaList } from "./dasha-list";
-import { LifeAreaList } from "./life-area-list";
-import { RightNow } from "./right-now";
-import { TransitList } from "./transit-list";
-import { SouthChart, type BirthShown } from "./south-chart";
 
 type Errors = Partial<Record<FormField, string>>;
 type Group = "date" | "time" | "place" | "lat" | "lng";
@@ -100,65 +96,69 @@ const noSubscribe = () => () => {};
 const useStoredChartStyle = () =>
   useSyncExternalStore(
     noSubscribe,
-    () => readChartStyle(window.localStorage),
+    () => readChartStyle(browserStore()),
     () => "south" as ChartStyle,
   );
 
-interface Result {
-  data: ChartResponse;
-  summary: string;
-  birth: BirthShown;
+/** What a successful "See my chart" hands on (the profile is already saved). */
+export interface FormDone {
+  /** The saved profile (D-136): new, updated, or the one being edited. */
+  id: string;
+  /** The profile's name ("My chart" when none was typed). */
+  name: string;
+  birth: BirthInputs;
+  result: ChartResponse;
   style: ChartStyle;
 }
 
-/** What the form starts with: empty, or a saved profile (Open or Edit). */
-interface Start {
-  /** A new key starts the form afresh (Cancel, or a profile loaded after the page came up). */
-  key: number;
+/** What the form starts with: empty (home) or a saved profile (the chart page's edit panel). */
+export interface FormStart {
   values: FormValues;
   repeatedTime: RepeatedTime | null;
-  /** Edit: the profile the next successful "See my chart" updates. */
-  editing: { id: string; name: string } | null;
-  /** Open: calculate as soon as the form is filled. */
-  calculate: boolean;
 }
 
-const EMPTY_START: Start = { key: 0, values: EMPTY_FORM, repeatedTime: null, editing: null, calculate: false };
+const EMPTY_START: FormStart = { values: EMPTY_FORM, repeatedTime: null };
 
+/** The home page's form: after a successful calculation it opens the chart page (D-138). */
 export function BirthForm({ t }: { t: Messages }) {
-  const [start, setStart] = useState<Start>(EMPTY_START);
+  const router = useRouter();
 
-  // A profile from /profiles: "?profile=<id>" or "?edit=<id>" (read once the page is in the browser;
-  // the server always draws the empty form).
+  // 0.4.7 links to the home form ("?profile=<id>", "?edit=<id>") now belong to the chart page.
   useEffect(() => {
     const link = profileFromUrl(window.location.search);
-    if (!link) return;
-    window.history.replaceState(window.history.state, "", window.location.pathname);
-    const profile = findProfile(link.id);
-    if (!profile) return;
-    const { values, repeatedTime } = formFromBirth(profile.birth, profile.name);
-    if (link.mode === "open") markOpened(profile.id);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- loaded from storage, which only exists in the browser
-    setStart({
-      key: 1,
-      values,
-      repeatedTime,
-      editing: link.mode === "edit" ? { id: profile.id, name: profile.name } : null,
-      calculate: link.mode === "open",
-    });
-  }, []);
+    if (link) router.replace(chartHref(link.id, link.mode === "edit"));
+  }, [router]);
 
   return (
-    <BirthFormBody
-      key={start.key}
+    <BirthFormCard
       t={t}
-      start={start}
-      onCancelEdit={() => setStart((s) => ({ ...EMPTY_START, key: s.key + 1 }))}
+      start={EMPTY_START}
+      editing={null}
+      onDone={(done) => {
+        leaveHandoff({ id: done.id, name: done.name, birth: done.birth, result: done.result });
+        router.push(chartHref(done.id));
+      }}
     />
   );
 }
 
-function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; onCancelEdit: () => void }) {
+/**
+ * The form card itself. `editing`: the profile the edit panel updates (D-136 item 3), with a Cancel
+ * button and "Update chart"; null on the home page (with the "See a sample chart" link).
+ */
+export function BirthFormCard({
+  t,
+  start,
+  editing,
+  onDone,
+  onCancel,
+}: {
+  t: Messages;
+  start: FormStart;
+  editing: { id: string; name: string } | null;
+  onDone: (done: FormDone) => void;
+  onCancel?: () => void;
+}) {
   const f = t.form;
   const a = f.advanced;
   const id = useId();
@@ -207,8 +207,6 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
   const [second, setSecond] = useState(init.second);
   const [period, setPeriod] = useState<Period | null>(init.period);
   const [place, setPlace] = useState<PlaceSuggestion | null>(init.place);
-  /** Edit mode (D-136 item 3): the profile the next successful "See my chart" updates. */
-  const [editing, setEditing] = useState(start.editing);
   /** The user's own pick; null = the remembered one (South the first time). */
   const [styleChoice, setStyleChoice] = useState<ChartStyle | null>(null);
   const chartStyle = styleChoice ?? storedStyle;
@@ -232,11 +230,6 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
   const [unreachable, setUnreachable] = useState(false);
   /** The repeated-time choice of the last attempt, for "Try again". */
   const lastRepeated = useRef<RepeatedTime | null>(start.repeatedTime);
-  const [result, setResult] = useState<Result | null>(null);
-  /** Heading of the chart (the first result card): the page scrolls there after calculating. */
-  const resultHeading = useRef<HTMLHeadingElement>(null);
-  /** Dates and words for the 0.3.7 lists, worked out once per result. */
-  const lists = useMemo(() => (result ? listContext(result.data, t) : null), [result, t]);
 
   const fullDate = birthDate(day, month, year);
   const date = fullDate && isUsableDate(fullDate) ? fullDate : null;
@@ -279,16 +272,6 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
     const used = effectiveClock(clockView, clockChoice);
     return formatUtcOffset(used ? used.utcOffsetSeconds : shownOffsetSeconds(place, date, time));
   }, [place, clockView, clockChoice, date, time]);
-
-  // After a successful calculation: scroll smoothly down to the chart, the first result card
-  // (instantly with reduced motion); the card is scrolled to and its heading gets the focus.
-  useEffect(() => {
-    const heading = resultHeading.current;
-    if (!result || !heading) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    heading.focus({ preventScroll: true });
-    (heading.closest("section") ?? heading).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  }, [result]);
 
   /** Any change to the birth clears that field's API message, the "which one?" question and state C. */
   function changed(field: FormField) {
@@ -359,13 +342,8 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
     setUnreachable(false);
     setSubmitting(true);
     lastRepeated.current = repeatedTime;
-    const fullTime = withSeconds(time, secondsOn ? second : null);
     const values: FormValues = { name, day, month, year, hour, minute, second, period, secondsOn, place, manualOn, lat, lng, utcOffset, clockChoice };
     const body = requestFromForm(values, clockView, repeatedTime)!;
-    const placeLabel =
-      manualOn && latValue !== null && lngValue !== null
-        ? fill(t.chart.manualPlace, { lat: formatCoordinateShort(latValue, "lat"), lng: formatCoordinateShort(lngValue, "lng") })
-        : place!.label;
     let problem: FieldError | null = null;
     let offline = false;
     try {
@@ -377,14 +355,14 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data?.chart) {
-        const shownBirth = birthSummary({ name, date, time: fullTime, place: placeLabel, repeatedTime }, t);
-        setResult({ data: data as ChartResponse, summary: shownBirth.summary, birth: shownBirth.birth, style: chartStyle });
-        saveChartStyle(window.localStorage, chartStyle);
+        saveChartStyle(browserStore(), chartStyle);
         // Kept as a saved profile, in this browser only (D-136): the inputs, never the results.
-        const birth = birthFromForm(values, clockView, repeatedTime);
-        if (birth) saveFromForm(birth, name, editing?.id ?? null, t.profiles.defaultName);
-        setEditing(null);
+        const birth = birthFromForm(values, clockView, repeatedTime)!;
+        const saved = saveFromForm(birth, name, editing?.id ?? null, t.profiles.defaultName, editing?.name);
         setAmbiguous(false);
+        setSubmitting(false);
+        onDone({ id: saved.id, name: saved.name, birth, result: data as ChartResponse, style: chartStyle });
+        return;
       } else {
         problem = errorFor(data?.error?.code, t.errors);
         // With typed coordinates, place problems belong to the coordinates, not the (unused) search box.
@@ -395,10 +373,8 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
     }
     setSubmitting(false);
     if (offline) {
-      setResult(null); // never leave an older chart under a new error
       setUnreachable(true);
     } else if (problem) {
-      setResult(null);
       if (problem.code === "AMBIGUOUS_LOCAL_TIME") {
         setAmbiguous(true);
       } else {
@@ -407,15 +383,6 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
       }
     }
   }
-
-  // Open (D-136 item 2): calculate at once with the saved details (once, also in React's dev double run).
-  const autoStarted = useRef(false);
-  useEffect(() => {
-    if (!start.calculate || autoStarted.current) return;
-    autoStarted.current = true;
-    void calculate(start.repeatedTime);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only once, with the values the form started with
-  }, []);
 
   const dateDescribedBy = dateMessage ? ids.dateError : undefined;
   const timeDescribedBy = [ids.timeHint, timeMessage ? ids.timeError : null, ambiguous ? ids.repeated : null].filter(Boolean).join(" ");
@@ -463,7 +430,7 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
 
   return (
     <>
-      <section className="birth-form card-outer p-4 sm:p-6 lg:p-7">
+      <section className={editing ? "birth-form" : "birth-form card-outer p-4 sm:p-6 lg:p-7"}>
         {/* No visible heading (D-134 item 1); this one names the form for screen readers. */}
         <h2 id={ids.title} className="sr-only">
           {f.srTitle}
@@ -479,16 +446,6 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
             void calculate(null);
           }}
         >
-          {/* Edit mode (D-136 item 3): one small line above the fields, with a quiet way out */}
-          {editing && (
-            <div className="notice flex items-center justify-between gap-3 py-1 pr-2 text-[13px] leading-5">
-              <p className="py-2">{fill(f.editing.line, { name: editing.name })}</p>
-              <button type="button" className="editing-cancel shrink-0 px-2" onClick={onCancelEdit}>
-                {f.editing.cancel}
-              </button>
-            </div>
-          )}
-
           {/* Name: not required, never sent (D-134 item 2) */}
           <div>
             <label htmlFor={ids.name} className="form-label">
@@ -759,8 +716,13 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
               aria-describedby={serverErrors.form ? ids.formError : undefined}
               className={buttonClass("primary", true, "btn-busy w-full")}
             >
-              {f.submit}
+              {editing ? f.editing.submit : f.submit}
             </button>
+            {editing && onCancel && (
+              <Button variant="quiet" className="mt-3 w-full" onClick={onCancel}>
+                {f.editing.cancel}
+              </Button>
+            )}
             {/* State B: calculating */}
             <div aria-live="polite">
               {submitting && (
@@ -784,39 +746,19 @@ function BirthFormBody({ t, start, onCancelEdit }: { t: Messages; start: Start; 
                 </div>
               )}
             </div>
+            {/* D-138 Q7: a look at a made-up chart, home page only */}
+            {!editing && (
+              <p className="mt-3 text-center">
+                <Link href={SAMPLE_HREF} className="sample-link">
+                  {f.sampleLink}
+                </Link>
+              </p>
+            )}
             <p className="mt-3 text-center text-xs leading-[18px] text-muted">{f.privacy}</p>
           </div>
         </form>
       </section>
 
-      {/* The result stays under the form until the chart page (0.5.1, D-134 item 10) */}
-      {result && <Divider inGrid className="lg:col-span-2" />}
-      {result && (
-        <SouthChart
-          ref={resultHeading}
-          result={result.data}
-          birth={result.birth}
-          summary={result.summary}
-          note={result.style === "north" ? f.chartStyle.northNote : undefined}
-          t={t.chart}
-        />
-      )}
-      {result && <Divider inGrid className="lg:col-span-2" />}
-      {result && <PlanetTable result={result.data} summary={result.summary} t={t.chart} />}
-      {/* Step 0.3.7 (D-113): plain lists below the table. Keyed by the calculation moment, so a new
-          chart starts with every list closed. */}
-      {lists && (
-        <>
-          <Divider inGrid className="lg:col-span-2" />
-          <RightNow ctx={lists} />
-          <Divider inGrid className="lg:col-span-2" />
-          <DashaList key={`d-${lists.result.dashas.asOf}`} ctx={lists} />
-          <Divider inGrid className="lg:col-span-2" />
-          <TransitList key={`t-${lists.result.dashas.asOf}`} ctx={lists} />
-          <Divider inGrid className="lg:col-span-2" />
-          <LifeAreaList ctx={lists} />
-        </>
-      )}
     </>
   );
 }

@@ -1,137 +1,98 @@
-// "Right now" (step 0.3.7, D-113 item 1; roomier layout 0.3.7.1, D-115 item 4, the founder's option A):
-// "Running now" full width on top as three stacked tiers (Mahadasha largest, Antardasha and
-// Pratyantardasha stepping down), each with its level label, dates, what it activates and a thin bar
-// for how far through the period the calculation moment is; "Coming up" and "Sade Sati" side by side
-// below (stacked on phones). The level is told apart by its label text, size, indentation and a
-// coloured left rule, never colour alone. Facts only. Every date on the clock at birth (D-098).
+// "Right now" on the chart page (step 0.5.1, design spec §6.4; from the 0.3.7 card, D-113, D-115):
+// eyebrow "RIGHT NOW · <date>", "You are in <planet>'s Mahadasha", the one-liner and the note that dates
+// are on the clock at birth (§6.10). The tiers card: three levels, each with its label in the tier colour,
+// the planet in Fraunces, the time left, the bar (heights 8/6/4 phone, 10/7/5 desktop) and the dates; no
+// left-border rules. Beside it (desktop) or under it (phones): Coming up, then link rows that jump to the
+// Sade Sati and Life areas sections. A birth after the calculation moment, or after the 120-year cycle,
+// keeps its plain line (D-113, D-114). Facts only; every date on the clock at birth (D-098).
 
 import { fill } from "@/lib/chart-format";
-import { dashaNow, type CurrentLine } from "@/lib/dasha-view";
+import { rightNowView } from "@/lib/chart-sections";
 import type { ListContext } from "@/lib/list-context";
-import { sadeSatiStatus } from "@/lib/transit-view";
-import { ListCard, Marker } from "./list-bits";
+import { JumpLink } from "./contents-panel";
+import { ChartSection, Marker, ProgressBar } from "./list-bits";
 
-const TIER_CLASS = { mahadasha: "tier tier-1", antardasha: "tier tier-2", pratyantardasha: "tier tier-3" } as const;
-
-function Tier({ c, ctx }: { c: CurrentLine; ctx: ListContext }) {
-  const t = ctx.t.lists;
-  return (
-    <li className={TIER_CLASS[c.level]}>
-      <p className="tier-label">{c.tierLabel}</p>
-      <p className="tier-main">
-        <span className="tier-lord">{c.row.lordName}</span>{" "}
-        <span className="tier-dates tabular-nums">{c.row.range}</span>
-        {c.row.beganBeforeBirth && (
-          <>
-            {" "}
-            <Marker>{t.beganBeforeBirth}</Marker>
-          </>
-        )}
-      </p>
-      {c.progress && c.progressText && (
-        <div className="tier-progress">
-          <div
-            role="progressbar"
-            aria-label={fill(t.progressLabel, { level: t.levels[c.level] })}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={c.progress.percent}
-            aria-valuetext={c.progressText}
-            className="tier-bar"
-          >
-            <div className="tier-bar-fill" style={{ width: `${c.progress.fraction * 100}%` }} />
-          </div>
-          <span aria-hidden="true" className="tier-percent tabular-nums">
-            {c.progressText}
-          </span>
-        </div>
-      )}
-      <p className="tier-activates">{c.activates}</p>
-    </li>
-  );
-}
+const LEVEL_NUMBER = { mahadasha: 1, antardasha: 2, pratyantardasha: 3 } as const;
 
 export function RightNow({ ctx }: { ctx: ListContext }) {
-  const t = ctx.t.lists;
-  const now = dashaNow(ctx);
-  const ss = sadeSatiStatus(ctx);
+  const t = ctx.t;
+  const r = t.chartPage.rightNow;
+  const v = rightNowView(ctx);
   return (
-    <ListCard id="right-now-title" title={t.rightNow.title}>
-      <p className="mt-1.5 text-[15px] text-muted">
-        {fill(t.asOf, { date: ctx.date(ctx.result.dashas.asOf) })} · {fill(t.clockPointer, { offset: ctx.offset })}
-      </p>
-      {now.message && <p className="mt-5 text-[17px] leading-relaxed">{now.message}</p>}
+    <ChartSection
+      id="right-now"
+      eyebrow={v.eyebrow}
+      heading={v.heading}
+      intro={
+        <>
+          {r.oneLiner}{" "}
+          <span className="text-muted">{fill(t.lists.clockNote, { offset: ctx.offset })}</span>
+        </>
+      }
+    >
+      {v.message && <p className="mt-5 text-[17px] leading-relaxed">{v.message}</p>}
 
-      {now.current.length > 0 && (
-        <div className="mt-7">
-          <h3 className="right-now-heading">{t.rightNow.running}</h3>
-          <ul className="mt-4 space-y-6">
-            {now.current.map((c) => (
-              <Tier key={c.level} c={c} ctx={ctx} />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="mt-8 grid gap-5 md:grid-cols-2">
-        <div className="card-inner p-4 sm:p-5">
-          <h3 className="right-now-heading">{t.rightNow.comingUp}</h3>
-          {now.nothingNext ? (
-            <p className="mt-3 text-[16px]">{now.nothingNext}</p>
-          ) : (
-            <ul className="mt-3 space-y-4">
-              {now.next.map((n) => (
-                <li key={n.level}>
-                  <p className="text-sm text-muted">{n.label}</p>
-                  <p className="mt-0.5 text-[16px]">
-                    <span className="font-semibold">{n.row.lordName}</span>{" "}
-                    <span className="tabular-nums">{n.startsText}</span>
+      <div className="right-now-grid mt-6">
+        {v.tiers.length > 0 && (
+          <div className="card-outer p-4 lg:p-6">
+            <h3 className="sr-only">{t.lists.rightNow.running}</h3>
+            <ul className="tiers">
+              {v.tiers.map((tier) => (
+                <li key={tier.level} className={`tier tier-${LEVEL_NUMBER[tier.level]}`}>
+                  <p className="tier-label">{tier.label}</p>
+                  <p className="tier-main">
+                    <span className="tier-lord">{tier.lord}</span>
+                    <span className="tier-left tabular-nums">{tier.left}</span>
+                  </p>
+                  <ProgressBar
+                    fraction={tier.fraction}
+                    level={LEVEL_NUMBER[tier.level]}
+                    label={fill(t.lists.progressLabel, { level: t.lists.levels[tier.level] })}
+                    valueText={tier.left}
+                  />
+                  <p className="tier-dates tabular-nums">
+                    {tier.dates}
+                    {tier.beganBeforeBirth && (
+                      <>
+                        {" "}
+                        <Marker>{t.lists.beganBeforeBirth}</Marker>
+                      </>
+                    )}
                   </p>
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <div className="card-outer p-4 lg:p-6">
+            <h3 className="type-label">{t.lists.rightNow.comingUp}</h3>
+            {v.nothingNext ? (
+              <p className="mt-3 text-[15px]">{v.nothingNext}</p>
+            ) : (
+              <ul className="mt-3 space-y-3">
+                {v.comingUp.map((c) => (
+                  <li key={c.key} className="dated-row">
+                    <span className="dated-row-date">{c.date}</span>
+                    <span>{c.text}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <JumpLink to="sade-sati" className="jump-row">
+            <span>{v.sadeSatiLink}</span>
+            <span aria-hidden="true">↓</span>
+          </JumpLink>
+          {v.lifeAreasLink && (
+            <JumpLink to="life-areas" className="jump-row">
+              <span>{v.lifeAreasLink}</span>
+              <span aria-hidden="true">↓</span>
+            </JumpLink>
           )}
         </div>
-
-        <div className="card-inner p-4 sm:p-5">
-          <h3 className="right-now-heading">{t.sadeSati.title}</h3>
-          <div className="text-[16px]">
-            <SadeSatiStatusBlock ctx={ctx} view={ss} />
-          </div>
-        </div>
       </div>
-    </ListCard>
-  );
-}
-
-export function SadeSatiStatusBlock({ ctx, view }: { ctx: ListContext; view: ReturnType<typeof sadeSatiStatus> }) {
-  const t = ctx.t.lists;
-  return (
-    <div className="mt-2 space-y-1.5">
-      <p>
-        <span className="text-muted">{t.sadeSati.statusLabel}:</span> <span className="font-semibold">{view.statusText}</span>
-      </p>
-      {view.current ? (
-        <>
-          <p className="tabular-nums">
-            {view.current.range}
-            {view.current.beganBeforeBirth && (
-              <>
-                {" "}
-                <Marker>{t.beganBeforeBirth}</Marker>
-              </>
-            )}
-          </p>
-          <ul className="space-y-0.5 text-sm">
-            {view.current.phases.map((p) => (
-              <li key={p.phase}>{p.text}</li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <p>{view.nextText}</p>
-      )}
-      <p className="text-sm text-muted">{view.saturnText}</p>
-    </div>
+    </ChartSection>
   );
 }

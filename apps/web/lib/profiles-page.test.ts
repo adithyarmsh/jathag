@@ -98,9 +98,9 @@ describe("three profiles", () => {
   it("Open (primary, link with only the id) · Edit · Delete (quiet) on every card, each named after the person", () => {
     const c = controls(html);
     expect(c.map((x) => x.name)).toEqual(["Open Meera", "Edit Meera", "Delete Meera", "Open My chart", "Edit My chart", "Delete My chart", "Open Arjun", "Edit Arjun", "Delete Arjun"]);
-    expect(c[0]!.attrs).toContain('href="/?profile=m"');
+    expect(c[0]!.attrs).toContain('href="/chart?profile=m"');
     expect(c[0]!.attrs).toContain("btn-primary");
-    expect(c[1]!.attrs).toContain('href="/?edit=m"');
+    expect(c[1]!.attrs).toContain('href="/chart?profile=m&amp;edit"');
     expect(c[1]!.attrs).toContain("btn-quiet");
     expect(c[2]!.tag).toBe("button");
     expect(c[2]!.attrs).toContain("btn-quiet");
@@ -173,8 +173,9 @@ describe("every control has a name and is at least 44 px high", () => {
     }
   });
 
-  it("the home form's \"Cancel\" (edit mode) is 44 px high too", () => {
-    expect(minHeight("editing-cancel")).toBe(44);
+  it("the edit panel's \"Cancel\" (a quiet button) and the home form's \"See a sample chart\" are 44 px high too", () => {
+    expect(minHeight("btn")).toBeGreaterThanOrEqual(44);
+    expect(minHeight("sample-link")).toBe(44);
   });
 });
 

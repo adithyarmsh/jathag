@@ -50,9 +50,10 @@ function subscribe(onChange: () => void) {
   };
 }
 
-function write(profiles: readonly Profile[]) {
-  writeProfiles(storage(), profiles);
+function write(profiles: readonly Profile[]): boolean {
+  const ok = writeProfiles(storage(), profiles);
   window.dispatchEvent(new Event(EVENT));
+  return ok;
 }
 
 /** The saved profiles, most recently used first; null while the page is drawn on the server (not read yet). */
@@ -71,12 +72,20 @@ export function findProfile(id: string): Profile | null {
   return readProfiles(storage()).find((p) => p.id === id) ?? null;
 }
 
-/** After a successful "See my chart": keeps the inputs (lib/profiles.ts, saveCalculated). */
-export function saveFromForm(birth: BirthInputs, name: string, editingId: string | null, defaultName: string) {
-  const { profiles } = saveCalculated(readProfiles(storage()), {
+/**
+ * After a successful "See my chart": keeps the inputs (lib/profiles.ts, saveCalculated). Returns the
+ * profile's id and the name it now has (also when storage is blocked: then nothing is kept, and the
+ * chart page gets the details in memory instead, components/chart-handoff.ts).
+ */
+export function saveFromForm(birth: BirthInputs, name: string, editingId: string | null, defaultName: string, fallbackName?: string): { id: string; name: string } {
+  const before = readProfiles(storage());
+  const { profiles, id } = saveCalculated(before, {
     birth, name, editingId, now: new Date().toISOString(), newId: makeProfileId, defaultName,
   });
-  write(profiles);
+  const stored = write(profiles);
+  // Blocked storage while editing: nothing was kept, so the page keeps the id it already has.
+  if (!stored && editingId) return { id: editingId, name: name.trim() || fallbackName || defaultName };
+  return { id, name: profiles.find((p) => p.id === id)!.name };
 }
 
 /** Opening a profile moves it to the top of the list. */

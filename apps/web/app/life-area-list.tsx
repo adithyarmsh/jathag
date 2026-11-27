@@ -1,43 +1,34 @@
-// "Life areas" (step 0.3.7, D-113 item 5, Requirements §6.6): the 10 areas, each with the planets linked
-// to it and every reason in plain words; the lords of the periods running now are marked. The Health
-// area carries the wellness line (FR-LA-04). No per-area period lists yet (0.7.5).
+// "Life areas" on the chart page (step 0.5.1, design spec §6.6; from the 0.3.7 list, D-113, Requirements
+// §6.6, D-104): "Which planets touch which part of life". The ten areas (phones: one card with ten rows;
+// desktop: a two-column grid of tiles), each with its reasons in words ("Sun rules the 1st · Jupiter and
+// Venus sit in the 1st"), an "Active now" tag where a planet of a current period is linked (with the
+// periods in words, so colour is never the only signal), and Health with the wellness line (FR-LA-04).
+// No links to life-area pages and no "why" pop-ups yet (both 0.7.5).
 
-import { lifeAreaViews } from "@/lib/life-area-view";
+import { lifeAreaTiles } from "@/lib/chart-sections";
 import type { ListContext } from "@/lib/list-context";
-import { ListCard, Marker } from "./list-bits";
+import { Tag } from "@/components/tag";
+import { ChartSection } from "./list-bits";
 
 export function LifeAreaList({ ctx }: { ctx: ListContext }) {
-  const t = ctx.t.lists.lifeAreas;
+  const l = ctx.t.chartPage.lifeAreas;
   return (
-    <ListCard id="life-area-list-title" title={t.title}>
-      <p className="mt-1 text-sm text-muted">{t.intro}</p>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        {lifeAreaViews(ctx).map((a) => (
-          <div key={a.area} className="card-inner p-4">
-            <h3 id={`life-area-${a.area}`} className="font-semibold">
-              {a.name}
-            </h3>
-            {a.note && <p className="mt-1 text-sm text-muted">{a.note}</p>}
-            {a.empty ? (
-              <p className="mt-2 text-[15px] text-muted">{a.empty}</p>
-            ) : (
-              <ul aria-labelledby={`life-area-${a.area}`} className="mt-2 space-y-2 text-[15px]">
-                {a.planets.map((p) => (
-                  <li key={p.code}>
-                    <span className="font-semibold">{p.name}</span>: {p.reasons}
-                    {p.current.map((m) => (
-                      <span key={m}>
-                        {" "}
-                        <Marker>{m}</Marker>
-                      </span>
-                    ))}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+    <ChartSection id="life-areas" eyebrow={l.eyebrow} heading={l.heading} intro={l.oneLiner}>
+      <ul className="life-area-grid mt-6">
+        {lifeAreaTiles(ctx).map((a) => (
+          <li key={a.area} className={a.active ? "life-area life-area-active" : "life-area"}>
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+              <h3 id={`life-area-${a.area}`} className="text-[15px] leading-6 font-semibold">
+                {a.name}
+              </h3>
+              {a.active && <Tag kind="active">{l.activeNow}</Tag>}
+            </div>
+            <p className="mt-1 text-[14px] leading-[22px] text-muted">{a.reasons}</p>
+            {a.activeText && <p className="mt-1 text-[13px] leading-5 text-accent-text">{a.activeText}</p>}
+            {a.note && <p className="mt-1 text-[13px] leading-5 text-muted italic">{a.note}</p>}
+          </li>
         ))}
-      </div>
-    </ListCard>
+      </ul>
+    </ChartSection>
   );
 }

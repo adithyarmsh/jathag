@@ -112,7 +112,7 @@ export function ProfilesBoard({
               </div>
             ) : (
               <div className="flex gap-2">
-                {/* Plain links (a full page load): the home form reads the id from the address */}
+                {/* Plain links (a full page load): the chart page reads the id from the address (0.5.1) */}
                 <a
                   id={profileIds.open(c.id)}
                   href={profileHref("open", c.id)}

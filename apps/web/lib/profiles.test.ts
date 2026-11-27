@@ -257,9 +257,9 @@ describe("round trip into the form: byte-identical request bodies", () => {
 });
 
 describe("between pages: only the id travels, never a birth detail", () => {
-  it("Open and Edit links", () => {
-    expect(profileHref("open", "3f2b8c1e-0000-4000-8000-000000000001")).toBe("/?profile=3f2b8c1e-0000-4000-8000-000000000001");
-    expect(profileHref("edit", "abc")).toBe("/?edit=abc");
+  it("Open and Edit links (both to the chart page since 0.5.1; the old home links are still read)", () => {
+    expect(profileHref("open", "3f2b8c1e-0000-4000-8000-000000000001")).toBe("/chart?profile=3f2b8c1e-0000-4000-8000-000000000001");
+    expect(profileHref("edit", "abc")).toBe("/chart?profile=abc&edit");
     expect(profileFromUrl("?profile=abc")).toEqual({ mode: "open", id: "abc" });
     expect(profileFromUrl("?edit=abc")).toEqual({ mode: "edit", id: "abc" });
     expect(profileFromUrl("")).toBeNull();
@@ -268,10 +268,10 @@ describe("between pages: only the id travels, never a birth detail", () => {
 
   it("no birth detail or name in any link the page code builds", () => {
     const WEB = join(import.meta.dirname, "..");
-    for (const f of ["app/profiles/profile-list.tsx", "app/birth-form.tsx", "lib/profile-link.ts"]) {
+    for (const f of ["app/profiles/profile-list.tsx", "app/birth-form.tsx", "app/chart-page.tsx", "lib/profile-link.ts", "lib/chart-page.ts"]) {
       const text = readFileSync(join(WEB, f), "utf8");
-      // every href / URL built in these files goes through profileHref (id only) or is a fixed path
-      for (const m of text.matchAll(/href=\{([^}]*)\}/g)) expect(m[1], f).toMatch(/^profileHref\("(open|edit)", c\.id\)$/);
+      // every href / URL built in these files goes through profileHref / chartHref (id only) or is a fixed path
+      for (const m of text.matchAll(/href=\{([^}]*)\}/g)) expect(m[1], f).toMatch(/^(profileHref\("(open|edit)", c\.id\)|SAMPLE_HREF)$/);
       expect(text, f).not.toMatch(/[?&](date|time|name|lat|lng|place)=/);
     }
   });

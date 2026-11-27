@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.21 · 2026-11-27 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.22 · 2026-11-27 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -49,7 +49,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started. Every step table be
 | **v0.1 Coming soon** | Live holding page; repo, CI, auto-deploy; docs + progress tracking; B2-styled Coming Soon | ✅ |
 | **v0.2 First real chart** | On the live site: enter real birth details, see planet positions that match JHora | ✅ |
 | **v0.3 Timing engine** | Dashas (3 levels), transits, Sade Sati, approximate-time results (as plain lists on the live site) | ✅ |
-| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | 🔄 (0.4.1 ✅, 0.4.2 ✅, 0.4.3 ✅, 0.4.4 ✅, 0.4.5 ✅ D-133, 0.4.6 ✅ D-135; next 0.4.7 saved profiles) |
+| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | ✅ (0.4.1–0.4.7 done; 0.4.7 D-137) |
 | **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | ⏳ |
 | **v0.6 Timing screens** | Timeline with "you are here", transits, Sade Sati card | ⏳ |
 | **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
@@ -133,7 +133,7 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs): `docs/design/design-spec.md`, `tokens.json`, `mockups/`; Requirements v1.13 (D-132) | Given | ✅ |
 | 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged | ✅ (#27, D-133) |
 | 0.4.6 | CODE | Full B2 birth form (D-134): home split from 1024 px (design spec §1.5, §5.1); "Coming soon" only on "Plain-language explanations" (D-133 carry-over); form without a heading, larger labels: Name (not marked optional), date with the old-clock "i" for historical-clock births (kept, D-092), exact time, place search with "also known as" and the Hyderabad hints, Chart style (remembered); a small "Advanced settings" link above "See my chart" opening inside the card: coordinates with a UTC-offset dropdown, "Which clock?" (only when it applies; default IST / War Time per D-082, D-086), the time choices with "I know roughly when" and "I don't know the time" switched off with "Coming soon" until 0.8.1 (D-132), seconds; privacy line kept; validation; result still under the form until 0.5.1 | Merged | ✅ (#28, D-135) |
-| 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged | ⏳ |
+| 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice (D-136: saved automatically, no duplicates, Open/Edit through the home form, inputs only) | Merged | ✅ (#29, D-137) |
 
 ## v0.5 — Chart screens
 

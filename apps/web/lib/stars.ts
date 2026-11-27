@@ -2,12 +2,13 @@
 // tiled CSS dots. Pure functions, tested in stars.test.ts; drawn by app/star-field.tsx after the page
 // has loaded (so every load differs and the server HTML never disagrees with the browser).
 //
-// Density: twice the old pattern, 28 stars per 320 × 320 px (the old tile had 14 dots).
+// Density: 38 stars per 320 × 320 px (D-140: about 35% more than the 28 of D-117; the old tile had 14 dots).
 // Size: tip to tip, random from STAR_MIN to STAR_MAX (= 1.5 × STAR_MIN).
-// Brightness follows size: opacity factor from 0.5 (smallest) to 1 (largest) × the theme's dust strength.
+// Brightness follows size: opacity factor from 0.5 (smallest) to 1 (largest) × the theme's --star-strength;
+// the colour is --star-colour (D-140: a lighter warm gold in light mode, the accent in dark).
 
 export const STAR_TILE = 320;
-export const STARS_PER_TILE = 28;
+export const STARS_PER_TILE = 38;
 /** Smallest star, px tip to tip: 3.5 px (D-118; the largest is 5.25 px). */
 export const STAR_MIN = 3.5;
 /** Largest star = 1.5 × the smallest (D-117 item 4b). */
@@ -28,7 +29,7 @@ export interface Star {
 /** A random number in [0, 1); Math.random in the browser, a fixed sequence in tests. */
 export type Random = () => number;
 
-/** How many stars an area gets (28 per 320 × 320 px, rounded). */
+/** How many stars an area gets (38 per 320 × 320 px, rounded). */
 export function starCount(width: number, height: number): number {
   if (!(width > 0) || !(height > 0)) return 0;
   return Math.round((width * height * STARS_PER_TILE) / (STAR_TILE * STAR_TILE));
