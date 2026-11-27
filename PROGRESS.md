@@ -7,13 +7,13 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1 references in progress); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.4.1 References from the founder (O-001), in progress |
-| **Next step** | 0.4.2 Design System (Project) |
-| **Then** | 0.4.3 Mockups, 0.4.4 Design handoff, then 0.4.5 App shell |
-| **Blocked on** | The founder's design references (O-001) |
+| **Milestone** | v0.4 Design system + app shell 🔄 (0.4.1–0.4.4 ✅ in the Project, D-125 to D-132; 0.4.5 in review); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
+| **Current step** | 0.4.5 App shell, in review |
+| **Next step** | 0.4.6 Full birth form |
+| **Then** | 0.4.7 Profiles, then v0.5 Chart screens (0.5.1 chart page) |
+| **Blocked on** | Project review of the 0.4.5 PR |
 | **Live site** | https://jathag.vercel.app (birth form, South Indian Rasi chart + planet table, Beta notice, footer v0.9.1; four list cards below the table: Right now, Dasha periods, Transits and Sade Sati, Life areas; `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
-| **Last updated** | 2026-11-25 |
+| **Last updated** | 2026-11-27 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
 
@@ -92,7 +92,12 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 - ✅ 0.3.7.3 Page width bug on phones (D-119): the two sideways-scrolling table boxes (planet table, today's positions) are now positioning containers, so their hidden "Does not apply" texts no longer make the page 815 px wide on a 390 px phone; regression test; approved (D-120) and merged (PR #24), founder checked on his phone, 2026-11-24 (D-121)
 
 ### v0.4 — Design system + app shell
-- 🔄 0.4.1 References (the founder is collecting them) · ⏳ 0.4.2 Design System · ⏳ 0.4.3 Mockups · ⏳ 0.4.4 Design handoff · ⏳ 0.4.5 App shell · ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
+- ✅ 0.4.1 References from the founder (O-001), done in the Project
+- ✅ 0.4.2 Design System "Still Water", approved in the Project (D-126 to D-128)
+- ✅ 0.4.3 Mockups, approved in the Project (D-129 to D-131)
+- ✅ 0.4.4 Design handoff: `docs/design/design-spec.md`, `tokens.json`, 18 mockups; Requirements v1.13 (D-132)
+- 🔄 0.4.5 App shell, in review: Still Water tokens and fonts site-wide, one-line header, phone menu, Beta band, new footer, Light / Dark / Match device, placeholder pages and a 404; the home page keeps its layout in the new look (PR #27)
+- ⏳ 0.4.6 Full B2 form · ⏳ 0.4.7 Profiles
 
 ### v0.5 — Chart screens
 - ⏳ 0.5.1 Overview · ⏳ 0.5.2 D1/D9 charts (South + North) · ⏳ 0.5.3 Planets table + pages
@@ -122,7 +127,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 ---
 
 ## Open questions / blockers
-- O-001 Design references for screens beyond the home page (founder, before v0.4)
+- ~~O-001 Design references for screens beyond the home page~~ resolved in 0.4.1–0.4.4
 - O-003 Content licence wording (before launch)
 - O-005 Analytics: none vs cookieless (v0.9)
 - O-006 Domain name (v1.0)
@@ -136,6 +141,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-27 | 0.4.5 | #27 | App shell built on the design system "Still Water": every colour, spacing, corner and shadow from `docs/design/tokens.json` in both themes (a test fails if they drift apart), Fraunces + Inter (Cormorant removed), shared components in `apps/web/components/`, one-line sticky header, full-screen phone menu (focus trap, Esc, scroll lock), Beta band, two-line footer, Light / Dark / Match device without a flash, placeholder pages (/profiles, /settings, /about, /faq, /disclaimer, /privacy, /sources) and a 404, each with its own title, all still noindex. Home page unchanged in layout and behaviour (R01 checked), restyled, star dividers between the result cards; "What you'll get" tiles stack at 1024–1279 px so nothing sticks out. 1,756 tests green (was 1,567). D-125 to D-132, roadmap, requirements v1.13 and `docs/design/` committed unchanged. Waiting for Project review. |
 | 2026-11-25 | 0.9.1 | #26 | Panchanga calculation built (pulled forward, D-123): sunrise through the adapter (Swiss Ephemeris rise/set, upper limb, refraction), tithi/paksha, nakshatra, sunrise-based weekday, yoga, karana and hora lord in the engine (`panchangaForChart`, engine 0.6.0) and a `panchanga` section in the chart API. All 29 reference births match JHora exactly on all six fields and within 0.05 points on both "% left"; the hora lord matches with 60-minute horas from sunrise (29/29; day/night split into 12 parts: 23/29). Polar fallback: calendar weekday, flagged. D-123 and roadmap v2.14 committed unchanged. Nothing new on the site except the footer. Approved by the Project (D-124, committed unchanged); squash-merged. |
 | 2026-11-25 | 0.3.7.3 | #25 | Step 0.3.7.3 and milestone v0.3 closed (D-121): the founder zoomed out on his phone and the page fills the screen; D-121 and D-122 committed unchanged. The founder's optional JHora comparison matched everything (settings test, Dasas view for R01, R06 and R16, Saturn into Libra, Scorpio and Sagittarius; D-122). Docs and progress only, no code change. |
 | 2026-11-24 | 0.3.7.3 | #24 | Page width bug fixed (D-119): measured on a production build at 390 px after calculating R01, the page was 815 px wide; the only elements past the screen were 12 hidden "Does not apply" texts (position absolute) in the planet table (right edges up to 814 px) and the today's-positions table (410 px), nothing else even with every list open. Both scroll boxes now `relative`; afterwards the page equals the screen at 320/360/390/430 px, light and dark, in every state; tables still scroll inside their boxes. Regression test renders both tables and checks every scroll box in the page code. 0.3.7.1 and 0.3.7.2 marked ✅ (founder checked them on his phone, D-119). D-119 and roadmap v2.13 committed unchanged. Approved by the Project as built (D-120, committed unchanged). Squash-merged; stays 🔄 until the founder zooms out on his phone. |

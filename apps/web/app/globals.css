@@ -230,12 +230,6 @@ body {
   .star-field-svg { animation: none; }
 }
 
-/* Text that sits on the page background: a solid backing so no background star is ever behind
-   letters (keeps WCAG contrast exact). Invisible otherwise. */
-.text-on-dust {
-  background-color: var(--bg);
-}
-
 /* Section divider (components/divider.tsx, spec §3.6): hairline · gold star · hairline. Fades in once
    when it scrolls into view; the server HTML is never hidden (the fade is added by script). */
 .divider {
@@ -449,8 +443,10 @@ body {
   padding: 0.55rem 0.8rem;
   font-size: 1rem;
 }
+/* Error: a 2 px edge in the error colour (1 px border + 1 px inset ring, so the field keeps its size) */
 .form-input[aria-invalid="true"] {
-  border: 2px solid var(--error);
+  border-color: var(--error);
+  box-shadow: inset 0 0 0 1px var(--error);
 }
 
 /* Tags (spec §3.11): "Coming soon", "Active now", "BETA" */

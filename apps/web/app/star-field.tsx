@@ -4,8 +4,8 @@
 // shape in <defs>, reused by a <use> per star. Made in the browser after the page has loaded, so every
 // load differs and the server HTML never disagrees with the browser (nothing is rendered on the server).
 // The layer covers the body, scrolls with the page, takes no clicks, is hidden from screen readers and
-// grows with the page (new stars only in the new area, nothing moves). Text on the page background
-// keeps its solid backing (.text-on-dust). Nothing is stored.
+// grows with the page (new stars only in the new area, nothing moves). Every text on the page
+// sits on solid surfaces (cards, the header, the Beta band and the footer). Nothing is stored.
 
 import { useEffect, useRef, useState } from "react";
 import { emptySky, extendSky, STAR_PATH, type StarSky } from "@/lib/stars";

@@ -252,7 +252,7 @@ export function BirthForm({ t }: { t: Messages }) {
     <>
       <section
         aria-labelledby="birth-form-title"
-        className="card-outer p-4 sm:p-6 lg:p-8"
+        className="card-outer p-4 sm:p-6 lg:p-7"
       >
         <h2 id="birth-form-title" className="type-h2 text-balance">
           {f.title}

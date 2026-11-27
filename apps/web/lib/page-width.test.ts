@@ -13,6 +13,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { calculateChartResponse } from "@jathag/api";
+import NotFound from "../app/not-found";
+import { PlaceholderPage, type PlaceholderKey } from "../components/placeholder-page";
+import { SiteFooter } from "../components/site-footer";
+import { HeaderBar, PhoneMenu } from "../components/site-header";
 import { PlanetTable } from "../app/planet-table";
 import { TransitList } from "../app/transit-list";
 import { listContext } from "./list-context";
@@ -68,5 +72,49 @@ describe("scroll boxes are positioning containers (D-119)", () => {
     expect(r).toHaveLength(1);
     expect(r[0]!.inner).toContain('class="sr-only"'); // Rahu/Ketu retrograde "—"
     expect(r[0]!.className.split(" ")).toContain("relative");
+  });
+});
+
+// Step 0.4.5 (D-120, design spec §15): the new pages (placeholders, 404) and the open phone menu. The
+// width itself was measured in the browser at 360 and 390 px for every page, menu open (0.4.5 PR
+// report: always exactly the screen width). Here, the rules that keep it so:
+//   1. scroll boxes in the shared components are positioning containers too;
+//   2. nothing in the rendered markup has a fixed or minimum width a 360 px phone can't hold
+//      (360 minus the 16 px page padding on each side = 328 px);
+//   3. the open menu is pinned to both edges of the screen and has no minimum width.
+describe("new pages and the open phone menu stay within a 360 / 390 px screen (0.4.5)", () => {
+  const COMPONENTS = join(import.meta.dirname, "../components");
+  const PHONE_CONTENT = 360 - 2 * 16;
+
+  it("scroll boxes in components/ are positioning containers", () => {
+    for (const f of readdirSync(COMPONENTS).filter((f) => f.endsWith(".tsx"))) {
+      for (const m of readFileSync(join(COMPONENTS, f), "utf8").matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
+        const c = m[1] ?? m[2] ?? "";
+        if (SCROLL.test(c)) expect(c, f).toMatch(POSITIONED);
+      }
+    }
+  });
+
+  const t = { header: en.header, menu: en.menu, footer: en.footer };
+  const pages: PlaceholderKey[] = ["profiles", "settings", "about", "faq", "disclaimer", "privacy", "sources"];
+  const screens: [string, string][] = [
+    ["header + open menu", renderToStaticMarkup(createElement(HeaderBar, { t, current: "about", open: true })) + renderToStaticMarkup(createElement(PhoneMenu, { t, current: "about" }))],
+    ["footer", renderToStaticMarkup(createElement(SiteFooter, { t: en.footer, commit: "7e5a8dc" }))],
+    ["404", renderToStaticMarkup(createElement(NotFound))],
+    ...pages.map((p): [string, string] => [`/${p}`, renderToStaticMarkup(createElement(PlaceholderPage, { page: p }))]),
+  ];
+
+  it.each(screens)("%s: no fixed or minimum width wider than a phone", (_name, html) => {
+    const widths = [...html.matchAll(/(?<![\w-])(?:min-)?w-\[(\d+(?:\.\d+)?)(px|rem)\]/g)].map((m) => Number(m[1]) * (m[2] === "rem" ? 16 : 1));
+    const inline = [...html.matchAll(/style="[^"]*(?<![\w-])(?:min-)?width:\s*(\d+)px/g)].map((m) => Number(m[1]));
+    for (const w of [...widths, ...inline]) expect(w).toBeLessThanOrEqual(PHONE_CONTENT);
+  });
+
+  it("the open menu is fixed to both screen edges, with no minimum width", () => {
+    const css = readFileSync(join(APP, "globals.css"), "utf8");
+    const menu = /\n\.site-menu \{([^}]*)\}/.exec(css)![1]!;
+    expect(menu).toContain("position: fixed");
+    expect(menu).toMatch(/right: 0;[\s\S]*left: 0;/);
+    expect(menu).not.toMatch(/min-width|width:/);
   });
 });

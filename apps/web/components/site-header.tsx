@@ -31,6 +31,13 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 export function SiteHeader({ t }: { t: ShellText }) {
   const current = currentPage(usePathname());
   const [open, setOpen] = useState(false);
+  // A new page (a menu link, Back or Forward): the menu closes. Done while rendering, as React
+  // recommends for state that follows a prop; focus then belongs to the new page.
+  const [openedOn, setOpenedOn] = useState(current);
+  if (openedOn !== current) {
+    setOpenedOn(current);
+    setOpen(false);
+  }
   const headerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -157,7 +164,7 @@ export function PhoneMenu({ t, current, onNavigate }: { t: ShellText; current: S
       </nav>
 
       <div className="mx-4 mt-2 flex flex-col gap-2.5 border-t border-line pt-5">
-        <span id={`${MENU_ID}-theme`} aria-hidden="true" className="field-label">
+        <span aria-hidden="true" className="field-label">
           {th.label}
         </span>
         <Toggle
