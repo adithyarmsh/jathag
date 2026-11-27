@@ -34,7 +34,7 @@ import {
   SAMPLE_HREF,
 } from "./chart-page";
 import { clockChoiceView } from "./clock-choice";
-import { activeIndex, SECTIONS, sectionFromHash } from "./contents";
+import { activeIndex, readingLine, SECTIONS, sectionFromHash } from "./contents";
 import { formDate, formFromBirth, requestFromForm } from "./form-values";
 import { listContext } from "./list-context";
 import type { BirthInputs, Profile } from "./profiles";
@@ -356,14 +356,59 @@ describe("contents panel (D-138 Q1–Q3)", () => {
     expect(phone).toContain('aria-label="Close contents"');
   });
 
-  it("the current section follows the scroll (reading line, page bottom) and the address hash", () => {
-    expect(activeIndex([0, 400, 900], 200, false)).toBe(0);
-    expect(activeIndex([-600, 150, 900], 200, false)).toBe(1);
-    expect(activeIndex([-1600, -900, 200], 200, false)).toBe(2);
-    expect(activeIndex([-1600, 100, 700], 200, true)).toBe(2);
-    expect(activeIndex([], 200, false)).toBe(0);
+  it("the address hash names a section", () => {
     expect(sectionFromHash("#sade-sati")).toBe("sade-sati");
     expect(sectionFromHash("#nope")).toBeNull();
+  });
+});
+
+// Fix after D-139: the current section is judged against the line where jumps land (the page's
+// scroll-padding-top: header 69 + gap 24 + the fixed bar + 32 on desktop; 80 on phones) + 16 px.
+describe("which section is current", () => {
+  /** Section tops on screen after a jump to section `i`: it sits exactly where jumps land. */
+  const afterJump = (i: number, landing: number) => SECTIONS.map((_, k) => landing + (k - i) * 900);
+  const desktopLanding = (barHeight: number) => 69 + 24 + barHeight + 32;
+
+  it.each(SECTIONS.map((id, i) => [id, i] as const))("desktop, fixed bar: after a jump to %s, that section is current", (_id, i) => {
+    for (const bar of [92, 116]) {
+      const landing = desktopLanding(bar);
+      expect(activeIndex(afterJump(i, landing), readingLine(landing), false)).toBe(i);
+      // a jump landing a few pixels lower (rounding, a smooth scroll ending early) still counts
+      expect(activeIndex(afterJump(i, landing + 10), readingLine(landing), false)).toBe(i);
+    }
+  });
+
+  it("the old bug: a section just under the bar was not current on a shorter screen", () => {
+    const landing = desktopLanding(116); // the sample chart's bar: 241 px
+    const oldLine = Math.min(260, Math.max(140, Math.round(740 * 0.3))); // the old 30 % line on a 740 px window: 222
+    expect(activeIndex(afterJump(3, landing), oldLine, false)).toBe(2); // the previous one stayed highlighted
+    expect(activeIndex(afterJump(3, landing), readingLine(landing), false)).toBe(3);
+  });
+
+  it("phones (no fixed bar): the line is just under the header", () => {
+    const landing = 80;
+    for (const i of [1, 4, 5]) expect(activeIndex(afterJump(i, landing), readingLine(landing), false)).toBe(i);
+  });
+
+  it("scrolling by hand: a section counts once its top reaches the line, not before", () => {
+    const line = readingLine(217);
+    expect(activeIndex([-1500, -300, line + 1, 1600], line, false)).toBe(1);
+    expect(activeIndex([-1500, -300, line, 1600], line, false)).toBe(2);
+    expect(activeIndex([300, 1200], line, false)).toBe(0); // the top of the page
+  });
+
+  it("at the very end of the page the last section is current, even if its top can't reach the line", () => {
+    expect(activeIndex([-4000, -3000, -2000, -1000, -400, 120, 520], readingLine(217), true)).toBe(6);
+    expect(activeIndex([], 233, false)).toBe(0);
+  });
+
+  it("the tracker measures against the page's scroll-padding-top, on scroll, resize and page-height changes; a chosen section is current at once", () => {
+    const src = readFileSync(join(WEB, "app/contents-panel.tsx"), "utf8");
+    expect(src).toContain("readingLine(pad)");
+    expect(src).toContain("getComputedStyle(root).scrollPaddingTop");
+    for (const ev of ['"scroll"', '"resize"', "ResizeObserver", '"scrollend"']) expect(src).toContain(ev);
+    expect(src).toMatch(/window\.dispatchEvent\(new CustomEvent\(CHOSEN, \{ detail: id \}\)\);\n\s+const reduce/);
+    expect(readFileSync(join(WEB, "app/chart-page.tsx"), "utf8")).toContain("goToSection(id, { instant: true, focus: false })");
   });
 });
 

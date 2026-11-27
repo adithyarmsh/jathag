@@ -39,7 +39,7 @@ import {
   type ChartSource,
 } from "@/lib/chart-page";
 import { browserStore, readChartStyle, type ChartStyle } from "@/lib/chart-style";
-import { headingId } from "@/lib/contents";
+import { headingId, sectionFromHash } from "@/lib/contents";
 import { formFromBirth } from "@/lib/form-values";
 import type { Messages } from "@/lib/i18n";
 import { listContext } from "@/lib/list-context";
@@ -50,7 +50,7 @@ import { Divider } from "@/components/divider";
 import { findProfile, markOpened } from "@/components/profiles-store";
 import { BirthChartSection } from "./birth-chart-section";
 import { BirthFormCard, type FormDone } from "./birth-form";
-import { ContentsPanel, useActiveSection } from "./contents-panel";
+import { ContentsPanel, goToSection, useActiveSection } from "./contents-panel";
 import { DashaList } from "./dasha-list";
 import { LifeAreaList } from "./life-area-list";
 import { ChartSection } from "./list-bits";
@@ -164,8 +164,8 @@ export function ChartPage({ t }: { t: Messages }) {
   useEffect(() => {
     if (!ctx || jumped.current) return;
     jumped.current = true;
-    const id = window.location.hash.slice(1);
-    if (id) document.getElementById(id)?.scrollIntoView({ block: "start" });
+    const id = sectionFromHash(window.location.hash);
+    if (id) goToSection(id, { instant: true, focus: false });
   }, [ctx]);
 
   /** "Update chart" succeeded: the profile is saved; show the new result and go back to the chart. */
@@ -180,11 +180,7 @@ export function ChartPage({ t }: { t: Messages }) {
     setStatus({ kind: "ready", result: done.result });
     setEditOpen(false);
     setEditKey((k) => k + 1);
-    requestAnimationFrame(() => {
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      document.getElementById("chart")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-      document.getElementById(headingId("chart"))?.focus({ preventScroll: true });
-    });
+    requestAnimationFrame(() => goToSection("chart"));
   }
 
   // The fixed bar's height (desktop, D-139): the contents column and section jumps sit below it.

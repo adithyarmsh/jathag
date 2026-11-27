@@ -16,61 +16,103 @@
 //
 // Items are links to the section anchors (#right-now …), so they work without JavaScript. With it,
 // choosing one scrolls smoothly (instantly with reduced motion), moves focus to the section's heading and
-// puts the section in the address (replaceState: Back still goes to the page before). The current item
-// follows the scroll: an IntersectionObserver on the sections triggers lib/contents.ts activeIndex.
+// puts the section in the address (replaceState: Back still goes to the page before). The chosen item is
+// current at once; otherwise the current item follows the scroll (useActiveSection, lib/contents.ts).
 
 import { useCallback, useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import type { Messages } from "@/lib/i18n";
-import { activeIndex, headingId, SECTIONS, type SectionId } from "@/lib/contents";
+import { activeIndex, headingId, readingLine, SECTIONS, type SectionId } from "@/lib/contents";
 import { trapFocusIndex } from "@/lib/shell";
 import { CloseIcon } from "@/components/icons";
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
-/** The reading line: about a third down the screen, well below the sticky header (60 / 68 px). */
-const readingLine = () => Math.min(260, Math.max(140, Math.round(window.innerHeight * 0.3)));
+/** Sent when a section is chosen (panel, jump link, #address on load): it is current at once. */
+const CHOSEN = "jathag-section-chosen";
+/** No scroll event for this long: a jump's scroll has ended (where the browser has no scrollend). */
+const SCROLL_IDLE_MS = 150;
 
 type Text = Messages["chartPage"]["contents"];
 
 /**
- * The current section while scrolling. `sections` changes whenever the sections are drawn anew (a new
- * result remounts some of them), so the observer always watches the elements on screen.
+ * The current section while scrolling (fix after D-139). Measured on scroll and resize (once per frame)
+ * and whenever the page changes height (e.g. the edit panel opens), against the line where jumps land
+ * (lib/contents.ts readingLine: the page's scroll-padding-top, which includes the fixed details bar on
+ * desktop). A chosen section is current at once and stays current until the reader scrolls by hand
+ * after the jump's own scroll has ended, so it never flickers through the sections in between and still
+ * holds when the page ends before its heading can reach the line.
+ * `sections` changes whenever the sections are drawn anew, so the right elements are measured.
  */
 export function useActiveSection(sections: unknown): SectionId {
   const [active, setActive] = useState<SectionId>("chart");
   useEffect(() => {
-    if (!sections || typeof IntersectionObserver === "undefined") return;
+    if (!sections) return;
     const els = SECTIONS.map((id) => document.getElementById(id)).filter((e): e is HTMLElement => e !== null);
     if (els.length === 0) return;
     let frame = 0;
+    let pinned: SectionId | null = null;
+    let jumping = false;
+    let idle: number | undefined;
     const measure = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
+        if (pinned) return setActive(pinned);
+        const root = document.documentElement;
+        const pad = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
         const tops = els.map((e) => e.getBoundingClientRect().top);
-        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-        setActive(SECTIONS[activeIndex(tops, readingLine(), atBottom)]!);
+        const atEnd = window.innerHeight + window.scrollY >= root.scrollHeight - 4;
+        setActive(SECTIONS[activeIndex(tops, readingLine(pad), atEnd)]!);
       });
     };
-    // Fires whenever a section crosses one of these lines; no scroll listener is needed.
-    // A thin band at the reading line: a section entering or leaving it changes the current one.
-    const line = readingLine();
-    const io = new IntersectionObserver(measure, { rootMargin: `-${line}px 0px -${window.innerHeight - line - 1}px 0px` });
-    els.forEach((e) => io.observe(e));
+    const jumpEnded = () => {
+      jumping = false;
+    };
+    const waitForEnd = () => {
+      window.clearTimeout(idle);
+      idle = window.setTimeout(jumpEnded, SCROLL_IDLE_MS);
+    };
+    const onScroll = () => {
+      if (jumping) waitForEnd();
+      else pinned = null; // the reader scrolls: back to measuring
+      measure();
+    };
+    const onChosen = (e: Event) => {
+      pinned = (e as CustomEvent<SectionId>).detail;
+      jumping = true;
+      waitForEnd();
+      setActive(pinned);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scrollend", jumpEnded);
+    window.addEventListener("resize", measure);
+    window.addEventListener(CHOSEN, onChosen);
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    ro?.observe(document.body);
     measure();
     return () => {
-      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scrollend", jumpEnded);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener(CHOSEN, onChosen);
+      ro?.disconnect();
       cancelAnimationFrame(frame);
+      window.clearTimeout(idle);
     };
   }, [sections]);
   return active;
 }
 
-/** Scroll to a section, focus its heading and put it in the address (without a history entry). */
-export function goToSection(id: SectionId) {
+/**
+ * Go to a section: it becomes current at once; the page scrolls (smoothly unless reduced motion, or
+ * instantly for an address on load), focus moves to its heading and the section goes in the address
+ * (without a history entry).
+ */
+export function goToSection(id: SectionId, { instant = false, focus = true }: { instant?: boolean; focus?: boolean } = {}) {
   const section = document.getElementById(id);
   if (!section) return;
+  window.dispatchEvent(new CustomEvent(CHOSEN, { detail: id }));
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  section.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  document.getElementById(headingId(id))?.focus({ preventScroll: true });
+  section.scrollIntoView({ behavior: instant || reduce ? "auto" : "smooth", block: "start" });
+  if (focus) document.getElementById(headingId(id))?.focus({ preventScroll: true });
   window.history.replaceState(window.history.state, "", `#${id}`);
 }
 
