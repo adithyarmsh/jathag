@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptySky, extendSky, OPACITY_MAX, OPACITY_MIN, STAR_MAX, STAR_MIN, starCount, starsInRect, type Random } from "./stars";
+import { emptySky, extendSky, OPACITY_MAX, OPACITY_MIN, STAR_MAX, STAR_MIN, STARS_PER_TILE, starCount, starsInRect, type Random } from "./stars";
 
 /** A repeatable random source (mulberry32) so tests can fix the sequence. */
 function seeded(seed: number): Random {
@@ -14,10 +14,11 @@ function seeded(seed: number): Random {
 }
 
 describe("background stars", () => {
-  it("count follows the area: 28 per 320 × 320 px (twice the old 14)", () => {
-    expect(starCount(320, 320)).toBe(28);
-    expect(starCount(640, 320)).toBe(56);
-    expect(starCount(360, 3000)).toBe(295);
+  it("count follows the area: 38 per 320 × 320 px (D-140: about 35% more than the 28 of D-117)", () => {
+    expect(STARS_PER_TILE).toBe(38);
+    expect(starCount(320, 320)).toBe(38);
+    expect(starCount(640, 320)).toBe(76);
+    expect(starCount(360, 3000)).toBe(401); // 360 × 3000 × 38 / 320² = 400.8
     expect(starCount(0, 500)).toBe(0);
     expect(starCount(-1, 500)).toBe(0);
   });
@@ -66,7 +67,7 @@ describe("background stars", () => {
     const s3 = extendSky(s2, 1280, 3000, r); // wider window
     expect(s3.stars.slice(0, s2.stars.length)).toEqual(s2.stars);
     for (const s of s3.stars.slice(s2.stars.length)) expect(s.x).toBeGreaterThanOrEqual(360);
-    // Density stays about 28 per tile over the whole area
+    // Density stays about 38 per tile over the whole area
     expect(s3.stars.length / starCount(1280, 3000)).toBeCloseTo(1, 1);
     // Shrinking changes nothing
     expect(extendSky(s3, 360, 500, r)).toBe(s3);

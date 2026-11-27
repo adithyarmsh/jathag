@@ -6,8 +6,13 @@
 // The layer covers the body, scrolls with the page, takes no clicks, is hidden from screen readers and
 // grows with the page (new stars only in the new area, nothing moves). Every text on the page
 // sits on solid surfaces (cards, the header, the Beta band and the footer). Nothing is stored.
+// The stars are grouped under SKY_ID so the chart page's desktop gap (app/gap-stars.tsx, D-140) can
+// show the very same stars without drawing them twice.
 
 import { useEffect, useRef, useState } from "react";
+
+/** The id of the group holding every star (re-used by app/gap-stars.tsx). */
+export const SKY_ID = "jathag-sky";
 import { emptySky, extendSky, STAR_PATH, type StarSky } from "@/lib/stars";
 
 export function StarField() {
@@ -31,14 +36,16 @@ export function StarField() {
           <defs>
             <path id="jathag-star" d={STAR_PATH} />
           </defs>
-          {sky.stars.map((s, i) => (
-            <use
-              key={i}
-              href="#jathag-star"
-              transform={`translate(${s.x.toFixed(1)} ${s.y.toFixed(1)}) scale(${(s.size / 2).toFixed(3)})`}
-              opacity={s.opacity.toFixed(2)}
-            />
-          ))}
+          <g id={SKY_ID}>
+            {sky.stars.map((s, i) => (
+              <use
+                key={i}
+                href="#jathag-star"
+                transform={`translate(${s.x.toFixed(1)} ${s.y.toFixed(1)}) scale(${(s.size / 2).toFixed(3)})`}
+                opacity={s.opacity.toFixed(2)}
+              />
+            ))}
+          </g>
         </svg>
       )}
     </div>

@@ -542,7 +542,8 @@
       "oneLiner": "The Vimshottari cycle: 120 years of planetary periods, starting from the Moon's birth star. Bar length shows how long each chapter lasts.",
       "length": "{n} yrs",
       "beganOn": "Began before birth, on {date}",
-      "nowSuffix": " · now"
+      "nowSuffix": " · now",
+      "antarNote": "Each one holds nine short-term periods, the Pratyantardashas. Open one to see them."
     },
     "lifeAreas": {
       "eyebrow": "Life areas",

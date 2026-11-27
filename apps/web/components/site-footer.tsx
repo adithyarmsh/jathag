@@ -10,7 +10,7 @@ import { STEP, versionLabel } from "@/lib/version";
 export function SiteFooter({ t, commit }: { t: Messages["footer"]; commit: string | undefined }) {
   return (
     <footer className="site-footer mt-auto border-t border-line">
-      <div className="type-small mx-auto flex max-w-[1168px] flex-col gap-3 px-4 pt-6 pb-7 text-muted sm:px-6 lg:flex-row lg:justify-between lg:gap-6">
+      <div className="type-small page-frame flex max-w-[1168px] flex-col gap-3 px-4 pt-6 pb-7 text-muted sm:px-6 lg:flex-row lg:justify-between lg:gap-6">
         <div className="flex flex-col gap-3 lg:gap-1.5">
           <nav aria-label={t.label}>
             <ul className="flex flex-wrap gap-x-4 gap-y-1 lg:gap-x-[18px]">

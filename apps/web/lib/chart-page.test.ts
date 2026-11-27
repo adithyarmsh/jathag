@@ -33,6 +33,7 @@ import {
   SAMPLE_BIRTH,
   SAMPLE_HREF,
 } from "./chart-page";
+import { mahaRowViews } from "./chart-sections";
 import { clockChoiceView } from "./clock-choice";
 import { activeIndex, readingLine, SECTIONS, sectionFromHash } from "./contents";
 import { formDate, formFromBirth, requestFromForm } from "./form-values";
@@ -272,6 +273,19 @@ describe("R01 on the chart page: the same values as before", () => {
     expect(v).toContain("Mars , 1986 – 1993");
     expect(v).toContain("Began before birth, on 11 Oct 1986");
     expect(v).toMatch(/Jupiter , 2011 – 2027 .*16 yrs , You are here/);
+  });
+
+  it("D-140 item 4: under the Antardashas of an opened Mahadasha, one line names the Pratyantardashas", () => {
+    const note = "Each one holds nine short-term periods, the Pratyantardashas. Open one to see them.";
+    expect(en.chartPage.dashas.antarNote).toBe(note);
+    expect(text(sections.dashas)).not.toContain(note); // nothing opened: no line
+    const jupiter = mahaRowViews(ctx).find((m) => m.row.current)!.row;
+    const opened = renderToStaticMarkup(createElement(DashaList, { ctx, initiallyOpen: [jupiter.key] }));
+    const v = text(opened);
+    expect(v).toContain(`Antardashas (medium-term) in the Jupiter Mahadasha ${note}`);
+    expect(opened.match(/class="sub-list-note"/g)).toHaveLength(1);
+    // the Antardashas really open to their Pratyantardashas on this page, so "Open one" is true
+    expect(opened).toMatch(/<button[^>]*class="sub-row sub-row-opener[^"]*"[^>]*aria-expanded="false"/);
   });
 
   it("life areas: reasons in words, Active now, the wellness line", () => {

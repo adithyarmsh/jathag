@@ -55,6 +55,7 @@ import { DashaList } from "./dasha-list";
 import { LifeAreaList } from "./life-area-list";
 import { ChartSection } from "./list-bits";
 import { PlanetTable } from "./planet-table";
+import { GapStars } from "./gap-stars";
 import { RightNow } from "./right-now";
 import { SadeSatiSection } from "./sade-sati-section";
 import { TransitList } from "./transit-list";
@@ -209,13 +210,14 @@ export function ChartPage({ t }: { t: Messages }) {
   const editStart = useMemo(() => (shown ? formFromBirth(shown.birth, shown.name === t.profiles.defaultName ? "" : shown.name) : null), [shown, t.profiles.defaultName]);
 
   return (
-    <main className="chart-main mx-auto w-full max-w-[1168px] flex-1 px-4 py-6 sm:px-6 lg:pt-2">
+    <main className="chart-main page-frame w-full max-w-[1168px] flex-1 px-4 py-6 sm:px-6 lg:pt-2">
       <noscript>
         <p className="card-outer p-4 text-[15px]">{p.noScript}</p>
       </noscript>
 
       {shown && names && (
         <div ref={barRef} className="details-sticky">
+          <GapStars />
           <section aria-label={p.details.label} className="details-bar card-outer">
             <div className="min-w-0">
               <p className="font-display text-[22px] leading-7 break-words">{names.barName}</p>

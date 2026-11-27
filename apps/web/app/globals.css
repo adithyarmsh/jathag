@@ -35,8 +35,10 @@
   --shadow-card: 0 1px 2px rgba(35,31,26,0.05), 0 8px 24px rgba(35,31,26,0.06);
   --shadow-pop: 0 12px 32px rgba(15,19,34,0.18);
 
-  /* Background stars: the accent gold at this strength (D-117, D-118) */
-  --star-strength: 0.3;
+  /* Background stars (D-117, D-118, D-140): their own colour at this strength. Light: a lighter warm
+     gold than the deep text gold, so the stars read brighter (decoration only, never used for text). */
+  --star-colour: #C49A3A;
+  --star-strength: 0.6;
 
   /* Spacing steps */
   --space-1: 4px;
@@ -81,6 +83,7 @@
     --soon-text: #F0A596;
     --soon-bg: #3A2024;
     --shadow-card: none;
+    --star-colour: var(--accent);
     --star-strength: 0.38;
     color-scheme: dark;
   }
@@ -106,6 +109,7 @@
   --soon-text: #F0A596;
   --soon-bg: #3A2024;
   --shadow-card: none;
+  --star-colour: var(--accent);
   --star-strength: 0.38;
   color-scheme: dark;
 }
@@ -206,9 +210,9 @@ body {
 
 /* ---------------------------------------------------------------- decoration (design spec §1.6) */
 
-/* Background stars (D-117, D-118): random four-point stars drawn by app/star-field.tsx, in the accent
-   gold at --star-strength; each star adds its own 0.5–1 brightness. Behind everything, scrolls with
-   the page, never takes clicks. */
+/* Background stars (D-117, D-118, D-140): random four-point stars drawn by app/star-field.tsx, in
+   --star-colour at --star-strength; each star adds its own 0.5–1 brightness. Behind everything, the
+   full page width, scrolls with the page, never takes clicks. */
 .star-field {
   position: absolute;
   inset: 0;
@@ -218,7 +222,7 @@ body {
 }
 .star-field-svg {
   display: block;
-  fill: var(--accent);
+  fill: var(--star-colour);
   opacity: var(--star-strength);
   animation: star-fade-in 600ms var(--ease);
 }
@@ -310,7 +314,7 @@ body {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 150ms var(--ease), border-color 150ms var(--ease);
+  transition: scale 150ms var(--ease), border-color 150ms var(--ease);
 }
 .btn-main {
   min-height: 50px;
@@ -353,7 +357,7 @@ body {
   line-height: 20px;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 150ms var(--ease), border-color 150ms var(--ease);
+  transition: scale 150ms var(--ease), border-color 150ms var(--ease);
 }
 .chip[aria-pressed="true"],
 .chip[aria-current="page"],
@@ -364,10 +368,24 @@ body {
   font-weight: 600;
 }
 
-/* Hover grow (motion 2): pointer devices only, never with reduced motion, never when disabled */
+/* Hover grow (motion 2, extended by D-140 item 3): every clickable thing grows a little under a mouse,
+   so it reads as clickable. ONE rule for all of them: each kind only says how much (--grow): buttons
+   ×1.02, small things (chips, toggle options, icon buttons, the "i", the contents dashes and button)
+   ×1.03, big full-width rows and cards ×1.01. Pointer devices with hover only, never with reduced
+   motion, never when disabled or switched off, not the already selected toggle option. It uses the
+   `scale` property (transform only: nothing around it moves) so it never fights a control's own
+   transform. Links inside running text never grow (the line would jump); they change their underline
+   instead (.footer-link, .clock-note-link). Tested in lib/hover-grow.test.ts. */
+.btn, .profile-btn, .nav-link, .sample-link, .advanced-toggle { --grow: 1.02; }
+.chip, .toggle-option, .icon-button, .info-button, .contents-dashes, .contents-fab { --grow: 1.03; }
+.contents-item, .option-card, .radio-card, .check-row, .opener-button, .sub-row-opener, .jump-row, .menu-row { --grow: 1.01; }
+:where(.btn, .profile-btn, .nav-link, .sample-link, .advanced-toggle, .chip, .toggle-option, .icon-button, .info-button, .contents-dashes, .contents-fab, .contents-item, .option-card, .radio-card, .check-row, .opener-button, .sub-row-opener, .jump-row, .menu-row) {
+  transition: scale 150ms var(--ease);
+}
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .btn:hover:not(:disabled):not([aria-disabled="true"]) { transform: scale(1.02); }
-  .chip:hover { transform: scale(1.03); }
+  :is(.btn, .profile-btn, .nav-link, .sample-link, .advanced-toggle, .chip, .toggle-option, .icon-button, .info-button, .contents-dashes, .contents-fab, .contents-item, .option-card, .radio-card, .check-row, .opener-button, .sub-row-opener, .jump-row, .menu-row):hover:not(:disabled, [aria-disabled="true"], [aria-checked="true"], .radio-card-off) {
+    scale: var(--grow);
+  }
 }
 @media (hover: hover) {
   .btn-quiet:hover:not(:disabled):not([aria-disabled="true"]),
@@ -415,7 +433,7 @@ body {
   font-size: 13px;
   line-height: 18px;
   cursor: pointer;
-  transition: color 240ms var(--ease);
+  transition: color 240ms var(--ease), scale 150ms var(--ease);
 }
 .toggle-option[aria-checked="true"] {
   color: var(--on-accent);
@@ -700,8 +718,16 @@ body {
   font-size: 13px;
   font-weight: 600;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
   cursor: pointer;
+}
+/* A link inside a sentence: no growing (D-140 item 3), a thicker underline in the fill gold instead */
+@media (hover: hover) {
+  .clock-note-link:hover {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent);
+  }
 }
 
 /* ---------------------------------------------------------------- the full birth form (0.4.6, spec §5.2, D-134) */
@@ -1042,6 +1068,17 @@ body {
   font-variant-numeric: lining-nums;
 }
 
+/* The page frame (D-140 item 1): the 1168 px column of the header, the chart page, the home page and the
+   footer, centred on a WHOLE pixel. "mx-auto" centred it on a half pixel whenever the window minus the
+   1168 px was odd (e.g. 1265 px wide inside a 1280 px window: 48.5 px each side). The fixed details bar
+   is drawn on its own layer, which the browser snaps to whole pixels apart from the content below it,
+   so on a normal (non-Retina) screen the bar's right edge and the content's could end 1 px apart.
+   Rounding the left margin down puts every edge in the column on whole pixels. */
+.page-frame {
+  margin-inline: auto; /* browsers without CSS round() keep plain centring */
+  margin-left: max(0px, round(down, calc((100% - 1168px) / 2), 1px));
+}
+
 /* ---------------------------------------------------------------- the chart page (0.5.1, spec §6, D-138) */
 
 /* Page frame: details bar, the edit panel, then the contents column + the sections. On phones the
@@ -1069,6 +1106,31 @@ body {
   html:has(.details-sticky) {
     scroll-padding-top: calc(69px + 24px + var(--details-h, 90px) + 32px);
   }
+  /* D-140 item 2b: the same background stars, seen passing in the gap (app/gap-stars.tsx). The gap
+     stays solid, so the page content still disappears under it; only the star copy shows. */
+  .gap-stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+}
+.gap-stars {
+  display: none;
+}
+@media (width >= 64rem) {
+  .gap-stars { display: block; }
+}
+.gap-stars-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  fill: var(--star-colour);
+  opacity: var(--star-strength);
 }
 .details-bar {
   display: flex;
@@ -1283,7 +1345,7 @@ body {
   box-shadow: var(--shadow-pop);
   color: var(--ink);
   cursor: pointer;
-  transition: opacity 200ms var(--ease);
+  transition: opacity 200ms var(--ease), scale 150ms var(--ease);
 }
 .contents-fab[data-hidden] {
   opacity: 0;
@@ -1630,6 +1692,13 @@ body {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--muted);
+}
+/* D-140 item 4: one line naming the third level under the Antardashas' label */
+.sub-list-label + .sub-list-note {
+  margin: -2px 0 8px;
+  font-size: 13px;
+  line-height: 20px;
   color: var(--muted);
 }
 .airy-list {

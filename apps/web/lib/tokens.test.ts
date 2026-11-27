@@ -72,11 +72,20 @@ describe("design tokens: tokens.json ↔ globals.css", () => {
     expect(value(darkSwitch, "shadow-card")).toBe("none");
   });
 
-  it("background stars keep their strength (0.3 light, 0.38 dark) and use the accent", () => {
-    expect(value(light, "star-strength")).toBe("0.3");
+  it("background stars: their own colour (D-140: lighter warm gold in light, the accent in dark) and strength", () => {
+    expect(value(light, "star-colour")).toBe("#C49A3A");
+    expect(value(darkDevice, "star-colour")).toBe("var(--accent)");
+    expect(value(darkSwitch, "star-colour")).toBe("var(--accent)");
+    expect(value(light, "star-strength")).toBe("0.6");
     expect(value(darkDevice, "star-strength")).toBe("0.38");
     expect(value(darkSwitch, "star-strength")).toBe("0.38");
-    expect(block(".star-field-svg")).toContain("fill: var(--accent)");
+    expect(block(".star-field-svg")).toContain("fill: var(--star-colour)");
+    expect(block(".gap-stars-svg")).toContain("fill: var(--star-colour)");
+  });
+
+  it("--star-colour is decoration only: used as a star fill, never for text, borders or backgrounds", () => {
+    const uses = [...css.matchAll(/([\w-]+):\s*var\(--star-colour\)/g)].map((m) => m[1]);
+    expect(uses).toEqual(["fill", "fill"]); // the star field and its copy in the desktop gap
   });
 
   it("the browser's address-bar colours are the bg token", () => {

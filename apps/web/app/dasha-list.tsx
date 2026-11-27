@@ -6,7 +6,8 @@
 // current row is highlighted with "You are here"; the one running at birth says "Began before birth, on
 // <date>"; periods that ended before birth are not shown (D-113 item 3). A row opens to its Antardashas
 // (start dates; the current one "· now"), and each Antardasha to its Pratyantardashas. Sub-rows are only
-// put on the page when opened (up to 729 Pratyantardashas otherwise). No link to the timeline page yet (0.6.1).
+// put on the page when opened (up to 729 Pratyantardashas otherwise). Under an opened Mahadasha's
+// Antardashas, one line names the third level (D-140 item 4). No link to the timeline page yet (0.6.1).
 
 import { useState } from "react";
 import { fill } from "@/lib/chart-format";
@@ -21,10 +22,10 @@ function subLabel(child: DashaLevel, parent: PeriodRow, ctx: ListContext) {
   return fill(t.subListLabel, { levels: t.levelsPlural[child], term: t.terms[child], lord: parent.lordName, level: t.levels[parent.level] });
 }
 
-export function DashaList({ ctx }: { ctx: ListContext }) {
+export function DashaList({ ctx, initiallyOpen = [] }: { ctx: ListContext; /** Row keys open at first (tests) */ initiallyOpen?: readonly string[] }) {
   const t = ctx.t.lists;
   const d = ctx.t.chartPage.dashas;
-  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
+  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(initiallyOpen));
   const toggle = (key: string) =>
     setOpen((s) => {
       const n = new Set(s);
@@ -137,6 +138,7 @@ export function DashaList({ ctx }: { ctx: ListContext }) {
                   <p id={`${subId}-label`} className="sub-list-label">
                     {subLabel("antardasha", r, ctx)}
                   </p>
+                  <p className="sub-list-note">{d.antarNote}</p>
                   <ol aria-labelledby={`${subId}-label`} className="antar-grid">
                     {antardashaRows(ctx, r.path[0]!).map(renderAntar)}
                   </ol>
