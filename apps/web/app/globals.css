@@ -1279,3 +1279,50 @@ body {
   text-transform: uppercase;
   color: var(--ink);
 }
+
+/* ---------------------------------------------------------------- saved profiles (0.4.7, spec §11) */
+
+/* Cards fill the row, each at least 300 px (never wider than a small phone's content) */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  align-items: start;
+  gap: 12px;
+}
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+/* Open · Edit · Delete and Keep it · Delete: three (two) equal buttons, 44 px high */
+.profile-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/* The delete check inside the card */
+.profile-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-md);
+  background-color: var(--raised);
+}
+.profile-empty-star {
+  fill: var(--accent);
+}
+/* "Cancel" on the home form's "Editing …" line: quiet text, a full 44 px to tap */
+.editing-cancel {
+  min-height: 44px;
+  color: var(--accent-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

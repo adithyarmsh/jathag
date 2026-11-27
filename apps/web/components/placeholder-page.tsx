@@ -1,6 +1,7 @@
 // A page that is not built yet (step 0.4.5, founder-confirmed: no dead links in the header or footer).
 // The app shell comes from the layout; here: an eyebrow, the page's h1, one muted line, a "Coming soon"
-// tag and a quiet button back to the home page. Each page is filled at its own roadmap step.
+// tag and a quiet button back to the home page. Each page is filled at its own roadmap step
+// (/profiles was filled in 0.4.7).
 
 import type { Metadata } from "next";
 import { getMessages, richText } from "@/lib/i18n";
@@ -8,7 +9,7 @@ import { ButtonLink } from "./button";
 import { Card } from "./card";
 import { Tag } from "./tag";
 
-export type PlaceholderKey = "profiles" | "settings" | "about" | "faq" | "disclaimer" | "privacy" | "sources";
+export type PlaceholderKey = "settings" | "about" | "faq" | "disclaimer" | "privacy" | "sources";
 
 /** Each page's own <title> and description (SEO groundwork, spec §4); robots stay noindex (layout). */
 export function placeholderMetadata(key: PlaceholderKey): Metadata {

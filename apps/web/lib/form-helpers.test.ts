@@ -86,16 +86,32 @@ describe("chart style: South the first time, then the last choice", () => {
     expect(() => saveChartStyle(blocked, "north")).not.toThrow();
   });
 
-  it('page code stores only "theme" and "chartStyle" in the browser (no sessionStorage, no cookies)', () => {
+  // 0.4.7 (D-136): saved profiles added a third key, "profiles" (the form inputs only; lib/profiles.ts).
+  it('page code stores only "theme", "chartStyle" and "profiles" in the browser (no sessionStorage, no cookies)', () => {
     const WEB = join(import.meta.dirname, "..");
     const files = ["app", "components", "lib"].flatMap((d) =>
       readdirSync(join(WEB, d)).filter((f) => /\.tsx?$/.test(f) && !f.endsWith(".test.ts")).map((f) => join(WEB, d, f)),
     );
     const users = files.filter((f) => /localStorage/.test(readFileSync(f, "utf8"))).map((f) => f.slice(WEB.length + 1)).sort();
-    expect(users).toEqual(["app/birth-form.tsx", "app/layout.tsx" /* a comment only */, "components/theme-store.ts", "lib/chart-style.ts", "lib/theme.ts"]);
-    // birth-form.tsx only hands localStorage to the chart-style helpers.
+    expect(users).toEqual([
+      "app/birth-form.tsx",
+      "app/layout.tsx" /* a comment only */,
+      "components/profiles-store.ts",
+      "components/theme-store.ts",
+      "lib/chart-style.ts",
+      "lib/profiles.ts" /* a comment only: it is handed a store */,
+      "lib/theme.ts",
+    ]);
+    // birth-form.tsx only hands localStorage to the chart-style helpers (profiles go through profiles-store.ts).
     const form = readFileSync(join(WEB, "app/birth-form.tsx"), "utf8");
-    expect([...form.matchAll(/localStorage[^\n]*/g)].map((m) => m[0])).toEqual(['localStorage "chartStyle" (FR-IN-10).', "localStorage),", "localStorage, chartStyle);"]);
+    expect([...form.matchAll(/localStorage[^\n]*/g)].map((m) => m[0])).toEqual([
+      'localStorage "chartStyle" (FR-IN-10), and, from step 0.4.7 (D-136), the inputs',
+      "localStorage),",
+      "localStorage, chartStyle);",
+    ]);
+    // Every key written: the three constants, nothing else.
+    const keys = files.flatMap((f) => [...readFileSync(f, "utf8").matchAll(/setItem\(([^,]+),/g)].map((m) => m[1]!.trim()));
+    expect([...new Set(keys)].sort()).toEqual(["CHART_STYLE_KEY", "PROFILES_KEY", "THEME_KEY"]);
     for (const f of files) {
       const text = readFileSync(f, "utf8");
       expect(text, f).not.toMatch(/sessionStorage|document\.cookie|indexedDB/);

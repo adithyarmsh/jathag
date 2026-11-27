@@ -136,7 +136,8 @@ describe("footer", () => {
 });
 
 describe("every interactive element has an accessible name", () => {
-  const pages: PlaceholderKey[] = ["profiles", "settings", "about", "faq", "disclaimer", "privacy", "sources"];
+  // /profiles is a real page from 0.4.7 (its controls are checked in profiles-page.test.ts).
+  const pages: PlaceholderKey[] = ["settings", "about", "faq", "disclaimer", "privacy", "sources"];
   const all = [
     bar("newChart"),
     bar(null, true),
@@ -152,7 +153,6 @@ describe("every interactive element has an accessible name", () => {
 
 describe("placeholder pages and the 404", () => {
   it.each([
-    ["profiles", "Saved profiles", "Your charts"],
     ["settings", "Settings", "How Jathag looks and calculates"],
     ["about", "About", "A birth chart, explained plainly"],
     ["faq", "FAQ", "Questions people ask first"],

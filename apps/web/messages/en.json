@@ -31,7 +31,9 @@
       "about": "What Jathag is",
       "faq": "Common questions"
     },
-    "moreLabel": "More about Jathag"
+    "moreLabel": "More about Jathag",
+    "profilesCountOne": "1 in this browser",
+    "profilesCount": "{n} in this browser"
   },
   "hero": {
     "nativeWordsLabel": "“Birth chart” in Indian languages",
@@ -57,6 +59,7 @@
   },
   "form": {
     "srTitle": "Your birth details",
+    "editing": { "line": "Editing {name}. See my chart saves your changes.", "cancel": "Cancel" },
     "name": { "label": "Name" },
     "date": {
       "label": "Date of birth",
@@ -443,6 +446,32 @@
       "currentMark": "current {level}"
     }
   },
+  "profiles": {
+    "defaultName": "My chart",
+    "newChart": "New chart",
+    "notice": "Profiles are saved only in this browser. Clearing browser data removes them.",
+    "listLabel": "Saved charts",
+    "loading": "Reading your saved charts…",
+    "when": "{date} · {time}",
+    "open": "Open",
+    "edit": "Edit",
+    "delete": "Delete",
+    "openLabel": "Open {name}",
+    "editLabel": "Edit {name}",
+    "deleteLabel": "Delete {name}",
+    "confirm": {
+      "question": "Delete {name}'s profile?",
+      "text": "It is removed from this browser and can't be brought back.",
+      "keep": "Keep it",
+      "delete": "Delete"
+    },
+    "deleted": "{name} deleted.",
+    "empty": {
+      "heading": "No saved charts yet",
+      "text": "Every chart you make is kept here, in this browser only.",
+      "action": "Make a chart"
+    }
+  },
   "footer": {
     "label": "Footer",
     "links": {
@@ -463,7 +492,7 @@
     "placeholder": { "text": "This page is on its way.", "comingSoon": "Coming soon", "back": "Back to the home page" },
     "profiles": {
       "title": "Saved profiles · Jathag",
-      "description": "Your saved birth charts, kept only in this browser. This page is on its way.",
+      "description": "Your saved birth charts, kept only in this browser. Open, edit or delete them.",
       "eyebrow": "Saved profiles",
       "heading": "Your charts"
     },
