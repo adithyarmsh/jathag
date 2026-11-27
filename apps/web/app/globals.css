@@ -395,6 +395,15 @@ body {
   transition: transform 240ms var(--ease);
   pointer-events: none;
 }
+.toggle[data-invalid] {
+  border: 2px solid var(--error);
+  padding: 2px;
+}
+.toggle[data-invalid] .toggle-fill {
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+}
 .toggle-option {
   position: relative; /* above the fill */
   flex: 1;
@@ -648,15 +657,17 @@ body {
   box-decoration-break: clone;
 }
 
-/* The circled "i" next to the date (D-092): ink = black in light mode, ivory in dark mode, NOT gold.
-   The pop-over is positioned against the date row, so it is never wider than the card.
-   Retired in 0.4.6 (spec §3.8). */
+/* The circled "i" next to the date (D-092, kept by D-134): ink = black in light mode, ivory in dark
+   mode, NOT gold. The pop-over is positioned against the date row, so it is never wider than the card;
+   it ends with the link to the "Which clock?" choice in Advanced settings (0.4.6). */
 .clock-note-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  /* a 44 px touch target that does not make the 24 px label row taller */
+  width: 44px;
+  height: 44px;
+  margin: -10px -8px;
   border-radius: 9999px;
   color: var(--ink);
   cursor: pointer;
@@ -680,6 +691,174 @@ body {
 }
 .clock-note-popover[hidden] {
   display: none;
+}
+.clock-note-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  min-height: 24px;
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- the full birth form (0.4.6, spec §5.2, D-134) */
+
+/* Field labels on the form are larger than the §3.4 default (D-134 item 1); also the Advanced headings */
+.form-label {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Option cards (chart style) and radio cards (clock, birth-time certainty): a real radio inside a
+   label. Selected = 2 px accent edge (+ accent-soft fill for the chart style, spec §3.5 highlighted). */
+.radio-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--card);
+  cursor: pointer;
+}
+.radio-card:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.radio-card:has(input:focus-visible),
+.option-card:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.radio-card input[type="radio"] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+/* Shown but switched off (D-132): 50 %, never selectable */
+.radio-card-off {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.option-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 12px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+}
+.option-card:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 600;
+}
+.option-card svg { color: var(--muted); }
+.option-card:has(input:checked) svg { color: var(--accent-text); }
+
+/* Checkbox rows inside Advanced settings */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.check-row input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+/* "Advanced settings": a small text link with a chevron that turns (motion 4) */
+.advanced-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--accent-text);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.advanced-chevron {
+  transition: transform 240ms var(--ease);
+}
+.advanced-toggle[aria-expanded="true"] .advanced-chevron {
+  transform: rotate(180deg);
+}
+/* Opens inside the card, which grows (motion 4, 240 ms). Closed = not shown, not focusable, not read. */
+.advanced-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 240ms var(--ease), visibility 0s linear 240ms;
+}
+.advanced-panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 240ms var(--ease), visibility 0s;
+}
+.advanced-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  /* room for focus rings, which the hidden overflow would otherwise cut off */
+  margin: -4px;
+  padding: 4px;
+}
+
+/* State B: an indeterminate gold bar (spec §6.12); a still, part-filled bar with reduced motion */
+.busy-bar {
+  position: relative;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--line);
+}
+.busy-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  border-radius: var(--radius-pill);
+  background-color: var(--accent);
+  animation: busy-slide 1.2s var(--ease) infinite;
+}
+@keyframes busy-slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advanced-chevron,
+  .advanced-panel,
+  .advanced-panel[data-open] {
+    transition: none;
+  }
+  .busy-bar::after {
+    animation: none;
+    transform: translateX(75%);
+  }
 }
 
 /* Tables (spec §3.11): header 12 px 600 muted, rows 14 px with 1 px line separators */
@@ -713,9 +892,10 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* "What you'll get" is rendered once (D-094 item 10a). Desktop: inside the hero card. Phones and
-   tablets: the hero box dissolves, so its intro (a card of its own) and the cards become items of the
-   page grid; the cards go last, after the form and the planet table (D-064). */
+/* Home layout (spec §5.1, 0.4.6). "What you'll get" is rendered once (D-094 item 10a): on desktop in
+   the left column under the intro; on phones and tablets the hero box dissolves, so its intro and the
+   features become items of the page grid, and the features go last, after the form and the result
+   (D-064). */
 @media (width < 64rem) {
   .hero {
     display: contents;
@@ -725,14 +905,56 @@ body {
   }
 }
 @media (width >= 64rem) {
-  /* Inside the hero card on desktop the intro is not a card of its own. */
-  .hero-intro {
+  .type-hero { font-size: 56px; line-height: 62px; }
+}
+/* The B2 split (spec §1.5): form column 440 px, gap 48 px from 1024 px; 480 px and 80 px from 1200 px.
+   Plain CSS so the two widths always apply in this order. Rows keep 40 px (the dividers count on it). */
+@media (width >= 64rem) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr) 440px;
+    column-gap: 48px;
+    row-gap: 40px;
+  }
+}
+@media (width >= 1200px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr) 480px;
+    column-gap: 80px;
+  }
+}
+/* One feature: an inner card on phones (heading, line, then the tag), a plain item on desktop
+   (heading with the tag beside it, then the line). */
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+  padding: 16px;
+}
+.feature-text {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 24px;
+}
+.feature-tag {
+  margin-top: 10px;
+}
+@media (width >= 64rem) {
+  .feature-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 10px;
     border: 0;
     border-radius: 0;
     background: none;
-    box-shadow: none;
     padding: 0;
   }
+  .feature-item .type-h3 { grid-column: 1; grid-row: 1; }
+  .feature-tag { grid-column: 2; grid-row: 1; margin-top: 0; justify-self: start; }
+  .feature-text { grid-column: 1 / -1; grid-row: 2; margin-top: 2px; }
 }
 
 /* Dropdowns: one arrow style for Day, Month, Hour and Minute, a few pixels in from the edge (D-094) */

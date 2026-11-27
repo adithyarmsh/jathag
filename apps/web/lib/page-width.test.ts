@@ -20,6 +20,9 @@ import { HeaderBar, PhoneMenu } from "../components/site-header";
 import { PlanetTable } from "../app/planet-table";
 import { TransitList } from "../app/transit-list";
 import { listContext } from "./list-context";
+import { clockChoiceView } from "./clock-choice";
+import Home from "../app/page";
+import { AdvancedSettings } from "../app/advanced-settings";
 import en from "../messages/en.json";
 
 const APP = join(import.meta.dirname, "../app");
@@ -116,5 +119,34 @@ describe("new pages and the open phone menu stay within a 360 / 390 px screen (0
     expect(menu).toContain("position: fixed");
     expect(menu).toMatch(/right: 0;[\s\S]*left: 0;/);
     expect(menu).not.toMatch(/min-width|width:/);
+  });
+});
+
+// Step 0.4.6: the home page with the full form, and Advanced settings open (coordinates ticked, and with
+// the "Which clock?" section). Measured in the browser at 360 and 390 px too, with the "i" note open and
+// a result calculated (0.4.6 PR report).
+describe("home page and the full form stay within a 360 px screen (0.4.6)", () => {
+  const PHONE_CONTENT = 360 - 2 * 16;
+  const IDS = { panel: "a", manual: "b", lat: "c", lng: "d", offset: "e", latError: "f", lngError: "g", clockLegend: "h", clockPrefix: "i", seconds: "j" };
+  const MUMBAI = { geonameId: 1275339, countryCode: "IN", admin1Code: "16", admin2Code: "", lng: 72.88261 };
+  const clock = clockChoiceView(MUMBAI, "1943-03-01", en.form.advanced.clock, en.clockNote);
+  const noop = () => {};
+  const adv = (manualOn: boolean) =>
+    renderToStaticMarkup(
+      createElement(AdvancedSettings, {
+        t: en.form.advanced, comingSoon: en.hero.comingSoon, ids: IDS, open: true, manualOn, onManual: noop, lat: "", lng: "",
+        offset: 19800, onLat: noop, onLng: noop, onOffset: noop, onCoordLeave: noop, clock, clockChoice: null, onClock: noop,
+        secondsOn: true, onSeconds: noop,
+      }),
+    );
+  const screens: [string, string][] = [
+    ["home page with the form", renderToStaticMarkup(createElement(Home))],
+    ["Advanced settings open, clock section", adv(false)],
+    ["Advanced settings open, coordinates ticked", adv(true)],
+  ];
+  it.each(screens)("%s: no fixed or minimum width wider than a phone", (_name, html) => {
+    const widths = [...html.matchAll(/(?<![\w-])(?:min-)?w-\[(\d+(?:\.\d+)?)(px|rem)\]/g)].map((m) => Number(m[1]) * (m[2] === "rem" ? 16 : 1));
+    const inline = [...html.matchAll(/style="[^"]*(?<![\w-])(?:min-)?width:\s*(\d+)px/g)].map((m) => Number(m[1]));
+    for (const w of [...widths, ...inline]) expect(w).toBeLessThanOrEqual(PHONE_CONTENT);
   });
 });

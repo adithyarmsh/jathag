@@ -1,13 +1,26 @@
 "use client";
 
-// The small circled "i" next to the date (FR-IN-09, D-092). Shown only for births in a
-// "Which clock?" window. Opens on click and on tap (phones have no hover); closes with Escape, a
-// second tap, or a tap/click outside. Colour: ink, i.e. black in light mode and ivory in dark mode
-// (deliberately not the gold accent).
+// The small circled "i" next to the date (FR-IN-09, D-092, kept by D-134 item 5). Shown only for
+// births in a "Which clock?" window. Opens on click and on tap (phones have no hover); closes with
+// Escape, a second tap, or a tap/click outside. Colour: ink, i.e. black in light mode and ivory in dark
+// mode (deliberately not the gold accent). From 0.4.6 the note ends with a link "Change it in Advanced
+// settings" (when a place is chosen), which closes the note and hands over to the form.
 
 import { useEffect, useId, useRef, useState } from "react";
 
-export function ClockNoteButton({ label, text }: { label: string; text: string }) {
+export function ClockNoteButton({
+  label,
+  text,
+  more,
+  link,
+}: {
+  label: string;
+  text: string;
+  /** An optional second line (e.g. "Once you've chosen the place, …"). */
+  more?: string;
+  /** The link at the end of the note; the form opens Advanced settings and moves focus there. */
+  link?: { label: string; onClick: () => void };
+}) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -50,7 +63,20 @@ export function ClockNoteButton({ label, text }: { label: string; text: string }
         </svg>
       </button>
       <span id={noteId} role="note" hidden={!open} className="clock-note-popover">
-        {text}
+        <span className="block">{text}</span>
+        {more && <span className="mt-2 block">{more}</span>}
+        {link && (
+          <button
+            type="button"
+            className="clock-note-link"
+            onClick={() => {
+              setOpen(false);
+              link.onClick();
+            }}
+          >
+            {link.label}
+          </button>
+        )}
       </span>
     </span>
   );

@@ -23,9 +23,16 @@ const MARK = 13; // length of the Lagna's corner line along each edge (clear of 
 
 export const SouthChart = forwardRef<
   HTMLHeadingElement,
-  { result: ChartResponse; birth: BirthShown; summary: string; t: Messages["chart"] }
+  {
+    result: ChartResponse;
+    birth: BirthShown;
+    summary: string;
+    /** One muted line above the drawing, e.g. "North Indian drawing arrives …" (0.4.6, D-134 item 7). */
+    note?: string;
+    t: Messages["chart"];
+  }
 >(
-  function SouthChart({ result, birth, summary, t }, headingRef) {
+  function SouthChart({ result, birth, summary, note, t }, headingRef) {
     const s = t.southChart;
     const boxes = southChartBoxes(result.chart, t);
     const lagna = boxes.find((b) => b.isLagna)!;
@@ -44,6 +51,7 @@ export const SouthChart = forwardRef<
           {s.heading}
         </h2>
         <p className="mt-1 text-sm text-muted">{summary}</p>
+        {note && <p className="mt-3 text-sm text-muted">{note}</p>}
         <div className="mx-auto mt-5 w-full max-w-[560px]">
           <svg
             viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}

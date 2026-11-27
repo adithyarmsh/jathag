@@ -5,10 +5,16 @@
 // Escape closes; options can be tapped. Searches start at 3 characters and wait about 0.25 s after
 // the last key (each search costs server time, D-091). Results are shown in the API's order.
 // The search text is sent in a POST body only and is never stored in the browser.
+// 0.4.6 (spec §5.2, D-134): two hints (town above the box, "add the state after a comma" below), a muted
+// "also known as Bombay" line when an old name matched (D-091 item 4), the chosen place on one line
+// ("13° 05′ N · 80° 17′ E · Asia/Kolkata (UTC+5:30)"), the "Enter coordinates yourself" link when
+// nothing is found (state D), and a set-aside look while coordinates are typed in Advanced settings.
 
 import { useEffect, useId, useRef, useState } from "react";
 import type { PlaceSuggestion as PlaceSearchResult } from "@jathag/api";
-import { fill, formatCoordinate } from "@/lib/chart-format";
+import { fill } from "@/lib/chart-format";
+import { formatCoordinateShort } from "@/lib/coordinates";
+import { alsoKnownAsLine } from "@/lib/place-suggestion";
 import type { Messages } from "@/lib/i18n";
 
 const MIN_CHARS = 3;
@@ -26,6 +32,8 @@ export function PlaceSearch({
   onLeave,
   error,
   errorId,
+  disabled = false,
+  onEnterCoordinates,
 }: {
   t: Messages["form"]["place"];
   searchError: string;
@@ -40,10 +48,16 @@ export function PlaceSearch({
   /** A friendly message for this field (from the form), or null. */
   error: string | null;
   errorId: string;
+  /** True while "Enter coordinates yourself" is ticked: the search is switched off and set aside. */
+  disabled?: boolean;
+  /** "Enter coordinates yourself" under "No places found" (state D). */
+  onEnterCoordinates: () => void;
 }) {
   const id = useId();
   const listId = `${id}-list`;
   const hintId = `${id}-hint`;
+  const hint2Id = `${id}-hint2`;
+  const asideId = `${id}-aside`;
   const chosenId = `${id}-chosen`;
 
   const [text, setText] = useState("");
@@ -147,18 +161,22 @@ export function PlaceSearch({
               ? t.resultsCountOne
               : fill(t.resultsCount, { count: results.length })
             : "";
-  // Visible status: searching / no results / search failed (the result count is for screen readers only).
-  const visibleStatus = status === "searching" || status === "error" || (status === "done" && results.length === 0);
+  // Visible status: searching / search failed (the result count is for screen readers only); "no
+  // places found" is shown with its "Enter coordinates yourself" link below.
+  const visibleStatus = status === "searching" || status === "error";
+  const noResults = status === "done" && results.length === 0;
 
-  const describedBy = [hintId, place ? chosenId : null, error ? errorId : null].filter(Boolean).join(" ");
+  const describedBy = [hintId, hint2Id, place ? chosenId : null, disabled ? asideId : null, error ? errorId : null]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="relative">
-      <label htmlFor={inputId} className="block font-semibold">
+    <div className={`relative ${disabled ? "opacity-50" : ""}`.trim()}>
+      <label htmlFor={inputId} className="form-label">
         {t.label}
       </label>
-      <p id={hintId} className="field-hint mt-1">
-        {t.hint}
+      <p id={hintId} className="field-hint mt-0.5">
+        {t.hintAbove}
       </p>
       <input
         id={inputId}
@@ -169,7 +187,8 @@ export function PlaceSearch({
         aria-controls={listId}
         aria-activedescendant={showList && active >= 0 ? `${listId}-${active}` : undefined}
         aria-describedby={describedBy}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={error && !disabled ? true : undefined}
+        disabled={disabled}
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
@@ -183,13 +202,13 @@ export function PlaceSearch({
         onFocus={() => {
           if (!place && results.length) setOpen(true);
         }}
-        className="form-input mt-2"
+        className="form-input mt-2 disabled:cursor-not-allowed"
       />
       <ul
         id={listId}
         role="listbox"
         aria-label={t.label}
-        hidden={!showList}
+        hidden={!showList || disabled}
         className="absolute right-0 left-0 z-40 mt-1 max-h-72 overflow-y-auto rounded-md border border-line bg-card py-1 shadow-[var(--shadow-pop)]"
       >
         {results.map((r, i) => (
@@ -205,22 +224,38 @@ export function PlaceSearch({
             className={`cursor-pointer px-3 py-2.5 text-[15px] leading-snug ${i === active ? "bg-accent-soft text-ink" : ""}`}
           >
             {r.label}
+            {alsoKnownAsLine(r, t) && <span className="block text-[13px] leading-5 text-muted">{alsoKnownAsLine(r, t)}</span>}
           </li>
         ))}
       </ul>
+      <p id={hint2Id} className="field-hint mt-1.5">
+        {t.hintBelow}
+      </p>
       <p aria-live="polite" className={visibleStatus ? "mt-2 text-sm text-muted" : "sr-only"}>
         {liveText}
       </p>
-      {place && (
-        <div id={chosenId} className="mt-2 space-y-0.5 text-xs text-muted">
-          <p>
-            {fill(t.chosenCoordinates, {
-              lat: formatCoordinate(place.lat, "lat"),
-              lng: formatCoordinate(place.lng, "lng"),
-            })}
-          </p>
-          <p>{fill(t.chosenTimeZone, { timeZone: place.timeZone, offset })}</p>
-        </div>
+      {noResults && !disabled && (
+        <p className="mt-1 text-sm text-muted">
+          {t.noResults}{" "}
+          <button type="button" className="clock-note-link mt-0" onClick={onEnterCoordinates}>
+            {t.enterCoordinates}
+          </button>
+        </p>
+      )}
+      {place && !disabled && (
+        <p id={chosenId} className="mt-2 text-[13px] leading-5 text-muted tabular-nums">
+          {fill(t.chosen, {
+            lat: formatCoordinateShort(place.lat, "lat"),
+            lng: formatCoordinateShort(place.lng, "lng"),
+            timeZone: place.timeZone,
+            offset,
+          })}
+        </p>
+      )}
+      {disabled && (
+        <p id={asideId} className="field-hint mt-1">
+          {t.setAside}
+        </p>
       )}
     </div>
   );

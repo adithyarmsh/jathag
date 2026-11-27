@@ -19,6 +19,8 @@ export interface PlaceSuggestion {
   admin1Code: string;
   admin2Code: string;
   featureCode: string;
+  /** The alternate or old name that matched, when it was not the main name (e.g. "Bombay" for Mumbai, D-091 item 4). */
+  matchedName?: string;
 }
 
 export interface SearchResponse {
@@ -46,6 +48,7 @@ export function searchPlaces(index: PlaceIndex, query: string): SearchResponse {
       admin1Code: p.admin1Code,
       admin2Code: p.admin2Code,
       featureCode: p.featureCode,
+      ...(p.matchedName !== undefined ? { matchedName: p.matchedName } : {}),
     })),
   };
 }

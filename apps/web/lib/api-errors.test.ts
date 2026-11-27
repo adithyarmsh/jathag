@@ -52,20 +52,21 @@ describe('error messages', () => {
 });
 
 describe('fixed wording from the handoff (D-092, D-093)', () => {
-  it('form title, Beta notice and page description (D-093; Beta band text from the design spec §4, step 0.4.5)', () => {
-    expect(en.form.title).toBe('Generate Your Chart');
-    expect(en.form.subtitle).toBe('Date, time and place of birth.');
+  it('form name for screen readers (no visible heading, D-134), Beta notice and page description (Beta band text from the design spec §4, step 0.4.5)', () => {
+    expect(en.form).not.toHaveProperty('title');
+    expect(en.form).not.toHaveProperty('subtitle');
+    expect(en.form.srTitle).toBe('Your birth details');
     expect(en.betaBand).toBe('Jathag Beta. The stars are still aligning: we are actively refining our features and design.');
     expect(en.meta.description.endsWith('Beta, stars are being aligned.')).toBe(true);
   });
   it('privacy line', () => {
     expect(en.form.privacy).toBe('Your details are only used to calculate your chart. Nothing is stored on our servers.');
   });
-  it('the single-situation notes', () => {
-    expect(en.clockNote.mumbai).toBe("In Mumbai until the 1950s, many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If your family used Bombay time, your chart may be different. You'll be able to switch soon.");
-    expect(en.clockNote.westBengal).toBe("In Kolkata and West Bengal until the late 1940s, many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If your family used Calcutta time, your chart may be different. You'll be able to switch soon.");
-    expect(en.clockNote.warTime).toBe("From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. If the time was written in IST, your chart may be different. You'll be able to switch soon.");
-    expect(en.clockNote.warTimeEarly).toBe("Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. We've calculated your chart with IST. If the time was written in War Time, your chart may be different. You'll be able to switch soon.");
-    expect(en.clockNote.before1906).toBe("Before 1906, many towns kept their own local time. Here that was about {minutes} minutes {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different. You'll be able to switch soon.");
+  it('the single-situation notes (0.4.6: "You\'ll be able to switch soon." dropped, the note now links to the clock choice, D-134)', () => {
+    expect(en.clockNote.mumbai).toBe("In Mumbai until the 1950s, many people used Bombay time, 39 minutes behind IST. We've calculated your chart with IST. If your family used Bombay time, your chart may be different.");
+    expect(en.clockNote.westBengal).toBe("In Kolkata and West Bengal until the late 1940s, many people used Calcutta time, 23 minutes 20 seconds ahead of IST. We've calculated your chart with IST. If your family used Calcutta time, your chart may be different.");
+    expect(en.clockNote.warTime).toBe("From September 1942 to October 1945 India's official clock was War Time, one hour ahead of IST, and we've used it. If the time was written in IST, your chart may be different.");
+    expect(en.clockNote.warTimeEarly).toBe("Between October 1941 and May 1942 some parts of India used War Time, one hour ahead of IST. We've calculated your chart with IST. If the time was written in War Time, your chart may be different.");
+    expect(en.clockNote.before1906).toBe("Before 1906, many towns kept their own local time. Here that was about {minutes} minutes {direction} IST. We've calculated your chart with IST. If the time was written in local time, your chart may be different.");
   });
 });

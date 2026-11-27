@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.18 · 2026-11-26 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.20 · 2026-11-27 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -49,7 +49,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started. Every step table be
 | **v0.1 Coming soon** | Live holding page; repo, CI, auto-deploy; docs + progress tracking; B2-styled Coming Soon | ✅ |
 | **v0.2 First real chart** | On the live site: enter real birth details, see planet positions that match JHora | ✅ |
 | **v0.3 Timing engine** | Dashas (3 levels), transits, Sade Sati, approximate-time results (as plain lists on the live site) | ✅ |
-| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | 🔄 (0.4.1 ✅, 0.4.2 ✅, 0.4.3 ✅, 0.4.4 ✅; next 0.4.5 app shell) |
+| **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | 🔄 (0.4.1 ✅, 0.4.2 ✅, 0.4.3 ✅, 0.4.4 ✅, 0.4.5 ✅ D-133; next 0.4.6 full birth form) |
 | **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | ⏳ |
 | **v0.6 Timing screens** | Timeline with "you are here", transits, Sade Sati card | ⏳ |
 | **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
@@ -131,8 +131,8 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 | 0.4.2 | PROJECT | Design System from B2 (tokens for dark + light with gold accents, type, spacing, components, "i" pop-up), contrast-checked | You approve | ✅ |
 | 0.4.3 | PROJECT | Mockups (phone + desktop): overview (the separate chart page, see 0.5.1), charts, planet page, timeline, transits, life area, profiles, settings, downloads, empty/error states; also the chart-type button row under the chart, the section navigation, and the About and FAQ pages (D-125) | You approve | ✅ |
 | 0.4.4 | PROJECT | Design handoff (tokens, components, screen specs): `docs/design/design-spec.md`, `tokens.json`, `mockups/`; Requirements v1.13 (D-132) | Given | ✅ |
-| 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged | ⏳ |
-| 0.4.6 | CODE | Full B2 birth form: exact time on the main form, the approximate-time modes (custom range, part-of-day presets, don't know) under Advanced settings (D-106; placement decided in the input design), place search, chart-style question (remembered), "Which clock?" question for affected births with "IST (or not sure)" pre-selected ("War Time (or not sure)" for 1942-09 – 1945-10) (FR-IN-09, D-082, D-086), validation | Merged | ⏳ |
+| 0.4.5 | CODE | App shell: header (Learn hidden), footer, theme toggle, fonts, layout grid; all UI text in message files (language-ready, D-063) | Merged | ✅ (#27, D-133) |
+| 0.4.6 | CODE | Full B2 birth form (D-134): home split from 1024 px (design spec §1.5, §5.1); "Coming soon" only on "Plain-language explanations" (D-133 carry-over); form without a heading, larger labels: Name (not marked optional), date with the old-clock "i" for historical-clock births (kept, D-092), exact time, place search with "also known as" and the Hyderabad hints, Chart style (remembered); a small "Advanced settings" link above "See my chart" opening inside the card: coordinates with a UTC-offset dropdown, "Which clock?" (only when it applies; default IST / War Time per D-082, D-086), the time choices with "I know roughly when" and "I don't know the time" switched off with "Coming soon" until 0.8.1 (D-132), seconds; privacy line kept; validation; result still under the form until 0.5.1 | Merged | ⏳ |
 | 0.4.7 | CODE | Profiles saved in the browser: list, open, edit, delete, notice | Merged | ⏳ |
 
 ## v0.5 — Chart screens
@@ -205,7 +205,7 @@ Marketing of the English web app may start any time after 1.0.5 (D-084). SEO/AEO
 | 1.1.5 | CODE | Divisional chart selector beside the main chart, both styles | Merged | ⏳ |
 | 1.1.6 | PROJECT | Accounts plan (O-008): sign-in options (email, Google, Apple, phone number, maybe Facebook), costs, privacy and DPDP rules, what is stored | You decide | ⏳ |
 | 1.1.7 | CODE | Accounts: sign-in, profiles and charts saved and synced; moving browser-saved profiles into an account | Merged; tested on phone + desktop | ⏳ |
-| 1.1.8 | PROJECT | Plan scope for Learn (v1.4–v1.6) and Indian languages (v1.7–v1.9) | You approve | ⏳ |
+| 1.1.8 | PROJECT | Plan scope for Learn (v1.4–v1.6) and Indian languages (v1.7–v1.9). **Reminder (O-011):** the founder wants Learn behind sign-in; discuss the middle path first (Learn free to read so search engines and AI answers can find it, sign-in adds the user's own chart to it) | You approve | ⏳ |
 
 ## After v1.1 (steps are detailed when we get there)
 
