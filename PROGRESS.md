@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Milestone** | v0.5 Chart screens 🔄 (0.5.1 ✅, D-138 to D-141). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
-| **Current step** | 0.5.2 Charts, in review |
-| **Next step** | 0.5.3 Planet pages |
-| **Blocked on** | Project review of the 0.5.2 PR |
-| **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.5.1, Light / Dark / Match device, placeholder pages and a 404; home page = welcome + full birth form with Advanced settings (D-134) and a "See a sample chart" link; saved profiles kept in this browser (every chart saved automatically, "Your charts" page with Open / Edit / Delete, count in the phone menu, D-136); the chart page /chart (D-138 to D-140: details bar fixed on desktop with Edit details in place, contents panel, sections Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets, South Indian Rasi chart with three fact tiles and "i" pop-ups; /chart?sample shows a made-up sample chart); `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
+| **Milestone** | v0.5 Chart screens 🔄 (0.5.1 ✅, D-138 to D-141; 0.5.2 ✅, D-143 to D-145). v0.4 Design system + app shell ✅ (0.4.1–0.4.7 done; 0.4.1–0.4.4 in the Project, D-125 to D-132; 0.4.5 D-133; 0.4.6 D-135; 0.4.7 D-137); v0.9 🔄 (0.9.1 ✅, pulled forward, D-123/D-124). v0.3 Timing engine ✅ (D-121) |
+| **Current step** | 0.5.3 Planet pages |
+| **Next step** | 0.6.1 Dasha timeline |
+| **Blocked on** | The Project's 0.5.3 handoff |
+| **Live site** | https://jathag.vercel.app (design system "Still Water": one-line header, phone menu, Beta band, footer v0.5.2, Light / Dark / Match device, placeholder pages and a 404; home page = welcome + full birth form with Advanced settings (D-134) and a "See a sample chart" link; saved profiles kept in this browser (every chart saved automatically, "Your charts" page with Open / Edit / Delete, count in the phone menu, D-136); the chart page /chart (D-138 to D-140: details bar fixed on desktop with Edit details in place, contents panel, sections Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets, drawn South / North Indian charts with Rasi (D1) / Navamsa (D9) chips, the South / North toggle (the same remembered style as the form) and an index, three fact tiles and "i" pop-ups; typed coordinates in DMS or DD, named "Near <place>" in the chart and details bar (D-144); /chart?sample shows a made-up sample chart); `POST /api/chart/range` (approximate-time scan) and the chart API's `panchanga` section have no screen yet; hidden from search engines) |
 | **Last updated** | 2026-11-28 |
 
 Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · ⏭ skipped (with reason)
@@ -101,7 +101,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 ### v0.5 — Chart screens
 - ✅ 0.5.1 Chart page (PR #30, D-138 to D-141): the chart on its own page /chart (only the profile id or "sample" in the address), seven sections in the D-129 order with a contents panel, Edit details in place with the home form, a sample chart, the first "i" pop-ups; the home page keeps only the welcome and the form; first-look changes D-139 (fixed details bar on desktop, hover pop-ups, smaller contents card, icon-only phone button); second polish round D-140 (one right edge, stars in the desktop gap, 38 stars per tile and a lighter light-mode star gold, hover grow on every clickable thing, the Pratyantardasha line); approved D-141. JHora matched (D-142).
-- 🔄 0.5.2 Drawn charts (in review): South and North Indian, Rasi (D1) and Navamsa (D9) with chips, toggle and index; coordinates in DMS or DD; "Near <place>" for typed coordinates (D-143, D-144). Done when: the founder's JHora visual check after the merge
+- ✅ 0.5.2 Drawn charts (PR #31, D-145): South and North Indian, Rasi (D1) and Navamsa (D9) with chips, toggle and index; coordinates in DMS or DD; "Near <place>" for typed coordinates (D-143, D-144). Done when: founder's JHora visual check (pending)
 - ⏳ 0.5.3 Planets table + pages
 
 ### v0.6 — Timing screens
@@ -143,6 +143,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started · ⛔ blocked · �
 
 | Date | Step | PR | What happened |
 |---|---|---|---|
+| 2026-11-28 | 0.5.2 | #31 | Approved by the Project (D-145). D-145 committed unchanged. Squash-merged; live on jathag.vercel.app. The founder's JHora visual check (South and North, D1 and D9) is still to come. |
 | 2026-11-28 | 0.5.2 | #31 | Drawn charts built (D-143, spec §7): South and North Indian SVG charts, Rasi (D1) and Navamsa (D9) (D9 houses from the D9 Lagna, (R) in both, never on Rahu/Ketu), chips and the South / North toggle under the chart (the toggle and the form's Chart style cards share "chartStyle"), the index (open on desktop, "What the letters mean" opener on phones); coordinates in DMS (default, N/E pre-selected) or DD, both sending the same decimals, profiles still version 1; "Near <place>" for typed coordinates from a new nearest-place lookup served with the place search (D-144). All 29 births match the JHora D1/D9 answer key in both styles. Waiting for Project review. |
 | 2026-11-27 | 0.5.1 | #30 | Reviewed and approved by the Project (D-141) after two founder preview rounds (D-139, D-140) and one bug fix. Squash-merged. |
 | 2026-11-27 | 0.5.1 | #30 | Founder's second polish round (D-140): the page column is now centred on a whole pixel (header, chart page, home, footer), so the fixed details bar and every block below it end on the same pixel (1280 px window: 1192 instead of 1192.5; 1440 px: 1272 instead of 1272.5; 1024 px: 985, unchanged); the background stars now show in the gap above the fixed bar on desktop (a clipped copy of the same stars, content still disappears there), 38 stars per 320 × 320 px (was 28), light mode uses a lighter star gold `--star-colour` #C49A3A at strength 0.6 (dark unchanged); one shared hover-grow rule (buttons ×1.02, small controls ×1.03, big rows and cards ×1.01; not when disabled, not links inside sentences, off with reduced motion); under an opened Mahadasha's Antardashas a line names the Pratyantardashas. D-140 committed unchanged. |
