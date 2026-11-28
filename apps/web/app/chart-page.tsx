@@ -22,10 +22,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChartResponse } from "@jathag/api";
 import { errorFor } from "@/lib/api-errors";
-import { birthSummary } from "@/lib/birth-summary";
 import {
   birthPlaceLabel,
-  birthTime24,
+  chartDateTime,
   chartHeading,
   chartHref,
   chartOwner,
@@ -36,9 +35,10 @@ import {
   pickBirth,
   requestFromBirth,
   shortPlace,
+  shownPlace,
+  typedCoords,
   type ChartSource,
 } from "@/lib/chart-page";
-import { browserStore, readChartStyle, type ChartStyle } from "@/lib/chart-style";
 import { headingId, sectionFromHash } from "@/lib/contents";
 import { formFromBirth } from "@/lib/form-values";
 import type { Messages } from "@/lib/i18n";
@@ -47,6 +47,7 @@ import type { BirthInputs } from "@/lib/profiles";
 import { Button, ButtonLink } from "@/components/button";
 import { takeHandoff, updateHandoff } from "@/components/chart-handoff";
 import { Divider } from "@/components/divider";
+import { nearestForProfile } from "@/components/nearest-place";
 import { findProfile, markOpened } from "@/components/profiles-store";
 import { BirthChartSection } from "./birth-chart-section";
 import { BirthFormCard, type FormDone } from "./birth-form";
@@ -69,14 +70,11 @@ interface Shown {
 
 type Status = { kind: "loading" } | { kind: "error"; message: string | null } | { kind: "ready"; result: ChartResponse };
 
-const storedStyle = (): ChartStyle => readChartStyle(browserStore());
-
 export function ChartPage({ t }: { t: Messages }) {
   const router = useRouter();
   const [shown, setShown] = useState<Shown | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "loading" });
   const [editOpen, setEditOpen] = useState(false);
-  const [style, setStyle] = useState<ChartStyle>("south");
   /** A new key restarts the edit form (opened again after a change or a Cancel). */
   const [editKey, setEditKey] = useState(0);
   /** The address this page last loaded (React may keep the page alive while hidden and show it again). */
@@ -130,7 +128,6 @@ export function ChartPage({ t }: { t: Messages }) {
     }
     /* eslint-disable react-hooks/set-state-in-effect -- read from the address and storage, which only exist in the browser */
     setShown(next);
-    setStyle(storedStyle());
     setEditOpen(source.kind === "profile" && source.edit);
     /* eslint-enable react-hooks/set-state-in-effect */
     if (result) {
@@ -156,6 +153,32 @@ export function ChartPage({ t }: { t: Messages }) {
     return () => mo.disconnect();
   }, [title]);
 
+  // "Near <place>" for typed coordinates (D-144): looked up once per profile (saved with it), never
+  // waited for. A profile saved before 0.5.2 (no label yet) gets it here, the first time it is opened.
+  const coords = shown ? typedCoords(shown.birth) : null;
+  const needsNear = shown?.birth.where.kind === "manual" && shown.birth.where.manual.near === undefined;
+  const nearKey = needsNear && coords ? `${shown?.id ?? ""}|${coords.lat},${coords.lng}` : null;
+  useEffect(() => {
+    if (!nearKey || !coords) return;
+    let live = true;
+    const id = shown?.id ?? null;
+    void nearestForProfile(id, coords).then((near) => {
+      if (!live || near === undefined) return;
+      setShown((s) => {
+        if (!s || s.birth.where.kind !== "manual") return s;
+        const c = typedCoords(s.birth);
+        if (!c || c.lat !== coords.lat || c.lng !== coords.lng) return s;
+        const birth = { ...s.birth, where: { kind: "manual" as const, manual: { ...s.birth.where.manual, near } } };
+        if (s.id) updateHandoff({ id: s.id, name: s.name, birth });
+        return { ...s, birth };
+      });
+    });
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per profile and pair of coordinates
+  }, [nearKey]);
+
   const ready = status.kind === "ready" ? status.result : null;
   const ctx = useMemo(() => (ready ? listContext(ready, t) : null), [ready, t]);
   const active = useActiveSection(ctx);
@@ -176,7 +199,6 @@ export function ChartPage({ t }: { t: Messages }) {
     setShown(next);
     updateHandoff({ id: done.id, name: done.name, birth: done.birth });
     if (done.id !== shown.id) window.history.replaceState(window.history.state, "", chartHref(done.id));
-    setStyle(done.style);
     latest.current++;
     setStatus({ kind: "ready", result: done.result });
     setEditOpen(false);
@@ -201,12 +223,7 @@ export function ChartPage({ t }: { t: Messages }) {
 
   const p = t.chartPage;
   const names = owner ? chartHeading(owner, p) : null;
-  const shownBirth = shown
-    ? birthSummary(
-        { name: "", date: shown.birth.date, time: birthTime24(shown.birth), place: birthPlaceLabel(shown.birth, t), repeatedTime: shown.birth.repeatedTime ?? null },
-        t,
-      ).birth
-    : null;
+  const shownBirth = shown ? { dateTime: chartDateTime(shown.birth, t), place: shownPlace(shown.birth, t) } : null;
   const editStart = useMemo(() => (shown ? formFromBirth(shown.birth, shown.name === t.profiles.defaultName ? "" : shown.name) : null), [shown, t.profiles.defaultName]);
 
   return (
@@ -303,7 +320,6 @@ export function ChartPage({ t }: { t: Messages }) {
               birth={shownBirth}
               heading={names.heading}
               place={shortPlace(birthPlaceLabel(shown.birth, t))}
-              northNote={style === "north" ? t.form.chartStyle.northNote : undefined}
               t={t}
             />
             <Divider />

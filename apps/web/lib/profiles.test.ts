@@ -225,7 +225,7 @@ describe("round trip into the form: byte-identical request bodies", () => {
   it("typed coordinates with seconds", () => {
     const v: FormValues = {
       ...EMPTY_FORM, day: "14", month: "8", year: "1992", hour: "6", minute: "45", period: "am", secondsOn: true, second: "30",
-      manualOn: true, lat: "13.0827", lng: "80.2707", utcOffset: 19800,
+      manualOn: true, coordFormat: "dd", lat: "13.0827", lng: "80.2707", utcOffset: 19800, // DD typed (0.5.2: DMS is the default)
     };
     const { first, again, values } = roundTrip(v);
     expect(first).toBe('{"date":"1992-08-14","time":"06:45:30","manual":{"lat":13.0827,"lng":80.2707,"utcOffsetSeconds":19800}}');

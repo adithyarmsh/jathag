@@ -220,7 +220,7 @@ describe("edit in place: the home page's form, re-used (D-138 Q4 B)", () => {
 const AS_OF = "2026-11-26T12:00:00Z";
 const res = calculateChartResponse(JSON.parse(MAIN_R01), { asOf: AS_OF });
 const ctx = listContext(res, en);
-const BIRTH = { date: "14 August 1992", time: "6:45 AM", place: "Chennai, Tamil Nadu, India" };
+const BIRTH = { dateTime: "14 Aug 1992 · 6:45 AM", place: "Chennai, Tamil Nadu, India" }; // 0.5.2: the chart centre's two lines
 const sections = {
   chart: renderToStaticMarkup(createElement(BirthChartSection, { result: res, birth: BIRTH, heading: "Meera's chart", place: "Chennai", t: en })),
   rightNow: renderToStaticMarkup(createElement(RightNow, { ctx })),

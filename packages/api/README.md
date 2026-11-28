@@ -1,12 +1,12 @@
 # @jathag/api
 
-Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, the range endpoint (step 0.3.6, no screen yet), and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` and `handleRangeRequest` (from `@jathag/api`) and `handleSearchRequest` (from `@jathag/api/search-endpoint`, which never imports the engine: the search function has no Swiss Ephemeris binary; `test/imports.test.ts` checks this), so everything here is tested without a server.
+Server-side logic of the calculation API (step 0.2.12): the two endpoints the form calls, the range endpoint (step 0.3.6, no screen yet), and the "Which clock?" rule for old Indian births. No UI and no page text: errors are **codes**, results are **stable IDs** (D-063). The Next.js route files in `apps/web/app/api/` only call `handleChartRequest` and `handleRangeRequest` (from `@jathag/api`) and `handleSearchRequest` / `handleNearestRequest` (from `@jathag/api/search-endpoint` and `@jathag/api/nearest-endpoint`, which never import the engine: the place function has no Swiss Ephemeris binary; `test/imports.test.ts` and `test/nearest.test.ts` check this), so everything here is tested without a server.
 
 **Privacy (FR-API-02, D-014):** nothing here logs, stores or caches a request. Errors never contain any part of the request. Every response has `Cache-Control: no-store`. An unexpected failure logs only the error's class name and code (never its message).
 
 ## The endpoints
 
-All are `POST` with a JSON body, so birth details and search text never appear in a URL (URLs can end up in hosting logs). They are separate server functions on Vercel: only the search function carries and loads the 21 MB place index; the chart and range functions carry the ephemeris files.
+All are `POST` with a JSON body, so birth details and search text never appear in a URL (URLs can end up in hosting logs). They are separate server functions on Vercel: only the place function (search and nearest place, one route `apps/web/app/api/places/[action]/route.ts`, step 0.5.2) carries and loads the 21 MB place index, once per server instance; the chart and range functions carry the ephemeris files.
 
 ### `POST /api/places/search`
 
@@ -21,6 +21,16 @@ All are `POST` with a JSON body, so birth details and search text never appear i
 ] }
 ```
 Limits: query up to 100 characters, body up to 1 KB.
+
+### `POST /api/places/nearest` (step 0.5.2, D-144)
+
+```json
+{ "lat": 13.087778, "lng": 80.278333 }
+```
+→ the label of the nearest place in the index (any place counts; great-circle distance), or `null` when none lies within 50 km. No distance and no coordinates in the answer. Only `lat` (−90…90) and `lng` (−180…180) are accepted, anything else is `INVALID_REQUEST`; body up to 256 bytes. The first lookup in a server instance builds a 0.5° grid of all places (`Server-Timing: grid`), later ones take about a millisecond (`nearest`).
+```json
+{ "nearest": { "label": "Chennai, Tamil Nadu, India" } }
+```
 
 ### `POST /api/chart`
 

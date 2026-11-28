@@ -11,7 +11,7 @@ import { birthDate, isUsableDate } from "./birth-date";
 import { buildChartRequest, type ChartRequestBody, type RepeatedTime } from "./chart-request";
 import { clockToSend, type ClockChoiceView } from "./clock-choice";
 import type { ClockId } from "./clock-rule";
-import { parseCoordinate } from "./coordinates";
+import { decimalText, dmsToDecimal, EMPTY_DMS, parseCoordinate, type CoordFormat, type DmsValues } from "./coordinates";
 import type { BirthInputs } from "./profiles";
 import { to24h, withSeconds, type Period } from "./time-12h";
 import { DEFAULT_UTC_OFFSET } from "./utc-offsets";
@@ -28,6 +28,10 @@ export interface FormValues {
   secondsOn: boolean;
   place: PlaceSuggestion | null;
   manualOn: boolean;
+  /** Typed coordinates: DMS (default, step 0.5.2) or DD; each format keeps its own boxes. */
+  coordFormat: CoordFormat;
+  dms: DmsValues;
+  /** The DD boxes. */
   lat: string;
   lng: string;
   utcOffset: number;
@@ -36,8 +40,21 @@ export interface FormValues {
 
 export const EMPTY_FORM: FormValues = {
   name: "", day: "", month: "", year: "", hour: "", minute: "", second: "0", period: null, secondsOn: false,
-  place: null, manualOn: false, lat: "", lng: "", utcOffset: DEFAULT_UTC_OFFSET, clockChoice: null,
+  place: null, manualOn: false, coordFormat: "dms", dms: EMPTY_DMS, lat: "", lng: "", utcOffset: DEFAULT_UTC_OFFSET, clockChoice: null,
 };
+
+/**
+ * The typed coordinates in decimal degrees, from whichever format is in use, or null for a coordinate
+ * that is not valid. DMS gives the same 6-decimal number its DD form would (D-143 item 11).
+ */
+export function typedCoordinates(v: Pick<FormValues, "coordFormat" | "dms" | "lat" | "lng">): { lat: number | null; lng: number | null } {
+  if (v.coordFormat === "dms") {
+    const lat = dmsToDecimal(v.dms.lat, "lat");
+    const lng = dmsToDecimal(v.dms.lng, "lng");
+    return { lat: "value" in lat ? lat.value : null, lng: "value" in lng ? lng.value : null };
+  }
+  return { lat: parseCoordinate(v.lat, "lat"), lng: parseCoordinate(v.lng, "lng") };
+}
 
 /** The usable date "YYYY-MM-DD", or null. */
 export function formDate(v: FormValues): string | null {
@@ -55,8 +72,7 @@ export function requestFromForm(v: FormValues, clockView: ClockChoiceView | null
   if (!date || !time) return null;
   const fullTime = withSeconds(time, v.secondsOn ? v.second : null);
   if (v.manualOn) {
-    const lat = parseCoordinate(v.lat, "lat");
-    const lng = parseCoordinate(v.lng, "lng");
+    const { lat, lng } = typedCoordinates(v);
     if (lat === null || lng === null) return null;
     return buildChartRequest({ date, time: fullTime, where: { kind: "manual", manual: { lat, lng, utcOffsetSeconds: v.utcOffset } }, repeatedTime });
   }
@@ -71,7 +87,19 @@ export function birthFromForm(v: FormValues, clockView: ClockChoiceView | null, 
   const time = { hour: v.hour, minute: v.minute, period: v.period, second: v.secondsOn ? v.second : null };
   let birth: BirthInputs;
   if (v.manualOn) {
-    birth = { date, time, where: { kind: "manual", manual: { lat: v.lat.trim(), lng: v.lng.trim(), utcOffsetSeconds: v.utcOffset } } };
+    if (v.coordFormat === "dms") {
+      // The decimal the request sends, as text (so dedupe and older readers see the same numbers),
+      // plus the boxes as typed so Edit reopens them in DMS.
+      const { lat, lng } = typedCoordinates(v);
+      if (lat === null || lng === null) return null;
+      birth = {
+        date,
+        time,
+        where: { kind: "manual", manual: { lat: decimalText(lat), lng: decimalText(lng), utcOffsetSeconds: v.utcOffset, format: "dms", dms: v.dms } },
+      };
+    } else {
+      birth = { date, time, where: { kind: "manual", manual: { lat: v.lat.trim(), lng: v.lng.trim(), utcOffsetSeconds: v.utcOffset } } };
+    }
   } else if (v.place) {
     const p = v.place;
     birth = {
@@ -109,7 +137,12 @@ export function formFromBirth(birth: BirthInputs, name: string): { values: FormV
   };
   if (birth.where.kind === "manual") {
     const mm = birth.where.manual;
-    Object.assign(values, { manualOn: true, lat: mm.lat, lng: mm.lng, utcOffset: mm.utcOffsetSeconds });
+    // Typed in DMS (step 0.5.2) → the same boxes again; else (and every profile saved before) DD.
+    Object.assign(values, {
+      manualOn: true, lat: mm.lat, lng: mm.lng, utcOffset: mm.utcOffsetSeconds,
+      coordFormat: mm.format === "dms" && mm.dms ? "dms" : "dd",
+      dms: mm.format === "dms" && mm.dms ? mm.dms : EMPTY_DMS,
+    });
   } else {
     // The search result again, as the form had it (featureCode is not used by the form or the request).
     values.place = { ...birth.where.place, featureCode: "" };

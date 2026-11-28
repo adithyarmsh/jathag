@@ -470,6 +470,11 @@ body {
   padding: 0.55rem 0.8rem;
   font-size: 1rem;
 }
+/* DMS boxes (step 0.5.2): two or three digits, centred, narrow side padding */
+.dms-box {
+  padding-inline: 0.35rem;
+  text-align: center;
+}
 /* Error: a 2 px edge in the error colour (1 px border + 1 px inset ring, so the field keeps its size) */
 .form-input[aria-invalid="true"] {
   border-color: var(--error);
@@ -1048,23 +1053,39 @@ body {
 
 /* The basic South Indian chart (0.3.2.1, D-101). Lines use the field-border colour (3:1 against the
    card in both themes, like form fields), drawn 1 px at any size; the Lagna's corner mark in gold. */
-.south-chart {
+/* ---- Drawn charts (step 0.5.2, spec §7): South and North, D1 and D9, theme tokens only. Lines stay
+   1 px (and the Lagna mark 1.6 px) at any size. */
+.drawn-chart {
   font-variant-numeric: tabular-nums;
 }
-.south-chart-line {
+.chart-paper {
+  fill: var(--card);
+}
+.chart-frame {
   fill: none;
   stroke: var(--field-border);
   stroke-width: 1px;
   vector-effect: non-scaling-stroke;
 }
-.south-chart-lagna {
-  stroke: var(--accent-text);
-  stroke-width: 1.5px;
-  stroke-linecap: round;
+.chart-line {
+  fill: none;
+  stroke: var(--field-border);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+.chart-centre {
+  fill: var(--raised);
+}
+.chart-lagna-fill {
+  fill: var(--accent-soft);
+}
+.chart-lagna-mark {
+  stroke: var(--accent);
+  stroke-width: 1.6px;
   vector-effect: non-scaling-stroke;
 }
 /* Lining figures, so "D-1" never reads as "D-I". */
-.south-chart-title {
+.chart-title {
   font-variant-numeric: lining-nums;
 }
 
@@ -1452,26 +1473,83 @@ body {
 .birth-chart-facts {
   margin-top: 20px;
 }
+/* Directly under the chart (spec §6.3): chips left, the South / North toggle right; on a narrow phone
+   they may wrap to two rows. Desktop: in the right column next to the chart (as drawn). */
+.birth-chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  max-width: 520px;
+}
+.north-caption {
+  margin-bottom: 10px;
+}
 @media (width >= 64rem) {
   .birth-chart {
     display: grid;
     grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
     column-gap: 40px;
   }
   .birth-chart > * { grid-column: 2; }
   .birth-chart > .birth-chart-drawing {
     grid-column: 1;
-    grid-row: 1 / 5;
+    grid-row: 1 / 6;
     margin-top: 0;
   }
+  .birth-chart-controls {
+    margin-top: 20px;
+    max-width: none;
+  }
 }
-.south-chart-box {
-  padding: 12px;
-  background-color: var(--card);
+
+/* The index under every chart (spec §7.3, D-143 item 8): 12/18 px, abbreviation 600 ink, name muted,
+   3 columns on phones, 4 on desktop, top hairline. Phones/tablets: behind an opener; desktop: open. */
+.chart-index {
+  margin-top: 16px;
+}
+.chart-index-opener {
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+  min-height: 48px;
+}
+.chart-index-body {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.chart-index[data-open] .chart-index-body {
+  display: block;
+}
+.chart-index-heading {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.chart-index-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px 10px;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 18px;
+}
+@media (width >= 64rem) {
+  .chart-index > .chart-index-opener { display: none; } /* beats .opener-button's display: flex */
+  .chart-index-body,
+  .chart-index[data-open] .chart-index-body {
+    display: block;
+    margin-top: 0;
+  }
+  .chart-index { margin-top: 20px; }
+  .chart-index-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 .fact-tiles {
   display: grid;

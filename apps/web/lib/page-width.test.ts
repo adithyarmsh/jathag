@@ -27,6 +27,9 @@ import { listContext } from "./list-context";
 import { clockChoiceView } from "./clock-choice";
 import Home from "../app/page";
 import { AdvancedSettings } from "../app/advanced-settings";
+import { BirthChartSection } from "../app/birth-chart-section";
+import { NorthChart } from "../app/north-chart";
+import { SouthChart } from "../app/south-chart";
 import en from "../messages/en.json";
 
 const APP = join(import.meta.dirname, "../app");
@@ -152,5 +155,43 @@ describe("home page and the full form stay within a 360 px screen (0.4.6)", () =
     const widths = [...html.matchAll(/(?<![\w-])(?:min-)?w-\[(\d+(?:\.\d+)?)(px|rem)\]/g)].map((m) => Number(m[1]) * (m[2] === "rem" ? 16 : 1));
     const inline = [...html.matchAll(/style="[^"]*(?<![\w-])(?:min-)?width:\s*(\d+)px/g)].map((m) => Number(m[1]));
     for (const w of [...widths, ...inline]) expect(w).toBeLessThanOrEqual(PHONE_CONTENT);
+  });
+});
+
+// Step 0.5.2: the drawn charts (South and North, D1 and D9), their controls, the index (open) and
+// Advanced settings with the DMS boxes. Measured in the browser at 360 and 390 px too (0.5.2 PR report).
+describe("drawn charts, the index and the DMS boxes stay within a 360 px screen (0.5.2)", () => {
+  const PHONE_CONTENT = 360 - 2 * 16;
+  const res = calculateChartResponse(
+    { date: "1992-08-14", time: "06:45", manual: { lat: 13.0878, lng: 80.2785, utcOffsetSeconds: 19800 } },
+    { asOf: "2026-11-28T12:00:00Z" },
+  );
+  const birth = { dateTime: "14 Aug 1992 · 6:45 AM", place: "Near Chennai, Tamil Nadu, India" };
+  const noop = () => {};
+  const IDS = { panel: "a", manual: "b", lat: "c", lng: "d", offset: "e", latError: "f", lngError: "g", clockLegend: "h", clockPrefix: "i", seconds: "j" };
+  const screens: [string, string][] = [
+    ["birth chart section (South D1, controls, index)", renderToStaticMarkup(createElement(BirthChartSection, { result: res, birth, heading: "Your chart", place: "Chennai", t: en }))],
+    ...(["d1", "d9"] as const).flatMap((kind): [string, string][] => [
+      [`North ${kind}`, renderToStaticMarkup(createElement(NorthChart, { chart: res.chart, kind, label: "x", t: en.chart }))],
+      [`South ${kind}`, renderToStaticMarkup(createElement(SouthChart, { chart: res.chart, kind, title: "t", dateTime: birth.dateTime, place: birth.place, label: "x", t: en.chart }))],
+    ]),
+    [
+      "Advanced settings with DMS boxes and an error",
+      renderToStaticMarkup(
+        createElement(AdvancedSettings, {
+          t: en.form.advanced, comingSoon: en.hero.comingSoon, ids: IDS, open: true, manualOn: true, onManual: noop, lat: "", lng: "",
+          offset: 19800, onLat: noop, onLng: noop, onOffset: noop, onCoordLeave: noop, clock: null, clockChoice: null, onClock: noop,
+          secondsOn: false, onSeconds: noop, latDmsError: { message: en.missing.dmsDegreesLat, part: "d" },
+        }),
+      ),
+    ],
+  ];
+  it.each(screens)("%s: no fixed or minimum width wider than a phone", (_name, html) => {
+    const widths = [...html.matchAll(/(?<![\w-])(?:min-)?w-\[(\d+(?:\.\d+)?)(px|rem)\]/g)].map((m) => Number(m[1]) * (m[2] === "rem" ? 16 : 1));
+    const inline = [...html.matchAll(/style="[^"]*(?<![\w-])(?:min-)?width:\s*(\d+)px/g)].map((m) => Number(m[1]));
+    for (const w of [...widths, ...inline]) expect(w).toBeLessThanOrEqual(PHONE_CONTENT);
+  });
+  it("the drawings scale to the width they get (no fixed width)", () => {
+    for (const [, html] of screens.slice(1, 5)) expect(html).toMatch(/^<svg viewBox="0 0 400 400"[^>]*class="drawn-chart block h-auto w-full/);
   });
 });
