@@ -7,12 +7,19 @@
 // coordinates, the clock choice when it differs from the default, the repeated-time answer), never the
 // calculated results: a profile is recalculated every time it is opened (D-136 item 4).
 //
+// Step 0.5.2 (D-143, D-144) adds two OPTIONAL fields to typed coordinates, still version 1 (an older
+// copy of this code reads such a profile fine: it keeps only the fields it knows and opens it in DD):
+//   manual.format = "dms" + manual.dms (the boxes as typed) when typed in DMS (absent = DD, as before);
+//     lat / lng then hold the same 6-decimal values the DMS boxes send, so dedupe and old readers agree;
+//   manual.near = the nearest place's label ("Chennai, Tamil Nadu, India"), or null when none lies
+//     within 50 km; absent = not looked up yet (profiles saved before 0.5.2, or the lookup failed).
+//
 // Reading never throws: a missing key, broken JSON, an unknown version or blocked storage (private
 // browsing) all read as "no profiles"; a single broken entry is skipped. Writing failures are ignored
 // (the form still works, nothing is kept).
 
 import type { ClockId } from "./clock-rule";
-import { parseCoordinate } from "./coordinates";
+import { parseCoordinate, type DmsParts, type DmsValues } from "./coordinates";
 import type { RepeatedTime } from "./chart-request";
 import type { Period } from "./time-12h";
 
@@ -37,6 +44,12 @@ export interface SavedManual {
   lat: string;
   lng: string;
   utcOffsetSeconds: number;
+  /** "dms" when typed in DMS (step 0.5.2); absent = typed in DD. */
+  format?: "dms";
+  /** The DMS boxes as typed (only with format "dms"). */
+  dms?: DmsValues;
+  /** The nearest place's label (D-144); null = none within 50 km; absent = not looked up yet. */
+  near?: string | null;
 }
 
 export interface BirthInputs {
@@ -68,6 +81,22 @@ const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFin
 /** The clocks the chart endpoint knows (packages/api/src/clock.ts, CLOCK_IDS). */
 const CLOCKS = new Set(["ist", "war", "bombay", "calcutta", "lmt"]);
 
+const DIGITS = /^\d{0,3}$/;
+
+function cleanParts(v: unknown, hemis: readonly string[]): DmsParts | null {
+  if (!isObj(v) || !isStr(v.d) || !isStr(v.m) || !isStr(v.s) || !DIGITS.test(v.d) || !DIGITS.test(v.m) || !DIGITS.test(v.s)) return null;
+  if (!isStr(v.h) || !hemis.includes(v.h)) return null;
+  return { d: v.d, m: v.m, s: v.s, h: v.h as DmsParts["h"] };
+}
+
+/** Stored DMS boxes → clean values, or null (then the profile opens in DD, from lat / lng). */
+function cleanDms(v: unknown): DmsValues | null {
+  if (!isObj(v)) return null;
+  const lat = cleanParts(v.lat, ["N", "S"]);
+  const lng = cleanParts(v.lng, ["E", "W"]);
+  return lat && lng ? { lat, lng } : null;
+}
+
 /** One stored entry → a clean Profile (only the known fields), or null when it is not a valid one. */
 function cleanProfile(v: unknown): Profile | null {
   if (!isObj(v) || !isStr(v.id) || !v.id || !isStr(v.name) || !isStr(v.createdAt) || !isStr(v.lastUsedAt)) return null;
@@ -90,7 +119,11 @@ function cleanProfile(v: unknown): Profile | null {
   } else if (isObj(w) && w.kind === "manual" && isObj(w.manual)) {
     const m = w.manual;
     if (!isStr(m.lat) || !isStr(m.lng) || !isNum(m.utcOffsetSeconds)) return null;
-    where = { kind: "manual", manual: { lat: m.lat, lng: m.lng, utcOffsetSeconds: m.utcOffsetSeconds } };
+    const manual: SavedManual = { lat: m.lat, lng: m.lng, utcOffsetSeconds: m.utcOffsetSeconds };
+    const dms = m.format === "dms" ? cleanDms(m.dms) : null;
+    if (dms) Object.assign(manual, { format: "dms", dms });
+    if (isStr(m.near) || m.near === null) manual.near = m.near;
+    where = { kind: "manual", manual };
   } else return null;
   const birth: BirthInputs = { date: b.date, time: { hour: t.hour, minute: t.minute, period: t.period, second: t.second }, where };
   if (isStr(b.clock) && CLOCKS.has(b.clock)) birth.clock = b.clock as ClockId;
@@ -162,11 +195,7 @@ export function sameBirth(a: BirthInputs, b: BirthInputs): boolean {
   if ((a.clock ?? null) !== (b.clock ?? null) || (a.repeatedTime ?? null) !== (b.repeatedTime ?? null)) return false;
   if (a.where.kind === "place" && b.where.kind === "place") return a.where.place.geonameId === b.where.place.geonameId;
   if (a.where.kind === "manual" && b.where.kind === "manual") {
-    const x = a.where.manual;
-    const y = b.where.manual;
-    const xLat = parseCoordinate(x.lat, "lat");
-    const xLng = parseCoordinate(x.lng, "lng");
-    return xLat !== null && xLng !== null && xLat === parseCoordinate(y.lat, "lat") && xLng === parseCoordinate(y.lng, "lng") && x.utcOffsetSeconds === y.utcOffsetSeconds;
+    return sameCoordinates(a.where.manual, b.where.manual) && a.where.manual.utcOffsetSeconds === b.where.manual.utcOffsetSeconds;
   }
   return false;
 }
@@ -197,12 +226,42 @@ export function saveCalculated(profiles: readonly Profile[], input: SaveInput): 
   const target =
     (input.editingId ? profiles.find((p) => p.id === input.editingId) : undefined) ?? profiles.find((p) => sameBirth(p.birth, input.birth));
   if (target) {
-    const updated: Profile = { ...target, name: typed || target.name, lastUsedAt: input.now, birth: input.birth };
+    const updated: Profile = { ...target, name: typed || target.name, lastUsedAt: input.now, birth: keepNear(target.birth, input.birth) };
     return { profiles: profiles.map((p) => (p.id === target.id ? updated : p)), id: target.id };
   }
   const id = input.newId();
   const made: Profile = { id, name: typed || input.defaultName, createdAt: input.now, lastUsedAt: input.now, birth: input.birth };
   return { profiles: [...profiles, made], id };
+}
+
+/**
+ * The same typed coordinates keep the nearest place already looked up (D-144 item 5: once per profile),
+ * unless the new birth brings its own.
+ */
+function keepNear(before: BirthInputs, after: BirthInputs): BirthInputs {
+  if (after.where.kind !== "manual" || before.where.kind !== "manual" || after.where.manual.near !== undefined) return after;
+  const near = before.where.manual.near;
+  if (near === undefined || !sameCoordinates(before.where.manual, after.where.manual)) return after;
+  return { ...after, where: { kind: "manual", manual: { ...after.where.manual, near } } };
+}
+
+function sameCoordinates(x: SavedManual, y: SavedManual): boolean {
+  const xLat = parseCoordinate(x.lat, "lat");
+  const xLng = parseCoordinate(x.lng, "lng");
+  return xLat !== null && xLng !== null && xLat === parseCoordinate(y.lat, "lat") && xLng === parseCoordinate(y.lng, "lng");
+}
+
+/**
+ * Saves the nearest place's label (or null for none) with a profile's typed coordinates (D-144 item 5),
+ * only while the profile still has those coordinates. Unchanged list when nothing applies.
+ */
+export function setNear(profiles: readonly Profile[], id: string, coords: { lat: number; lng: number }, near: string | null): Profile[] {
+  return profiles.map((p) => {
+    if (p.id !== id || p.birth.where.kind !== "manual") return p;
+    const m = p.birth.where.manual;
+    if (parseCoordinate(m.lat, "lat") !== coords.lat || parseCoordinate(m.lng, "lng") !== coords.lng || m.near === near) return p;
+    return { ...p, birth: { ...p.birth, where: { kind: "manual", manual: { ...m, near } } } };
+  });
 }
 
 /** Opening a profile: it moves to the top of the list. */

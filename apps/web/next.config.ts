@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   // Native Swiss Ephemeris binding: loaded by Node at run time, never bundled (D-069).
   serverExternalPackages: ["sweph"],
   // Trace files from the monorepo root, and copy each endpoint's data files into ITS function only:
-  // the 21 MB place index goes to the search function, the 1.7 MB ephemeris files to the chart and range functions.
+  // the 21 MB place index goes to the place function (search + nearest), the 1.7 MB ephemeris files to the chart and range functions.
   outputFileTracingRoot: path.join(__dirname, "..", ".."),
   outputFileTracingIncludes: {
     "/api/chart": [
@@ -31,7 +31,8 @@ const nextConfig: NextConfig = {
       "../../packages/engine/ephe/*.se1",
       "../../node_modules/.pnpm/sweph@*/node_modules/sweph/prebuilds/linux-*/sweph.node",
     ],
-    "/api/places/search": ["../../data/places/index/places.tsv.gz"],
+    // Place search and nearest place (step 0.5.2): one route, /api/places/[action], one function.
+    "/api/places/*": ["../../data/places/index/places.tsv.gz"],
   },
 };
 

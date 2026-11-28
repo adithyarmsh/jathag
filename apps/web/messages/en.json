@@ -100,18 +100,25 @@
     "chartStyle": {
       "label": "Chart style",
       "south": "South Indian",
-      "north": "North Indian",
-      "northNote": "North Indian drawing arrives with the new chart page. Showing South Indian for now."
+      "north": "North Indian"
     },
     "advanced": {
       "toggle": "Advanced settings",
       "manual": {
         "checkbox": "Enter coordinates yourself",
+        "format": { "label": "Coordinate format", "dms": "DMS", "dd": "DD" },
+        "dmsHint": "Degrees, minutes and seconds, as on most birth records and atlases.",
         "hint": "Decimal degrees. Use a minus sign for South or West.",
         "latitude": "Latitude",
         "latitudeHint": "e.g. 13.0827",
         "longitude": "Longitude",
         "longitudeHint": "e.g. 80.2707",
+        "degrees": "Degrees",
+        "minutes": "Minutes",
+        "seconds": "Seconds",
+        "latitudeHemisphere": "North or South",
+        "longitudeHemisphere": "East or West",
+        "hemispheres": { "N": "N", "S": "S", "E": "E", "W": "W" },
         "timeZone": "Time zone",
         "timeZoneHint": "The UTC offset of the clock the birth time was written on."
       },
@@ -184,7 +191,13 @@
     "period": "Please choose AM or PM.",
     "yearDigits": "Please enter the year with all 4 digits, e.g. 1985.",
     "dayTooLarge": "{month} has {days} days.",
-    "dayTooLargeFebruary": "February {year} has {days} days."
+    "dayTooLargeFebruary": "February {year} has {days} days.",
+    "dmsDegreesLat": "Please enter the latitude degrees, from 0 to 90.",
+    "dmsDegreesLng": "Please enter the longitude degrees, from 0 to 180.",
+    "dmsMinutes": "Minutes go from 0 to 59.",
+    "dmsSeconds": "Seconds go from 0 to 59.",
+    "dmsPoleLat": "At 90° the minutes and seconds must be 0.",
+    "dmsPoleLng": "At 180° the minutes and seconds must be 0."
   },
   "errors": {
     "INVALID_REQUEST": "Something went wrong while sending your details. Please check them and try again.",
@@ -281,18 +294,34 @@
       "Ke": "Ke"
     },
     "southChart": {
-      "heading": "South Indian Birth Chart",
-      "centreTitle": "Rasi chart (D-1)",
-      "svgTitle": "South Indian Rasi chart",
-      "svgDescription": "Lagna in {sign}. Moon sign (Rasi): {moonSign}, nakshatra: {nakshatra}, pada: {pada}. The planet table below lists every position in words.",
-      "moonSign": "Moon sign (Rasi)",
-      "nakshatra": "Nakshatra",
-      "pada": "Pada",
-      "centreFact": "{label}: {value}",
       "retrogradeMark": "(R)",
-      "houseLabel": "{n} house",
-      "ordinals": ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th"],
-      "key": "Su Sun · Mo Moon · Ma Mars · Me Mercury · Ju Jupiter · Ve Venus · Sa Saturn · Ra Rahu · Ke Ketu · La Lagna (Ascendant) · (R) retrograde · House numbers count from the Lagna (1st house)."
+      "ordinals": ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th", "11th", "12th"]
+    },
+    "drawing": {
+      "titleD1": "Rasi chart (D-1)",
+      "titleD9": "Navamsa (D-9)",
+      "styleSouth": "South Indian",
+      "styleNorth": "North Indian",
+      "dateTime": "{date} · {time}",
+      "near": "Near {place}",
+      "aria": {
+        "intro": "{style} {chart} for {dateTime}, {place}.",
+        "lagna": "Lagna in {sign}, the 1st house.",
+        "lagnaWith": "Lagna in {sign}, the 1st house, with {bodies}.",
+        "sign": "{sign}, {house} house: {bodies}.",
+        "retrograde": "{name} (retrograde)",
+        "comma": ", ",
+        "and": " and ",
+        "outro": "The planet table below lists every position in words."
+      }
+    },
+    "index": {
+      "eyebrow": "Index",
+      "signs": "Signs",
+      "planets": "Planets",
+      "opener": "What the letters mean",
+      "lagna": "Lagna, rising sign",
+      "retrograde": "retrograde"
     },
     "bodies": {
       "La": "Lagna",
@@ -307,6 +336,7 @@
       "Ke": "Ketu"
     },
     "signs": ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"],
+    "signsShort": ["Ari", "Tau", "Gem", "Can", "Leo", "Vir", "Lib", "Sco", "Sag", "Cap", "Aqu", "Pis"],
     "nakshatras": [
       "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
       "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
@@ -489,6 +519,9 @@
       "headingSample": "Sample chart",
       "oneLiner": "A map of the sky at the moment of birth, seen from {place}. Each box is a sign; the numbers count houses from the Lagna.",
       "rasiNotice": "[Rasi, the main chart.] Where each planet stood at birth. Most readings start here.",
+      "navamsaNotice": "[Navamsa.] Each sign split into nine parts. Read alongside the main chart, often for relationships and how strong each planet is.",
+      "types": { "label": "Chart type", "d1": "Rasi (D1)", "d9": "Navamsa (D9)" },
+      "style": { "label": "Chart style", "south": "South", "north": "North" },
       "facts": {
         "lagna": "Lagna (rising sign)",
         "moon": "Moon sign",

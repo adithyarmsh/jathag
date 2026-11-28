@@ -1,6 +1,6 @@
 # JATHAG – ROADMAP (v0.1 → v2.0)
 
-Version 2.22 · 2026-11-27 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
+Version 2.24 · 2026-11-27 · Companion to `requirements.md` and `decisions-log.md`. Live status of every step is tracked in `PROGRESS.md` at the repo root.
 
 ---
 
@@ -50,7 +50,7 @@ Status key: ✅ done · 🔄 in progress · ⏳ not started. Every step table be
 | **v0.2 First real chart** | On the live site: enter real birth details, see planet positions that match JHora | ✅ |
 | **v0.3 Timing engine** | Dashas (3 levels), transits, Sade Sati, approximate-time results (as plain lists on the live site) | ✅ |
 | **v0.4 Design system + app shell** | Approved design system and screen mockups; real header/footer/theme; full B2 home form; saved profiles | ✅ (0.4.1–0.4.7 done; 0.4.7 D-137) |
-| **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | ⏳ |
+| **v0.5 Chart screens** | Overview, beautiful D1/D9 charts (South + North), planets table and planet pages | 🔄 (0.5.1 ✅ D-141; next 0.5.2 charts) |
 | **v0.6 Timing screens** | Timeline with "you are here", transits, Sade Sati card | ⏳ |
 | **v0.7 Interpretations** | ~600 approved readings, "i" pop-ups, Sources screen, life-area pages | ⏳ |
 | **v0.8 Approx. time, settings, downloads** | Certain/uncertain markers, settings, PNG/PDF downloads, report-an-issue | ⏳ |
@@ -139,8 +139,8 @@ Design (Track D) and content writing (Track C) can start early, in parallel with
 
 | Step | Who | What | Done when | Status |
 |---|---|---|---|---|
-| 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below, in this order (D-129): chart (one style at a time, chart-type chips, South / North toggle), Right now, Dasha periods, Life areas, Sade Sati, Transits, planet positions. Until then (v0.2–v0.4) the table appears under the form on the home page | You compare with JHora | ⏳ |
-| 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle (replaces the basic chart from 0.3.2.1) | Visual match with JHora | ⏳ |
+| 0.5.1 | CODE | Chart overview (bird's-eye view) on **its own page**, opened by "See my chart" (founder, 2026-11-21): the birth details at the top, editable there (changing them recalculates), with the **download buttons** next to them (working from 0.8.4); the chart and the other sections below, in this order (D-129): chart (one style at a time, chart-type chips, South / North toggle), Right now, Dasha periods, Life areas, Sade Sati, Transits, planet positions. Built as `/chart` with a contents panel, edit in place and a sample chart (D-138 to D-141) | You compare with JHora | ✅ (#30, D-141; JHora matched, D-142) |
+| 0.5.2 | CODE | D1 + D9 chart diagrams, South + North, SVG, both themes; style toggle (replaces the basic chart from 0.3.2.1); also coordinates entry in DMS (default) or DD under Advanced settings (D-142) | Visual match with JHora | ⏳ |
 | 0.5.3 | CODE | Planets table + planet detail pages (numbers; text placeholders until v0.7) | Merged | ⏳ |
 
 ## v0.6 — Timing screens

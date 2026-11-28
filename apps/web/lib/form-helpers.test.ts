@@ -106,9 +106,14 @@ describe("chart style: South the first time, then the last choice", () => {
     // (browserStore(), safe when the browser blocks storage); profiles go through profiles-store.ts.
     const form = readFileSync(join(WEB, "app/birth-form.tsx"), "utf8");
     expect([...form.matchAll(/localStorage[^\n]*/g)].map((m) => m[0])).toEqual(['localStorage "chartStyle" (FR-IN-10), then `onDone` gets the result:']);
-    expect(form).toContain("readChartStyle(browserStore())");
-    expect(form).toContain("saveChartStyle(browserStore(), chartStyle)");
-    expect(readFileSync(join(WEB, "app/chart-page.tsx"), "utf8")).toContain("readChartStyle(browserStore())");
+    // 0.5.2 (D-143 item 1): the form, the chart page's toggle and its section share ONE store for the
+    // style, which reads and writes through the chart-style helpers.
+    expect(form).toContain("useChartStyle()");
+    expect(form).toContain("setChartStyle(chartStyle)");
+    expect(readFileSync(join(WEB, "app/birth-chart-section.tsx"), "utf8")).toContain("onChange={setChartStyle}");
+    const store = readFileSync(join(WEB, "components/chart-style-store.ts"), "utf8");
+    expect(store).toContain("readChartStyle(store)");
+    expect(store).toContain("saveChartStyle(store, style)");
     // Every key written: the three constants, nothing else.
     const keys = files.flatMap((f) => [...readFileSync(f, "utf8").matchAll(/setItem\(([^,]+),/g)].map((m) => m[1]!.trim()));
     expect([...new Set(keys)].sort()).toEqual(["CHART_STYLE_KEY", "PROFILES_KEY", "THEME_KEY"]);

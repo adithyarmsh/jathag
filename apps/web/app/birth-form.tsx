@@ -33,10 +33,10 @@ import type { ClockId } from "@/lib/clock-rule";
 import { birthDate, daysInMonth, isUsableDate, usableYear } from "@/lib/birth-date";
 import type { RepeatedTime } from "@/lib/chart-request";
 import { chartHref, SAMPLE_HREF } from "@/lib/chart-page";
-import { birthFromForm, EMPTY_FORM, requestFromForm, type FormValues } from "@/lib/form-values";
-import { browserStore, readChartStyle, saveChartStyle, type ChartStyle } from "@/lib/chart-style";
+import { birthFromForm, EMPTY_FORM, requestFromForm, typedCoordinates, type FormValues } from "@/lib/form-values";
+import type { ChartStyle } from "@/lib/chart-style";
 import { formatUtcOffset } from "@/lib/chart-format";
-import { parseCoordinate } from "@/lib/coordinates";
+import { dmsToDecimal, switchFormat, type CoordFormat, type DmsParts, type DmsValues } from "@/lib/coordinates";
 import { checkDate, checkTime, firstProblem, type DatePart, type TimePart } from "@/lib/form-checks";
 import { shownOffsetSeconds } from "@/lib/place-offset";
 import { profileFromUrl } from "@/lib/profile-link";
@@ -45,9 +45,11 @@ import { HOURS, MINUTES, SECONDS, to24h, type Period } from "@/lib/time-12h";
 import type { Messages } from "@/lib/i18n";
 import { Button, buttonClass } from "@/components/button";
 import { leaveHandoff } from "@/components/chart-handoff";
+import { setChartStyle, useChartStyle } from "@/components/chart-style-store";
+import { lookupNearest, nearestForProfile } from "@/components/nearest-place";
 import { saveFromForm } from "@/components/profiles-store";
 import { Toggle } from "@/components/toggle";
-import { AdvancedSettings } from "./advanced-settings";
+import { AdvancedSettings, dmsBoxId, type DmsError } from "./advanced-settings";
 import { ChartStyleChoice } from "./chart-style-choice";
 import { ClockNoteButton } from "./clock-note-button";
 import { PlaceSearch } from "./place-search";
@@ -89,15 +91,6 @@ const useDesktop = () =>
     subscribeDesktop,
     () => window.matchMedia(DESKTOP).matches,
     () => false,
-  );
-
-/** The remembered chart style, read once after the page has loaded (the server always draws South). */
-const noSubscribe = () => () => {};
-const useStoredChartStyle = () =>
-  useSyncExternalStore(
-    noSubscribe,
-    () => readChartStyle(browserStore()),
-    () => "south" as ChartStyle,
   );
 
 /** What a successful "See my chart" hands on (the profile is already saved). */
@@ -196,7 +189,9 @@ export function BirthFormCard({
   const init = start.values;
 
   const desktop = useDesktop();
-  const storedStyle = useStoredChartStyle();
+  // The remembered style (lib/chart-style.ts via components/chart-style-store.ts): the same one the
+  // chart page's South / North toggle shows and changes (D-143 item 1).
+  const storedStyle = useChartStyle();
 
   const [name, setName] = useState(init.name);
   const [day, setDay] = useState(init.day);
@@ -213,6 +208,8 @@ export function BirthFormCard({
   // Advanced settings
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [manualOn, setManualOn] = useState(init.manualOn);
+  const [coordFormat, setCoordFormat] = useState<CoordFormat>(init.coordFormat);
+  const [dms, setDms] = useState<DmsValues>(init.dms);
   const [lat, setLat] = useState(init.lat);
   const [lng, setLng] = useState(init.lng);
   const [utcOffset, setUtcOffset] = useState(init.utcOffset);
@@ -240,8 +237,9 @@ export function BirthFormCard({
   // Live checks (D-094 items 3–4).
   const dateCheck = checkDate(day, month, year, { missing: t.missing, errors: t.errors, months: f.date.months });
   const timeCheck = checkTime(hour, minute, period, t);
-  const latValue = manualOn ? parseCoordinate(lat, "lat") : null;
-  const lngValue = manualOn ? parseCoordinate(lng, "lng") : null;
+  const typed = typedCoordinates({ coordFormat, dms, lat, lng });
+  const latValue = manualOn ? typed.lat : null;
+  const lngValue = manualOn ? typed.lng : null;
   const dateComplete = Boolean(day && month && year.length === 4);
   const dateLive = dateCheck && (shown.date || dateCheck.immediate || dateComplete) ? dateCheck : null;
   const timeLive = timeCheck && shown.time ? timeCheck : null;
@@ -249,8 +247,23 @@ export function BirthFormCard({
   const dateMessage = serverErrors.date ?? dateLive?.message;
   const timeMessage = serverErrors.time ?? timeLive?.message;
   const placeMessage = manualOn ? undefined : (serverErrors.place ?? (!place && shown.place ? t.missing.place : undefined));
-  const latMessage = manualOn && latValue === null && shown.lat ? t.missing.latitude : undefined;
-  const lngMessage = manualOn && lngValue === null && shown.lng ? t.missing.longitude : undefined;
+  const latMessage = manualOn && coordFormat === "dd" && latValue === null && shown.lat ? t.missing.latitude : undefined;
+  const lngMessage = manualOn && coordFormat === "dd" && lngValue === null && shown.lng ? t.missing.longitude : undefined;
+  // DMS (step 0.5.2): which box is wrong and why, in plain words (spec §3.4).
+  const dmsError = (axis: "lat" | "lng"): DmsError | undefined => {
+    if (!manualOn || coordFormat !== "dms" || !shown[axis]) return undefined;
+    const r = dmsToDecimal(dms[axis], axis);
+    if ("value" in r) return undefined;
+    const words = {
+      degrees: axis === "lat" ? t.missing.dmsDegreesLat : t.missing.dmsDegreesLng,
+      minutes: t.missing.dmsMinutes,
+      seconds: t.missing.dmsSeconds,
+      pole: axis === "lat" ? t.missing.dmsPoleLat : t.missing.dmsPoleLng,
+    };
+    return { message: words[r.problem], part: r.part };
+  };
+  const latDmsError = dmsError("lat");
+  const lngDmsError = dmsError("lng");
   const dateBad = (p: DatePart) => Boolean(serverErrors.date || dateLive?.parts.includes(p));
   const timeBad = (p: TimePart) => Boolean(serverErrors.time || timeLive?.parts.includes(p));
 
@@ -319,6 +332,25 @@ export function BirthFormCard({
     if (selected) openAdvancedAt(`${advIds.clockPrefix}-${selected.id}`);
   }
 
+  /** The first box of a coordinate to fix (DMS: the box with the problem; DD: the one field). */
+  function coordinateTarget(axis: "lat" | "lng"): string {
+    const axisId = axis === "lat" ? advIds.lat : advIds.lng;
+    if (coordFormat !== "dms") return axisId;
+    const r = dmsToDecimal(dms[axis], axis);
+    return dmsBoxId(axisId, "part" in r ? r.part : "d");
+  }
+
+  /** DMS ↔ DD: what is typed is converted; text that cannot be converted is kept as typed (lib/coordinates.ts). */
+  function changeFormat(to: CoordFormat) {
+    if (to === coordFormat) return;
+    const next = switchFormat(to, { dd: { lat, lng }, dms });
+    setLat(next.dd.lat);
+    setLng(next.dd.lng);
+    setDms(next.dms);
+    setCoordFormat(to);
+    changed("form");
+  }
+
   /** State D's link (and the checkbox): typed coordinates instead of the place search. */
   function setManual(on: boolean) {
     setManualOn(on);
@@ -334,7 +366,7 @@ export function BirthFormCard({
     );
     if (problem0 || !date || !time) {
       setShown({ date: true, time: true, place: true, lat: true, lng: true });
-      if (problem0?.inAdvanced) openAdvancedAt(problem0.field === "lat" ? advIds.lat : advIds.lng);
+      if (problem0?.inAdvanced) openAdvancedAt(coordinateTarget(problem0.field === "lat" ? "lat" : "lng"));
       else if (problem0) pendingFocus.current = ids[problem0.field as Exclude<typeof problem0.field, "lat" | "lng">];
       return;
     }
@@ -342,8 +374,11 @@ export function BirthFormCard({
     setUnreachable(false);
     setSubmitting(true);
     lastRepeated.current = repeatedTime;
-    const values: FormValues = { name, day, month, year, hour, minute, second, period, secondsOn, place, manualOn, lat, lng, utcOffset, clockChoice };
+    const values: FormValues = { name, day, month, year, hour, minute, second, period, secondsOn, place, manualOn, coordFormat, dms, lat, lng, utcOffset, clockChoice };
     const body = requestFromForm(values, clockView, repeatedTime)!;
+    // Typed coordinates: the nearest place is looked up alongside (D-144), never waited for here.
+    const coords = manualOn && latValue !== null && lngValue !== null ? { lat: latValue, lng: lngValue } : null;
+    if (coords) void lookupNearest(coords.lat, coords.lng);
     let problem: FieldError | null = null;
     let offline = false;
     try {
@@ -355,10 +390,11 @@ export function BirthFormCard({
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data?.chart) {
-        saveChartStyle(browserStore(), chartStyle);
+        setChartStyle(chartStyle);
         // Kept as a saved profile, in this browser only (D-136): the inputs, never the results.
         const birth = birthFromForm(values, clockView, repeatedTime)!;
         const saved = saveFromForm(birth, name, editing?.id ?? null, t.profiles.defaultName, editing?.name);
+        if (coords) void nearestForProfile(saved.id, coords);
         setAmbiguous(false);
         setSubmitting(false);
         onDone({ id: saved.id, name: saved.name, birth, result: data as ChartResponse, style: chartStyle });
@@ -644,7 +680,7 @@ export function BirthFormCard({
               disabled={manualOn}
               onEnterCoordinates={() => {
                 setManual(true);
-                openAdvancedAt(advIds.lat);
+                openAdvancedAt(coordFormat === "dms" ? dmsBoxId(advIds.lat, "d") : advIds.lat);
               }}
             />
             <div aria-live="polite">
@@ -692,8 +728,17 @@ export function BirthFormCard({
               latError={latMessage}
               lngError={lngMessage}
               onCoordLeave={(axis) => {
-                if ((axis === "lat" ? lat : lng).trim()) show(axis);
+                if (coordFormat === "dms" || (axis === "lat" ? lat : lng).trim()) show(axis);
               }}
+              coordFormat={coordFormat}
+              onFormat={changeFormat}
+              dms={dms}
+              onDms={(axis, parts: DmsParts) => {
+                setDms((d) => ({ ...d, [axis]: parts }));
+                changed("form");
+              }}
+              latDmsError={latDmsError}
+              lngDmsError={lngDmsError}
               clock={clockView}
               clockChoice={clockChoice}
               onClock={(c) => {

@@ -1,6 +1,6 @@
 # JATHAG – DESIGN SPEC (Web v1)
 
-Version 1.2 · 2026-11-27 · Roadmap step 0.4.4 (design handoff). Companion to `docs/requirements.md` (v1.14), `docs/decisions-log.md` (D-125 to D-134) and `docs/roadmap.md`.
+Version 1.3 · 2026-11-27 · Roadmap step 0.4.4 (design handoff). Companion to `docs/requirements.md` (v1.14), `docs/decisions-log.md` (D-125 to D-141) and `docs/roadmap.md`.
 
 **Read this before any step that changes what users see** (0.4.5 onward). It turns the approved Design System "Still Water" (D-126 to D-128) and the approved 0.4.3 mockups (D-129 to D-131) into build rules.
 
@@ -109,7 +109,7 @@ All text pairs were measured at WCAG AA in both themes (Design System README). A
 
 ### 1.6 Decoration
 
-- **Background stars** (D-117/D-118): keep the existing star field (random four-point stars, 3.5–5.25 px, generated in the browser), recoloured to `accent` × `--star-strength`. Behind everything, never behind text without a solid card, no clicks, hidden from screen readers.
+- **Background stars** (D-117/D-118, D-140): random four-point stars, 3.5–5.25 px, generated in the browser, **38 per 320 × 320 px**, covering the full page width; colour `--star-colour` × `--star-strength` (light: `#C49A3A` at 0.6, a lighter decoration-only gold, never used for text; dark: `accent` at 0.38). Behind everything, never behind text without a solid card, no clicks, hidden from screen readers. On the chart page (desktop) they also show in the gap above the fixed details bar (§6.1).
 - **Section divider** (§3.6). Nothing else decorative: no gradients, no glows, no zodiac clip-art, **no left-border cards** (today's 4 px left rules on dasha tiers are replaced, §6.4), no decorative numbers (D-067).
 
 ---
@@ -121,7 +121,7 @@ At most five kinds of motion (D-125, Design System README). Easing `cubic-bezier
 | # | Motion | Spec | Where |
 |---|---|---|---|
 | 1 | Fade-up on scroll | 8 px up + fade in, 400 ms, once per section | Each section of the chart page and reading pages; the star divider fades only (400 ms, D-127) |
-| 2 | Hover grow | Buttons × 1.02, chips × 1.03, 150 ms, border turns `accent` | Pointer devices only |
+| 2 | Hover grow | Buttons × 1.02; chips, toggle options, icon buttons, the "i", contents dashes × 1.03; option cards, opener rows, full-width rows and contents items × 1.01; 150 ms, border turns `accent`. **Every clickable control** grows (D-140), one shared rule, transform only; not disabled or already-selected items; links inside running text get a colour/underline change instead | Pointer devices only |
 | 3 | Sliding fill | The selected half of a toggle slides, 240 ms | South/North, AM/PM, theme |
 | 4 | Opener | Content slides open 240 ms; a short gold underline draws under the summary; chevron turns 180° | All openers (dasha rows, Sade Sati periods, FAQ, Advanced settings) |
 | 5 | Progress fill | Bars fill from 0 to their value, 400 ms, when they come into view | Right now tiers, dasha rows, timeline |
@@ -178,9 +178,10 @@ Build these once in `apps/web/components/` (plain React + Tailwind; no new UI li
 - A full-width `<button aria-expanded>` row, min height 44–56, 1 px `line`, radius 8–12; open state `raised` fill + gold underline under the summary (motion 4); content below indented 12–16 px with a 1–2 px guide line in `line` or the level colour (timeline). Children are rendered only when opened where lists are long (729 pratyantardashas, D-113).
 - Uses: Advanced settings, dasha rows, Sade Sati periods, FAQ answers, "All sign changes".
 
-### 3.10 SectionNav
-- **Phones/tablets (< 1024 px):** a sticky row of chips directly under the header, scrolling sideways (no visible scrollbar), active chip filled `accent`. **Desktop:** a sticky dot rail in a 150 px left column: 1 px `line` rail, 7 px hollow dots (`field-border` edge) and a 9 px filled `accent` dot for the active section, labels 14 px (`accent-text` 600 when active, `muted` otherwise) (D-127).
-- Labels (chart page): **Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets**. The active item follows the scroll (IntersectionObserver); clicking scrolls smoothly (instant with reduced motion) and moves focus to the section heading. It is a `<nav aria-label="Sections">`.
+### 3.10 Contents panel (replaces the SectionNav, D-138/D-139)
+- **Desktop (≥ 1024 px):** a slim sticky column at the left of the content, one short horizontal dash per section, the current one brighter/longer (`accent`), the others muted. Clicking/tapping the column or hovering it with a mouse opens a small card (eyebrow "CONTENTS", the section names, current highlighted; about 216 px wide, rows 40 px); it closes on Esc, outside click, mouse leave (hover-opened) or choosing an item. A real "Contents" button (`aria-expanded`) opens it by keyboard.
+- **Phones/tablets (< 1024 px):** a round 48 px icon button at the bottom right (2 px `field-border`, icon = three short lines of different lengths, not the ≡ of the menu; accessible name "Contents") that opens the same list as a bottom panel (§3.11 sheet, rows 44 px, focus trapped).
+- One level (chart page): **Chart · Right now · Dashas · Life areas · Sade Sati · Transits · Planets**. The current section is the last one whose top has passed the line where jumps land (just under the fixed details bar on desktop, under the header on phones), recomputed on scroll, resize and height changes; a chosen item is marked current at once; at the page end the last section is current. Choosing an item scrolls smoothly (instant with reduced motion), moves focus to the heading and sets the address hash.
 
 ### 3.11 Also needed (small)
 - **Tag:** "Coming soon" pill (`soon-bg` / `soon-text`, 12 px 600), "Active now" pill (`accent-soft` / `accent-text`), "BETA" outline pill in the header.
@@ -225,10 +226,10 @@ The card has no visible heading (a hidden heading names the form for screen read
 Its own page (`/chart`, opened by "See my chart"), per D-129, top to bottom:
 
 ### 6.1 Birth details bar
-- Phone: a card with the name (Fraunces 22), "14 Aug 1992 · 6:45 AM · Chennai, Tamil Nadu, India", and two quiet buttons: **Edit details** · **Download**. Desktop: a full-width `card` band under the header: name + details + coordinates on the left; **Edit details · Download chart · Download report** on the right. Editing recalculates (0.5.1); downloads work from 0.8.4 (before that the buttons are hidden, not dead).
+- Phone: a card with the name (Fraunces 22), "14 Aug 1992 · 6:45 AM · Chennai, Tamil Nadu, India", and two quiet buttons: **Edit details** · **Download**. Desktop: a full-width `card` band under the header: name + details + coordinates on the left; **Edit details · Download chart · Download report** on the right. Editing recalculates (0.5.1); downloads work from 0.8.4 (before that the buttons are hidden, not dead). **Built in 0.5.1 (D-138/D-139):** "Edit details" opens the same birth form in place under the bar ("Update chart" updates the same profile); on desktop the bar is **fixed** under the header with a 24 px gap filled with `bg` (stars show there, content hides under it), and the bar, contents column and every block below share one right edge on a whole-pixel page frame (D-140); on phones it scrolls away. The sample chart (`/chart?sample`, made-up R01) shows "Sample chart", a one-line note and "Make your own chart" instead of Edit.
 
-### 6.2 Section nav
-Chips (phone) / dot rail (desktop), §3.10.
+### 6.2 Contents panel
+Dash column (desktop) / round icon button (phones), §3.10 (D-138/D-139).
 
 ### 6.3 Birth chart section
 - Eyebrow "BIRTH CHART", h1 "<Name>'s chart" (or "Your chart" for "My chart"), one-liner "A map of the sky at the moment of birth, seen from <place>. Each box is a sign; the numbers count houses from the Lagna."

@@ -6,7 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./search-endpoint": "./src/search-endpoint.ts"
+    "./search-endpoint": "./src/search-endpoint.ts",
+    "./nearest-endpoint": "./src/nearest-endpoint.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

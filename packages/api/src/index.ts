@@ -8,5 +8,7 @@ export * from './search.ts';
 export * from './http-common.ts';
 export * from './chart-endpoint.ts';
 export * from './search-endpoint.ts';
+export * from './nearest.ts';
+export * from './nearest-endpoint.ts';
 export * from './range.ts';
 export * from './range-endpoint.ts';

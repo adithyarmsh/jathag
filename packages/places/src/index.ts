@@ -289,6 +289,87 @@ export class PlaceIndex {
     });
   }
 
+  // ---- Nearest place (step 0.5.2, D-144) ----------------------------------------------------------
+
+  /** Built on the first nearest() call only, so place search's cold start is unchanged. */
+  private grid: NearestGrid | null = null;
+
+  /** True once the nearest-place grid exists (for timing reports). */
+  get nearestReady(): boolean {
+    return this.grid !== null;
+  }
+
+  /**
+   * The place nearest to a point (great-circle distance), or undefined when none lies within `maxKm`
+   * (default 50). Every place in the index counts (D-144 item 4); on equal distance the lower GeoNames
+   * id wins. Pure: nothing is logged or kept. Latitude −90…90, longitude −180…180 (wraps at ±180°).
+   */
+  nearest(lat: number, lng: number, maxKm = NEAREST_MAX_KM): (Place & { distanceKm: number }) | undefined {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || !(maxKm >= 0)) return undefined;
+    const g = (this.grid ??= this.buildGrid());
+    const dLat = (maxKm / EARTH_RADIUS_KM) * (180 / Math.PI);
+    const lat0 = Math.max(-90, lat - dLat);
+    const lat1 = Math.min(90, lat + dLat);
+    const r0 = cellRow(lat0);
+    const r1 = cellRow(lat1);
+    // Longitude reach at the latitude farthest from the equator in range; near a pole, all of it.
+    const far = Math.max(Math.abs(lat0), Math.abs(lat1));
+    const cos = Math.cos((far * Math.PI) / 180);
+    const allLng = cos < 1e-6 || dLat / cos >= 180;
+    const dLng = allLng ? 180 : dLat / cos;
+    const c0 = Math.floor((lng - dLng + 180) / CELL_DEG);
+    const c1 = Math.floor((lng + dLng + 180) / CELL_DEG);
+    const cols = allLng ? GRID_COLS : Math.min(GRID_COLS, c1 - c0 + 1);
+    let best = -1;
+    let bestKm = Infinity;
+    for (let r = r0; r <= r1; r++) {
+      for (let k = 0; k < cols; k++) {
+        const c = ((((allLng ? k : c0 + k) % GRID_COLS) + GRID_COLS) % GRID_COLS);
+        const cell = r * GRID_COLS + c;
+        for (let j = g.start[cell]!; j < g.start[cell + 1]!; j++) {
+          const i = g.rows[j]!;
+          const km = distanceKm(lat, lng, g.lat[i]!, g.lng[i]!);
+          if (km < bestKm || (km === bestKm && i < best)) {
+            bestKm = km;
+            best = i;
+          }
+        }
+      }
+    }
+    if (best < 0 || bestKm > maxKm) return undefined;
+    return { ...this.place(best), distanceKm: bestKm };
+  }
+
+  /** Every place's coordinates in a 0.5° grid (cells in row order; places in a cell in index order). */
+  private buildGrid(): NearestGrid {
+    const n = this.size;
+    const lat = new Float64Array(n);
+    const lng = new Float64Array(n);
+    const cellOf = new Int32Array(n);
+    const count = new Int32Array(GRID_ROWS * GRID_COLS + 1);
+    const text = this.text;
+    for (let i = 0; i < n; i++) {
+      // Row: id, name, asciiname, alternate names, lat, lon, …
+      let p = this.rowStart[i]!;
+      for (let f = 0; f < 4; f++) p = text.indexOf('\t', p) + 1;
+      const q = text.indexOf('\t', p);
+      const e = text.indexOf('\t', q + 1);
+      const la = Number(text.slice(p, q));
+      const lo = Number(text.slice(q + 1, e));
+      lat[i] = la;
+      lng[i] = lo;
+      const c = cellRow(la) * GRID_COLS + cellCol(lo);
+      cellOf[i] = c;
+      count[c + 1]!++;
+    }
+    for (let c = 0; c < GRID_ROWS * GRID_COLS; c++) count[c + 1]! += count[c]!;
+    const start = count.slice();
+    const fillAt = count.slice();
+    const rows = new Int32Array(n);
+    for (let i = 0; i < n; i++) rows[fillAt[cellOf[i]!]!++] = i;
+    return { lat, lng, start, rows };
+  }
+
   private row(i: number): string[] {
     const s = this.rowStart[i]!;
     return this.text.slice(s, this.text.indexOf('\n', s)).split('\t');
@@ -338,6 +419,34 @@ export class PlaceIndex {
       featureCode: f[10]!,
     };
   }
+}
+
+/** D-144 item 3: nothing is named when no place lies within this distance. */
+export const NEAREST_MAX_KM = 50;
+/** Mean Earth radius (IUGG). */
+const EARTH_RADIUS_KM = 6371.0088;
+const CELL_DEG = 0.5;
+const GRID_ROWS = 180 / CELL_DEG;
+const GRID_COLS = 360 / CELL_DEG;
+
+interface NearestGrid {
+  lat: Float64Array;
+  lng: Float64Array;
+  /** start[cell] … start[cell + 1] = the cell's places in `rows`. */
+  start: Int32Array;
+  rows: Int32Array;
+}
+
+const cellRow = (lat: number) => Math.min(GRID_ROWS - 1, Math.max(0, Math.floor((lat + 90) / CELL_DEG)));
+const cellCol = (lng: number) => ((Math.floor((lng + 180) / CELL_DEG) % GRID_COLS) + GRID_COLS) % GRID_COLS;
+
+/** Great-circle distance in km (haversine). */
+export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLng = (lng2 - lng1) * rad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
 /**

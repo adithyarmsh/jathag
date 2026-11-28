@@ -13,6 +13,7 @@ import {
   PROFILES_KEY,
   readProfiles,
   saveCalculated,
+  setNear,
   touchProfile,
   writeProfiles,
   type BirthInputs,
@@ -91,6 +92,13 @@ export function saveFromForm(birth: BirthInputs, name: string, editingId: string
 /** Opening a profile moves it to the top of the list. */
 export function markOpened(id: string) {
   write(touchProfile(readProfiles(storage()), id, new Date().toISOString()));
+}
+
+/** Saves the nearest place's label with a profile's typed coordinates (D-144 item 5); no-op when unchanged. */
+export function saveNear(id: string, coords: { lat: number; lng: number }, near: string | null) {
+  const before = readProfiles(storage());
+  const after = setNear(before, id, coords, near);
+  if (after.some((p, i) => p !== before[i])) write(after);
 }
 
 export function removeProfile(id: string) {

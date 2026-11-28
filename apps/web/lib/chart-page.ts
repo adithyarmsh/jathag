@@ -141,15 +141,44 @@ export function chartHeading(owner: ChartOwner, t: Messages["chartPage"]): { hea
   return { heading: fill(t.chart.headingNamed, { name: owner.name }), barName: owner.name };
 }
 
+/**
+ * The typed coordinates of a birth as numbers (what the chart request sends), or null for a searched
+ * place (or unreadable text).
+ */
+export function typedCoords(birth: BirthInputs): { lat: number; lng: number } | null {
+  if (birth.where.kind !== "manual") return null;
+  const lat = parseCoordinate(birth.where.manual.lat, "lat");
+  const lng = parseCoordinate(birth.where.manual.lng, "lng");
+  return lat === null || lng === null ? null : { lat, lng };
+}
+
+/**
+ * The place shown in the details bar and in the centre of the drawn charts (and ONLY there, D-144 item
+ * 1): for typed coordinates with a nearest place, "Near Chennai, Tamil Nadu, India"; otherwise the same
+ * as birthPlaceLabel (the searched place's label, or the coordinates).
+ */
+export function shownPlace(birth: BirthInputs, t: Pick<Messages, "chart">): string {
+  if (birth.where.kind === "manual" && birth.where.manual.near) return fill(t.chart.drawing.near, { place: birth.where.manual.near });
+  return birthPlaceLabel(birth, t);
+}
+
+function shortDate(birth: BirthInputs, t: Pick<Messages, "lists">): string {
+  const [y, m, d] = birth.date.split("-").map(Number);
+  return `${d} ${t.lists.monthsShort[m! - 1]} ${y}`;
+}
+
+/** "14 Aug 1992 · 6:45 AM" for the chart centre (no repeated-time note: the details bar has it). */
+export function chartDateTime(birth: BirthInputs, t: Pick<Messages, "chart" | "form" | "lists">): string {
+  return fill(t.chart.drawing.dateTime, { date: shortDate(birth, t), time: to12hText(birthTime24(birth), t.form.time.am, t.form.time.pm) });
+}
+
 /** "14 Aug 1992 · 6:45 AM · Chennai, Tamil Nadu, India" (+ "(the first time)" after a repeated time). */
 export function detailsLine(birth: BirthInputs, t: Pick<Messages, "chart" | "form" | "lists" | "chartPage">): string {
-  const [y, m, d] = birth.date.split("-").map(Number);
-  const date = `${d} ${t.lists.monthsShort[m! - 1]} ${y}`;
   let time = to12hText(birthTime24(birth), t.form.time.am, t.form.time.pm);
   if (birth.repeatedTime) {
     time += ` (${birth.repeatedTime === "earlier" ? t.form.repeatedTime.summaryEarlier : t.form.repeatedTime.summaryLater})`;
   }
-  return fill(t.chartPage.details.line, { date, time, place: birthPlaceLabel(birth, t) });
+  return fill(t.chartPage.details.line, { date: shortDate(birth, t), time, place: shownPlace(birth, t) });
 }
 
 /** "13° 05′ N, 80° 17′ E" from the chart response (shown on desktop). */

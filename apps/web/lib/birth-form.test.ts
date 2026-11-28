@@ -131,7 +131,7 @@ describe("Advanced settings", () => {
 
   it("coordinates ticked: latitude, longitude and the UTC-offset dropdown (UTC+5:30 selected); no clock section", () => {
     const clock = clockChoiceView(MUMBAI, "1940-06-01", en.form.advanced.clock, en.clockNote);
-    const html = advanced({ manualOn: true, clock, latError: en.missing.latitude });
+    const html = advanced({ manualOn: true, coordFormat: "dd", clock, latError: en.missing.latitude }); // DD (0.5.2: DMS is the default)
     expect(html).toContain('id="lat"');
     expect(html).toContain('id="lng"');
     expect(html).toMatch(/<option value="19800" selected="">UTC\+5:30<\/option>/);
